@@ -1,16 +1,16 @@
-defmodule Ecto.TestAdapter do
-  @behaviour Ecto.Adapter
+defmodule EctoOne.TestAdapter do
+  @behaviour EctoOne.Adapter
 
-  alias Ecto.Migration.SchemaMigration
+  alias EctoOne.Migration.SchemaMigration
 
   defmacro __before_compile__(_opts), do: :ok
 
   def start_link(_repo, opts) do
-    Ecto.TestRepo.Pool = opts[:pool_name]
-    Ecto.Pools.Poolboy = opts[:pool]
-    Ecto.TestRepo      = opts[:repo]
+    EctoOne.TestRepo.Pool = opts[:pool_name]
+    EctoOne.Pools.Poolboy = opts[:pool]
+    EctoOne.TestRepo      = opts[:repo]
 
-    :ecto   = opts[:otp_app]
+    :ecto_one   = opts[:otp_app]
     "user"  = opts[:username]
     "pass"  = opts[:password]
     "hello" = opts[:database]
@@ -25,13 +25,13 @@ defmodule Ecto.TestAdapter do
 
   ## Types
 
-  def load(:binary_id, data), do: Ecto.Type.load(Ecto.UUID, data, &load/2)
-  def load(type, data), do: Ecto.Type.load(type, data, &load/2)
+  def load(:binary_id, data), do: EctoOne.Type.load(EctoOne.UUID, data, &load/2)
+  def load(type, data), do: EctoOne.Type.load(type, data, &load/2)
 
-  def dump(:binary_id, data), do: Ecto.Type.dump(Ecto.UUID, data, &dump/2)
-  def dump(type, data), do: Ecto.Type.dump(type, data, &dump/2)
+  def dump(:binary_id, data), do: EctoOne.Type.dump(EctoOne.UUID, data, &dump/2)
+  def dump(type, data), do: EctoOne.Type.dump(type, data, &dump/2)
 
-  def embed_id(%Ecto.Embedded{}), do: Ecto.UUID.generate
+  def embed_id(%EctoOne.Embedded{}), do: EctoOne.UUID.generate
 
   ## Queryable
 
@@ -87,14 +87,14 @@ defmodule Ecto.TestAdapter do
     try do
       {:ok, fun.()}
     catch
-      :throw, {:ecto_rollback, value} ->
+      :throw, {:ecto_one_rollback, value} ->
         {:error, value}
     end
   end
 
   def rollback(_repo, value) do
     send self, {:rollback, value}
-    throw {:ecto_rollback, value}
+    throw {:ecto_one_rollback, value}
   end
 
   ## Migrations
@@ -113,10 +113,10 @@ defmodule Ecto.TestAdapter do
   end
 end
 
-Application.put_env(:ecto, Ecto.TestRepo, [user: "invalid"])
+Application.put_env(:ecto_one, EctoOne.TestRepo, [user: "invalid"])
 
-defmodule Ecto.TestRepo do
-  use Ecto.Repo, otp_app: :ecto, adapter: Ecto.TestAdapter
+defmodule EctoOne.TestRepo do
+  use EctoOne.Repo, otp_app: :ecto_one, adapter: EctoOne.TestAdapter
 end
 
-Ecto.TestRepo.start_link(url: "ecto://user:pass@local/hello")
+EctoOne.TestRepo.start_link(url: "ecto_one://user:pass@local/hello")

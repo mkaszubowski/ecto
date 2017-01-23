@@ -1,4 +1,4 @@
-defmodule Ecto.Schema do
+defmodule EctoOne.Schema do
   @moduledoc ~S"""
   Defines a schema for a model.
 
@@ -9,7 +9,7 @@ defmodule Ecto.Schema do
   ## Example
 
       defmodule User do
-        use Ecto.Schema
+        use EctoOne.Schema
 
         schema "users" do
           field :name, :string
@@ -39,7 +39,7 @@ defmodule Ecto.Schema do
       used by `belongs_to` associations. Defaults to `:integer`;
 
     * `@timestamps_opts` - configures the default timestamps type
-      used by `timestamps`. Defaults to `[type: Ecto.DateTime, usec: false]`;
+      used by `timestamps`. Defaults to `[type: EctoOne.DateTime, usec: false]`;
 
     * `@derive` - the same as `@derive` available in `Kernel.defstruct/1`
       as the schema defines a struct behind the scenes;
@@ -56,7 +56,7 @@ defmodule Ecto.Schema do
       defmodule MyApp.Schema do
         defmacro __using__(_) do
           quote do
-            use Ecto.Schema
+            use EctoOne.Schema
             @primary_key {:id, :binary_id, autogenerate: true}
             @foreign_key_type :binary_id
           end
@@ -82,12 +82,12 @@ defmodule Ecto.Schema do
 
   ## Primary keys
 
-  Ecto supports two ID types, called `:id` and `:binary_id` which are
+  EctoOne supports two ID types, called `:id` and `:binary_id` which are
   often used as the type for primary keys and associations.
 
   The `:id` type is used when the primary key is an integer while the
   `:binary_id` is used when the primary key is in binary format, which
-  may be `Ecto.UUID` for databases like PostgreSQL and MySQL, or some
+  may be `EctoOne.UUID` for databases like PostgreSQL and MySQL, or some
   specific ObjectID or RecordID often imposed by NoSQL databases.
 
   In both cases, both types have their semantics specified by the
@@ -98,10 +98,10 @@ defmodule Ecto.Schema do
   Similarly, the `:binary_id` type may be generated in the adapter
   for cases like UUID but it may also be handled by the database if
   required. In any case, both scenarios are handled transparently by
-  Ecto.
+  EctoOne.
 
   Besides `:id` and `:binary_id`, which are often used by primary
-  and foreign keys, Ecto provides a huge variety of types to be used
+  and foreign keys, EctoOne provides a huge variety of types to be used
   by the remaining columns.
 
   ## Types and casting
@@ -113,7 +113,7 @@ defmodule Ecto.Schema do
 
   The primitive types are:
 
-  Ecto type               | Elixir type             | Literal syntax in query
+  EctoOne type               | Elixir type             | Literal syntax in query
   :---------------------- | :---------------------- | :---------------------
   `:id`                   | `integer`               | 1, 2, 3
   `:binary_id`            | `binary`                | `<<int, int, int, ...>>`
@@ -131,20 +131,20 @@ defmodule Ecto.Schema do
 
   ### Custom types
 
-  Besides providing primitive types, Ecto allows custom types to be
-  implemented by developers, allowing Ecto behaviour to be extended.
+  Besides providing primitive types, EctoOne allows custom types to be
+  implemented by developers, allowing EctoOne behaviour to be extended.
 
-  A custom type is a module that implements the `Ecto.Type` behaviour.
-  By default, Ecto provides the following custom types:
+  A custom type is a module that implements the `EctoOne.Type` behaviour.
+  By default, EctoOne provides the following custom types:
 
   Custom type             | Database type           | Elixir type
   :---------------------- | :---------------------- | :---------------------
-  `Ecto.DateTime`         | `:datetime`             | `%Ecto.DateTime{}`
-  `Ecto.Date`             | `:date`                 | `%Ecto.Date{}`
-  `Ecto.Time`             | `:time`                 | `%Ecto.Time{}`
-  `Ecto.UUID`             | `:uuid`                 | "uuid-string"
+  `EctoOne.DateTime`         | `:datetime`             | `%EctoOne.DateTime{}`
+  `EctoOne.Date`             | `:date`                 | `%EctoOne.Date{}`
+  `EctoOne.Time`             | `:time`                 | `%EctoOne.Time{}`
+  `EctoOne.UUID`             | `:uuid`                 | "uuid-string"
 
-  Read the `Ecto.Type` documentation for more information on implementing
+  Read the `EctoOne.Type` documentation for more information on implementing
   your own types.
 
   ### The map type
@@ -176,15 +176,15 @@ defmodule Ecto.Schema do
   the other hand, do not yet provide a JSON type, so the value will be
   stored in a text field.
 
-  For maps to work in such databases, Ecto will need a JSON library.
-  By default Ecto will use [Poison](http://github.com/devinus/poison)
+  For maps to work in such databases, EctoOne will need a JSON library.
+  By default EctoOne will use [Poison](http://github.com/devinus/poison)
   which needs to be added your deps in `mix.exs`:
 
       {:poison, "~> 1.0"}
 
-  You can however tell Ecto to use any other library by configuring it:
+  You can however tell EctoOne to use any other library by configuring it:
 
-      config :ecto, :json_library, YourLibraryOfChoice
+      config :ecto_one, :json_library, YourLibraryOfChoice
 
   ### Casting
 
@@ -198,18 +198,18 @@ defmodule Ecto.Schema do
       "0"
 
   However, if you attempt to persist the struct above, an error will
-  be raised since Ecto validates the types when sending them to the
+  be raised since EctoOne validates the types when sending them to the
   adapter/database.
 
   Therefore, when working and manipulating external data, it is
-  recommended the usage of `Ecto.Changeset`'s that are able to filter
+  recommended the usage of `EctoOne.Changeset`'s that are able to filter
   and properly cast external data:
 
-      changeset = Ecto.Changeset.cast(%User{}, %{"age" => "0"}, [:age], [])
+      changeset = EctoOne.Changeset.cast(%User{}, %{"age" => "0"}, [:age], [])
       user = Repo.insert!(changeset)
 
-  In fact, `Ecto.Changeset` and custom types provide a powerful
-  combination to extend Ecto types and queries.
+  In fact, `EctoOne.Changeset` and custom types provide a powerful
+  combination to extend EctoOne types and queries.
 
   Finally, models can also have virtual fields by passing the
   `virtual: true` option. These fields are not persisted to the database
@@ -264,7 +264,7 @@ defmodule Ecto.Schema do
       import Inspect.Algebra
 
       def inspect(metadata, opts) do
-        concat ["#Ecto.Schema.Metadata<", to_doc(metadata.state, opts), ">"]
+        concat ["#EctoOne.Schema.Metadata<", to_doc(metadata.state, opts), ">"]
       end
     end
   end
@@ -272,20 +272,20 @@ defmodule Ecto.Schema do
   @doc false
   defmacro __using__(_) do
     quote do
-      import Ecto.Schema, only: [schema: 2, embedded_schema: 1]
+      import EctoOne.Schema, only: [schema: 2, embedded_schema: 1]
 
       @primary_key {:id, :id, autogenerate: true}
       @timestamps_opts []
       @foreign_key_type :id
-      @before_compile Ecto.Schema
+      @before_compile EctoOne.Schema
 
-      Module.register_attribute(__MODULE__, :ecto_fields, accumulate: true)
-      Module.register_attribute(__MODULE__, :ecto_assocs, accumulate: true)
-      Module.register_attribute(__MODULE__, :ecto_embeds, accumulate: true)
-      Module.register_attribute(__MODULE__, :ecto_raw, accumulate: true)
-      Module.register_attribute(__MODULE__, :ecto_autogenerate_insert, accumulate: true)
-      Module.register_attribute(__MODULE__, :ecto_autogenerate_update, accumulate: true)
-      Module.put_attribute(__MODULE__, :ecto_autogenerate_id, nil)
+      Module.register_attribute(__MODULE__, :ecto_one_fields, accumulate: true)
+      Module.register_attribute(__MODULE__, :ecto_one_assocs, accumulate: true)
+      Module.register_attribute(__MODULE__, :ecto_one_embeds, accumulate: true)
+      Module.register_attribute(__MODULE__, :ecto_one_raw, accumulate: true)
+      Module.register_attribute(__MODULE__, :ecto_one_autogenerate_insert, accumulate: true)
+      Module.register_attribute(__MODULE__, :ecto_one_autogenerate_update, accumulate: true)
+      Module.put_attribute(__MODULE__, :ecto_one_autogenerate_id, nil)
     end
   end
 
@@ -325,34 +325,34 @@ defmodule Ecto.Schema do
           false ->
             []
           {name, type, opts} ->
-            Ecto.Schema.__field__(__MODULE__, name, type, true, opts)
+            EctoOne.Schema.__field__(__MODULE__, name, type, true, opts)
             [name]
           other ->
             raise ArgumentError, "@primary_key must be false or {name, type, opts}"
         end
 
       try do
-        import Ecto.Schema
+        import EctoOne.Schema
         unquote(block)
       after
         :ok
       end
 
-      fields = @ecto_fields |> Enum.reverse
-      assocs = @ecto_assocs |> Enum.reverse
-      embeds = @ecto_embeds |> Enum.reverse
+      fields = @ecto_one_fields |> Enum.reverse
+      assocs = @ecto_one_assocs |> Enum.reverse
+      embeds = @ecto_one_embeds |> Enum.reverse
 
       Module.eval_quoted __ENV__, [
-        Ecto.Schema.__defstruct__(@struct_fields),
-        Ecto.Schema.__changeset__(@changeset_fields),
-        Ecto.Schema.__schema__(source, fields, primary_key_fields),
-        Ecto.Schema.__types__(fields),
-        Ecto.Schema.__assocs__(assocs),
-        Ecto.Schema.__embeds__(embeds),
-        Ecto.Schema.__read_after_writes__(@ecto_raw),
-        Ecto.Schema.__autogenerate__(@ecto_autogenerate_id,
-                                     @ecto_autogenerate_insert,
-                                     @ecto_autogenerate_update)]
+        EctoOne.Schema.__defstruct__(@struct_fields),
+        EctoOne.Schema.__changeset__(@changeset_fields),
+        EctoOne.Schema.__schema__(source, fields, primary_key_fields),
+        EctoOne.Schema.__types__(fields),
+        EctoOne.Schema.__assocs__(assocs),
+        EctoOne.Schema.__embeds__(embeds),
+        EctoOne.Schema.__read_after_writes__(@ecto_one_raw),
+        EctoOne.Schema.__autogenerate__(@ecto_one_autogenerate_id,
+                                     @ecto_one_autogenerate_insert,
+                                     @ecto_one_autogenerate_update)]
     end
   end
 
@@ -365,7 +365,7 @@ defmodule Ecto.Schema do
 
     * `:default` - Sets the default value on the schema and the struct.
       The default value is calculated at compilation time, so don't use
-      expressions like `Ecto.DateTime.utc` or `Ecto.UUID.generate` as
+      expressions like `EctoOne.DateTime.utc` or `EctoOne.UUID.generate` as
       they would then be the same for all records
 
     * `:autogenerate` - Annotates the field to be autogenerated before
@@ -386,20 +386,20 @@ defmodule Ecto.Schema do
   """
   defmacro field(name, type \\ :string, opts \\ []) do
     quote do
-      Ecto.Schema.__field__(__MODULE__, unquote(name), unquote(type), false, unquote(opts))
+      EctoOne.Schema.__field__(__MODULE__, unquote(name), unquote(type), false, unquote(opts))
     end
   end
 
   @doc """
   Generates `:inserted_at` and `:updated_at` timestamp fields.
 
-  When using `Ecto.Model`, the fields generated by this macro
+  When using `EctoOne.Model`, the fields generated by this macro
   will automatically be set to the current time when inserting
   and updating values in a repository.
 
   ## Options
 
-    * `:type` - the timestamps type, defaults to `Ecto.DateTime`.
+    * `:type` - the timestamps type, defaults to `EctoOne.DateTime`.
     * `:usec` - boolean, sets whether microseconds are used in timestamps.
       Microseconds will be 0 if false. Defaults to false.
     * `:inserted_at` - the name of the column for insertion times or `false`
@@ -411,7 +411,7 @@ defmodule Ecto.Schema do
     quote bind_quoted: binding do
       timestamps =
         [inserted_at: :inserted_at, updated_at: :updated_at,
-         type: Ecto.DateTime, usec: false]
+         type: EctoOne.DateTime, usec: false]
         |> Keyword.merge(@timestamps_opts)
         |> Keyword.merge(opts)
 
@@ -419,14 +419,14 @@ defmodule Ecto.Schema do
       autogen = if Keyword.fetch!(timestamps, :usec), do: [:usec], else: []
 
       if inserted_at = Keyword.fetch!(timestamps, :inserted_at) do
-        Ecto.Schema.field(inserted_at, type, [])
-        Module.put_attribute(__MODULE__, :ecto_autogenerate_insert, {inserted_at, Ecto.DateTime, autogen})
+        EctoOne.Schema.field(inserted_at, type, [])
+        Module.put_attribute(__MODULE__, :ecto_one_autogenerate_insert, {inserted_at, EctoOne.DateTime, autogen})
       end
 
       if updated_at = Keyword.fetch!(timestamps, :updated_at) do
-        Ecto.Schema.field(updated_at, type, [])
-        Module.put_attribute(__MODULE__, :ecto_autogenerate_insert, {updated_at, Ecto.DateTime, autogen})
-        Module.put_attribute(__MODULE__, :ecto_autogenerate_update, {updated_at, Ecto.DateTime, autogen})
+        EctoOne.Schema.field(updated_at, type, [])
+        Module.put_attribute(__MODULE__, :ecto_one_autogenerate_insert, {updated_at, EctoOne.DateTime, autogen})
+        Module.put_attribute(__MODULE__, :ecto_one_autogenerate_update, {updated_at, EctoOne.DateTime, autogen})
       end
     end
   end
@@ -458,10 +458,10 @@ defmodule Ecto.Schema do
     * `:on_replace` - The action taken on associations when the model is
       replaced   when casting or manipulating parent changeset. May be
       `:raise` (default), `:mark_as_invalid`, `:nilify`, or `:delete`.
-      See `Ecto.Changeset`'s section on related models for more info.
+      See `EctoOne.Changeset`'s section on related models for more info.
 
     * `:on_cast` - The default changeset function to call during casting
-      of a nested association which can be overridden in `Ecto.Changeset.cast/4`.
+      of a nested association which can be overridden in `EctoOne.Changeset.cast/4`.
       It's an atom representing the function name in the associated model's
       module which will receive the module and the parameters for casting
       (default: `:changeset`)
@@ -471,7 +471,7 @@ defmodule Ecto.Schema do
   ## Examples
 
       defmodule Post do
-        use Ecto.Schema
+        use EctoOne.Schema
         schema "posts" do
           has_many :comments, Comment
         end
@@ -487,11 +487,11 @@ defmodule Ecto.Schema do
 
   ## has_many/has_one :through
 
-  Ecto also supports defining associations in terms of other associations
+  EctoOne also supports defining associations in terms of other associations
   via the `:through` option. Let's see an example:
 
       defmodule Post do
-        use Ecto.Schema
+        use EctoOne.Schema
 
         schema "posts" do
           has_many :comments, Comment
@@ -511,7 +511,7 @@ defmodule Ecto.Schema do
       end
 
       defmodule Comment do
-        use Ecto.Schema
+        use EctoOne.Schema
 
         schema "comments" do
           belongs_to :author, Author
@@ -567,7 +567,7 @@ defmodule Ecto.Schema do
   """
   defmacro has_many(name, queryable, opts \\ []) do
     quote do
-      Ecto.Schema.__has_many__(__MODULE__, unquote(name), unquote(queryable), unquote(opts))
+      EctoOne.Schema.__has_many__(__MODULE__, unquote(name), unquote(queryable), unquote(opts))
     end
   end
 
@@ -598,10 +598,10 @@ defmodule Ecto.Schema do
     * `:on_replace` - The action taken on associations when the model is
       replaced   when casting or manipulating parent changeset. May be
       `:raise` (default), `:mark_as_invalid`, `:nilify`, or `:delete`.
-      See `Ecto.Changeset`'s section on related models for more info.
+      See `EctoOne.Changeset`'s section on related models for more info.
 
     * `:on_cast` - The default changeset function to call during casting
-      of a nested association which can be overridden in `Ecto.Changeset.cast/4`.
+      of a nested association which can be overridden in `EctoOne.Changeset.cast/4`.
       It's an atom representing the function name in the associated model's
       module which will receive the module and the parameters for casting
       (default: `:changeset`)
@@ -611,7 +611,7 @@ defmodule Ecto.Schema do
   ## Examples
 
       defmodule Post do
-        use Ecto.Schema
+        use EctoOne.Schema
 
         schema "posts" do
           has_one :permalink, Permalink
@@ -628,7 +628,7 @@ defmodule Ecto.Schema do
   """
   defmacro has_one(name, queryable, opts \\ []) do
     quote do
-      Ecto.Schema.__has_one__(__MODULE__, unquote(name), unquote(queryable), unquote(opts))
+      EctoOne.Schema.__has_one__(__MODULE__, unquote(name), unquote(queryable), unquote(opts))
     end
   end
 
@@ -666,7 +666,7 @@ defmodule Ecto.Schema do
   ## Examples
 
       defmodule Comment do
-        use Ecto.Schema
+        use EctoOne.Schema
 
         schema "comments" do
           belongs_to :post, Post
@@ -694,7 +694,7 @@ defmodule Ecto.Schema do
   the database. You can't use foreign keys and it is very inneficient
   both in terms of query time and storage.
 
-  In Ecto, we have two ways to solve this issue. The simplest one
+  In EctoOne, we have two ways to solve this issue. The simplest one
   is to define multiple fields in the Comment model, one for each
   association:
 
@@ -704,12 +704,12 @@ defmodule Ecto.Schema do
   Unless you have dozens of columns, this is simpler for the developer,
   more DB friendly and more efficient on all aspects.
 
-  Alternatively, because Ecto does not tie a model to a given table,
+  Alternatively, because EctoOne does not tie a model to a given table,
   we can use separate tables for each association. Let's start over
   and define a new Comment model:
 
       defmodule Comment do
-        use Ecto.Schema
+        use EctoOne.Schema
 
         schema "abstract table: comments" do
           # This will be used by associations on each "concrete" table
@@ -724,7 +724,7 @@ defmodule Ecto.Schema do
   Now in your Post and Task models:
 
       defmodule Post do
-        use Ecto.Schema
+        use EctoOne.Schema
 
         schema "posts" do
           has_many :comments, {"posts_comments", Comment}, foreign_key: :assoc_id
@@ -732,7 +732,7 @@ defmodule Ecto.Schema do
       end
 
       defmodule Task do
-        use Ecto.Schema
+        use EctoOne.Schema
 
         schema "tasks" do
           has_many :comments, {"tasks_comments", Comment}, foreign_key: :assoc_id
@@ -753,8 +753,8 @@ defmodule Ecto.Schema do
 
       Repo.insert!(build_assoc(post, :comments))
 
-  where `build/2` is defined in `Ecto.Model`. You can also
-  use `assoc/2` in both `Ecto.Model` and in the query syntax
+  where `build/2` is defined in `EctoOne.Model`. You can also
+  use `assoc/2` in both `EctoOne.Model` and in the query syntax
   to easily retrieve associated comments to a given post or
   task:
 
@@ -770,7 +770,7 @@ defmodule Ecto.Schema do
   """
   defmacro belongs_to(name, queryable, opts \\ []) do
     quote do
-      Ecto.Schema.__belongs_to__(__MODULE__, unquote(name), unquote(queryable), unquote(opts))
+      EctoOne.Schema.__belongs_to__(__MODULE__, unquote(name), unquote(queryable), unquote(opts))
     end
   end
 
@@ -792,23 +792,23 @@ defmodule Ecto.Schema do
   ## Options
 
     * `:on_cast` - the default changeset function to call during casting,
-      which can be overridden in `Ecto.Changeset.cast/4`. It's an atom representing
+      which can be overridden in `EctoOne.Changeset.cast/4`. It's an atom representing
       the function name in the embedded model's module which will receive
       the module and the parameters for casting (default: `:changeset`).
 
     * `:strategy` - the strategy for storing models in the database.
-      Ecto supports only the `:replace` strategy out of the box which is the
+      EctoOne supports only the `:replace` strategy out of the box which is the
       default. Read the strategy in `embeds_many/3` for more info.
 
     * `:on_replace` - The action taken on associations when the model is
       replaced   when casting or manipulating parent changeset. May be
       `:raise` (default), `:mark_as_invalid`, or `:delete`.
-      See `Ecto.Changeset`'s section on related models for more info.
+      See `EctoOne.Changeset`'s section on related models for more info.
 
   ## Examples
 
       defmodule Order do
-        use Ecto.Schema
+        use EctoOne.Schema
 
         schema "orders" do
           embeds_one :item, Item
@@ -816,7 +816,7 @@ defmodule Ecto.Schema do
       end
 
       defmodule Item do
-        use Ecto.Schema
+        use EctoOne.Schema
 
         # A required field for all embedded documents
         @primary_key {:id, :binary_id, autogenerate: true}
@@ -829,23 +829,23 @@ defmodule Ecto.Schema do
       order = Repo.get!(Order, 42)
       order.item #=> %Item{...}
 
-  Adding and removal of embeds can only be done via the `Ecto.Changeset`
-  API so Ecto can properly track the embeded model life-cycle:
+  Adding and removal of embeds can only be done via the `EctoOne.Changeset`
+  API so EctoOne can properly track the embeded model life-cycle:
 
       order = Repo.get!(Order, 42)
 
       # Generate a changeset
-      changeset = Ecto.Changeset.change(order)
+      changeset = EctoOne.Changeset.change(order)
 
       # Change, put a new one or remove an item
-      changeset = Ecto.Changeset.put_change(order, :item, nil)
+      changeset = EctoOne.Changeset.put_change(order, :item, nil)
 
       # Update the order
       changeset = Repo.update!(changeset)
   """
   defmacro embeds_one(name, model, opts \\ []) do
     quote do
-      Ecto.Schema.__embeds_one__(__MODULE__, unquote(name), unquote(model), unquote(opts))
+      EctoOne.Schema.__embeds_one__(__MODULE__, unquote(name), unquote(model), unquote(opts))
     end
   end
 
@@ -858,30 +858,30 @@ defmodule Ecto.Schema do
 
   It is recommended to declare your `embeds_many/3` field with type
   `{:array, :map}` and default value of `[]` at the database level.
-  In fact, Ecto will automatically translate `nil` values from the
+  In fact, EctoOne will automatically translate `nil` values from the
   database into empty lists for embeds many (this behaviour is specific
   to `embeds_many/3` fields in order to mimic `has_many/3`).
 
   ## Options
 
     * `:on_cast` - the default changeset function to call during casting,
-      which can be overridden in `Ecto.Changeset.cast/4`. It's an atom representing
+      which can be overridden in `EctoOne.Changeset.cast/4`. It's an atom representing
       the function name in the embedded model's module which will receive
       the module and the parameters for casting (default: `:changeset`).
 
     * `:strategy` - the strategy for storing models in the database.
-      Ecto supports only the `:replace` strategy out of the box which is the
+      EctoOne supports only the `:replace` strategy out of the box which is the
       default. Read strategy section below for more info.
 
     * `:on_replace` - The action taken on associations when the model is
       replaced   when casting or manipulating parent changeset. May be
       `:raise` (default), `:mark_as_invalid`, or `:delete`.
-      See `Ecto.Changeset`'s section on related models for more info.
+      See `EctoOne.Changeset`'s section on related models for more info.
 
   ## Examples
 
       defmodule Order do
-        use Ecto.Schema
+        use EctoOne.Schema
 
         schema "orders" do
           embeds_many :items, Item
@@ -889,7 +889,7 @@ defmodule Ecto.Schema do
       end
 
       defmodule Item do
-        use Ecto.Schema
+        use EctoOne.Schema
 
         # embedded_schema is a shorcut for:
         #
@@ -905,16 +905,16 @@ defmodule Ecto.Schema do
       order = Repo.get!(Order, 42)
       order.items #=> [%Item{...}, ...]
 
-  Adding and removal of embeds can only be done via the `Ecto.Changeset`
-  API so Ecto can properly track the embeded models life-cycle:
+  Adding and removal of embeds can only be done via the `EctoOne.Changeset`
+  API so EctoOne can properly track the embeded models life-cycle:
 
       order = Repo.get!(Order, 42)
 
       # Generate a changeset
-      changeset = Ecto.Changeset.change(order)
+      changeset = EctoOne.Changeset.change(order)
 
       # Change, put a new one or remove all items
-      changeset = Ecto.Changeset.put_change(order, :items, [])
+      changeset = EctoOne.Changeset.put_change(order, :items, [])
 
       # Update the order
       changeset = Repo.update!(changeset)
@@ -926,7 +926,7 @@ defmodule Ecto.Schema do
   the database, although embeds_many will always have them as a list in the
   model.
 
-  Ecto supports only the `:replace` strategy out of the box which is the
+  EctoOne supports only the `:replace` strategy out of the box which is the
   default. This means all embeds in the model always fully replace the entries
   in the database.
 
@@ -942,7 +942,7 @@ defmodule Ecto.Schema do
   """
   defmacro embeds_many(name, model, opts \\ []) do
     quote do
-      Ecto.Schema.__embeds_many__(__MODULE__, unquote(name), unquote(model), unquote(opts))
+      EctoOne.Schema.__embeds_many__(__MODULE__, unquote(name), unquote(model), unquote(opts))
     end
   end
 
@@ -957,7 +957,7 @@ defmodule Ecto.Schema do
     loaded = do_load(struct, fields, data, loader)
     loaded = Map.put(loaded, :__meta__,
                      %Metadata{state: :loaded, source: {prefix, source}, context: context})
-    Ecto.Model.Callbacks.__apply__(model, :after_load, loaded)
+    EctoOne.Model.Callbacks.__apply__(model, :after_load, loaded)
   end
 
   defp do_load(struct, fields, map, loader) when is_map(map) do
@@ -995,7 +995,7 @@ defmodule Ecto.Schema do
 
     unless opts[:virtual] do
       if raw = opts[:read_after_writes] do
-        Module.put_attribute(mod, :ecto_raw, name)
+        Module.put_attribute(mod, :ecto_one_raw, name)
       end
 
       if gen = opts[:autogenerate] do
@@ -1006,7 +1006,7 @@ defmodule Ecto.Schema do
         raise ArgumentError, "cannot mark the same field as autogenerate and read_after_writes"
       end
 
-      Module.put_attribute(mod, :ecto_fields, {name, type})
+      Module.put_attribute(mod, :ecto_one_fields, {name, type})
     end
   end
 
@@ -1023,10 +1023,10 @@ defmodule Ecto.Schema do
     end
 
     if is_list(queryable) and Keyword.has_key?(queryable, :through) do
-      association(mod, :many, name, Ecto.Association.HasThrough, queryable)
+      association(mod, :many, name, EctoOne.Association.HasThrough, queryable)
     else
       struct =
-        association(mod, :many, name, Ecto.Association.Has, [queryable: queryable] ++ opts)
+        association(mod, :many, name, EctoOne.Association.Has, [queryable: queryable] ++ opts)
       Module.put_attribute(mod, :changeset_fields, {name, {:assoc, struct}})
     end
   end
@@ -1036,10 +1036,10 @@ defmodule Ecto.Schema do
     check_options!(opts, @valid_has_options, "has_one/3")
 
     if is_list(queryable) and Keyword.has_key?(queryable, :through) do
-      association(mod, :one, name, Ecto.Association.HasThrough, queryable)
+      association(mod, :one, name, EctoOne.Association.HasThrough, queryable)
     else
       struct =
-        association(mod, :one, name, Ecto.Association.Has, [queryable: queryable] ++ opts)
+        association(mod, :one, name, EctoOne.Association.Has, [queryable: queryable] ++ opts)
       Module.put_attribute(mod, :changeset_fields, {name, {:assoc, struct}})
     end
   end
@@ -1055,7 +1055,7 @@ defmodule Ecto.Schema do
       __field__(mod, opts[:foreign_key], foreign_key_type, false, opts)
     end
 
-    association(mod, :one, name, Ecto.Association.BelongsTo, [queryable: queryable] ++ opts)
+    association(mod, :one, name, EctoOne.Association.BelongsTo, [queryable: queryable] ++ opts)
   end
 
   @doc false
@@ -1185,31 +1185,31 @@ defmodule Ecto.Schema do
   @doc false
   def __before_compile__(env) do
     unless Module.get_attribute(env.module, :struct_fields) do
-      raise "module #{inspect env.module} uses Ecto.Model (or Ecto.Schema) but it " <>
+      raise "module #{inspect env.module} uses EctoOne.Model (or EctoOne.Schema) but it " <>
             "does not define a schema. Please cherry pick the functionality you want " <>
-            "instead, for example, by importing Ecto.Query, Ecto.Model or others"
+            "instead, for example, by importing EctoOne.Query, EctoOne.Model or others"
     end
   end
 
   ## Private
 
   defp association(mod, cardinality, name, association, opts) do
-    not_loaded  = %Ecto.Association.NotLoaded{__owner__: mod,
+    not_loaded  = %EctoOne.Association.NotLoaded{__owner__: mod,
                     __field__: name, __cardinality__: cardinality}
     put_struct_field(mod, name, not_loaded)
     opts = [cardinality: cardinality] ++ opts
     struct = association.struct(mod, name, opts)
-    Module.put_attribute(mod, :ecto_assocs, {name, struct})
+    Module.put_attribute(mod, :ecto_one_assocs, {name, struct})
 
     struct
   end
 
   defp embed(mod, cardinality, name, model, opts) do
     opts   = [cardinality: cardinality, related: model] ++ opts
-    struct = Ecto.Embedded.struct(mod, name, opts)
+    struct = EctoOne.Embedded.struct(mod, name, opts)
 
     __field__(mod, name, {:embed, struct}, false, opts)
-    Module.put_attribute(mod, :ecto_embeds, {name, struct})
+    Module.put_attribute(mod, :ecto_one_embeds, {name, struct})
   end
 
   defp put_struct_field(mod, name, assoc) do
@@ -1225,7 +1225,7 @@ defmodule Ecto.Schema do
   defp check_options!(opts, valid, fun_arity) do
     if opts[:on_cast] do
       IO.write :stderr, "warning: :on_cast option for #{fun_arity} is deprecated, " <>
-                        "pass :with option to Ecto.Changeset.cast_embed/cast_assoc\n" <>
+                        "pass :with option to EctoOne.Changeset.cast_embed/cast_assoc\n" <>
                         Exception.format_stacktrace
     end
 
@@ -1242,7 +1242,7 @@ defmodule Ecto.Schema do
       type == :any and not virtual? ->
         raise ArgumentError, "only virtual fields can have type :any, " <>
                              "invalid type for field #{inspect name}"
-      Ecto.Type.primitive?(type) and not type in [:date, :time, :datetime] ->
+      EctoOne.Type.primitive?(type) and not type in [:date, :time, :datetime] ->
         true
       is_atom(type) ->
         if Code.ensure_compiled?(type) and function_exported?(type, :type, 0) do
@@ -1261,20 +1261,20 @@ defmodule Ecto.Schema do
   end
 
   defp raise_type_error_hint(:datetime),
-    do: ". Maybe you meant to use Ecto.DateTime?"
+    do: ". Maybe you meant to use EctoOne.DateTime?"
   defp raise_type_error_hint(:date),
-    do: ". Maybe you meant to use Ecto.Date?"
+    do: ". Maybe you meant to use EctoOne.Date?"
   defp raise_type_error_hint(:time),
-    do: ". Maybe you meant to use Ecto.Time?"
+    do: ". Maybe you meant to use EctoOne.Time?"
   defp raise_type_error_hint(:uuid),
-    do: ". Maybe you meant to use Ecto.UUID?"
+    do: ". Maybe you meant to use EctoOne.UUID?"
   defp raise_type_error_hint(_),
     do: ""
 
   defp check_default!(_name, :binary_id, _default), do: :ok
   defp check_default!(_name, {:embed, _}, _default), do: :ok
   defp check_default!(name, type, default) do
-    case Ecto.Type.dump(type, default) do
+    case EctoOne.Type.dump(type, default) do
       {:ok, _} ->
         :ok
       :error ->
@@ -1285,11 +1285,11 @@ defmodule Ecto.Schema do
 
   defp store_autogenerate!(mod, name, type, true) do
     if id = autogenerate_id(type) do
-      if Module.get_attribute(mod, :ecto_autogenerate_id) do
+      if Module.get_attribute(mod, :ecto_one_autogenerate_id) do
         raise ArgumentError, "only one primary key with ID type may be marked as autogenerated"
       end
 
-      Module.put_attribute(mod, :ecto_autogenerate_id, {name, id})
+      Module.put_attribute(mod, :ecto_one_autogenerate_id, {name, id})
     else
       store_autogenerate!(mod, name, type, false)
     end
@@ -1301,7 +1301,7 @@ defmodule Ecto.Schema do
         raise ArgumentError, "only primary keys allow :autogenerate for type #{inspect type}, " <>
                              "field #{inspect name} is not a primary key"
 
-      Ecto.Type.primitive?(type) ->
+      EctoOne.Type.primitive?(type) ->
         raise ArgumentError, "field #{inspect name} does not support :autogenerate because it uses a " <>
                              "primitive type #{inspect type}"
 
@@ -1311,12 +1311,12 @@ defmodule Ecto.Schema do
                              "custom type #{inspect type} that does not define generate/0"
 
       true ->
-        Module.put_attribute(mod, :ecto_autogenerate_insert, {name, type, []})
+        Module.put_attribute(mod, :ecto_one_autogenerate_insert, {name, type, []})
     end
   end
 
   defp autogenerate_id(type) do
-    id = if Ecto.Type.primitive?(type), do: type, else: type.type
+    id = if EctoOne.Type.primitive?(type), do: type, else: type.type
     if id in [:id, :binary_id], do: id, else: nil
   end
 

@@ -1,8 +1,8 @@
-defmodule Ecto.Query.Builder.Update do
+defmodule EctoOne.Query.Builder.Update do
   @moduledoc false
 
   @keys [:set, :inc, :push, :pull]
-  alias Ecto.Query.Builder
+  alias EctoOne.Query.Builder
 
   @doc """
   Escapes a list of quoted expressions.
@@ -90,7 +90,7 @@ defmodule Ecto.Query.Builder.Update do
         params = Builder.escape_params(params)
 
         update = quote do
-          %Ecto.Query.QueryExpr{expr: unquote(compile), params: unquote(params),
+          %EctoOne.Query.QueryExpr{expr: unquote(compile), params: unquote(params),
                                 file: unquote(env.file), line: unquote(env.line)}
         end
 
@@ -102,7 +102,7 @@ defmodule Ecto.Query.Builder.Update do
         query
       else
         update = quote do
-          Ecto.Query.Builder.Update.runtime(unquote(runtime), unquote(env.line), unquote(env.file))
+          EctoOne.Query.Builder.Update.runtime(unquote(runtime), unquote(env.line), unquote(env.file))
         end
 
         Builder.apply_query(query, __MODULE__, [update], env)
@@ -114,9 +114,9 @@ defmodule Ecto.Query.Builder.Update do
   @doc """
   The callback applied by `build/4` to build the query.
   """
-  @spec apply(Ecto.Queryable.t, term) :: Ecto.Query.t
+  @spec apply(EctoOne.Queryable.t, term) :: EctoOne.Query.t
   def apply(query, updates) do
-    query = Ecto.Queryable.to_query(query)
+    query = EctoOne.Queryable.to_query(query)
     %{query | updates: query.updates ++ [updates]}
   end
 
@@ -125,7 +125,7 @@ defmodule Ecto.Query.Builder.Update do
   we need to handle them at runtime. We do such in
   this callback.
   """
-  @spec runtime(term, line :: integer, file :: binary) :: Ecto.Query.t
+  @spec runtime(term, line :: integer, file :: binary) :: EctoOne.Query.t
   def runtime(runtime, line, file) when is_list(runtime) do
     {runtime, {params, _count}} =
       Enum.map_reduce runtime, {[], 0}, fn
@@ -137,7 +137,7 @@ defmodule Ecto.Query.Builder.Update do
           runtime_error! runtime
       end
 
-    %Ecto.Query.QueryExpr{expr: runtime, params: Enum.reverse(params),
+    %EctoOne.Query.QueryExpr{expr: runtime, params: Enum.reverse(params),
                           file: file, line: line}
   end
 

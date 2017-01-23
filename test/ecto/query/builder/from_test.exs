@@ -1,5 +1,5 @@
-defmodule Ecto.Query.Builder.FromTest do
+defmodule EctoOne.Query.Builder.FromTest do
   use ExUnit.Case, async: true
-  import Ecto.Query.Builder.From
-  doctest Ecto.Query.Builder.From
+  import EctoOne.Query.Builder.From
+  doctest EctoOne.Query.Builder.From
 end

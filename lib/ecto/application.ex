@@ -1,4 +1,4 @@
-defmodule Ecto.Application do
+defmodule EctoOne.Application do
   @moduledoc false
 
   use Application
@@ -7,10 +7,10 @@ defmodule Ecto.Application do
     import Supervisor.Spec
 
     children = [
-      supervisor(Ecto.Migration.Supervisor, [])
+      supervisor(EctoOne.Migration.Supervisor, [])
     ]
 
-    opts = [strategy: :one_for_one, name: Ecto.Supervisor]
+    opts = [strategy: :one_for_one, name: EctoOne.Supervisor]
     Supervisor.start_link(children, opts)
   end
 end

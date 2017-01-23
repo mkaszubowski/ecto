@@ -1,13 +1,13 @@
-defmodule Ecto.Query.Builder.LimitOffsetTest do
+defmodule EctoOne.Query.Builder.LimitOffsetTest do
   use ExUnit.Case, async: true
 
-  import Ecto.Query
+  import EctoOne.Query
 
   test "overrides on duplicated limit and offset" do
-    %Ecto.Query{limit: %Ecto.Query.QueryExpr{expr: limit}} = %Ecto.Query{} |> limit([], 1) |> limit([], 2)
+    %EctoOne.Query{limit: %EctoOne.Query.QueryExpr{expr: limit}} = %EctoOne.Query{} |> limit([], 1) |> limit([], 2)
     assert limit == 2
 
-    %Ecto.Query{offset: %Ecto.Query.QueryExpr{expr: offset}} = %Ecto.Query{} |> offset([], 1) |> offset([], 2) |> select([], 3)
+    %EctoOne.Query{offset: %EctoOne.Query.QueryExpr{expr: offset}} = %EctoOne.Query{} |> offset([], 1) |> offset([], 2) |> select([], 3)
     assert offset == 2
   end
 end

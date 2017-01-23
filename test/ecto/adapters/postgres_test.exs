@@ -1,15 +1,15 @@
 Code.require_file "../../../integration_test/support/types.exs", __DIR__
 
-defmodule Ecto.Adapters.PostgresTest do
+defmodule EctoOne.Adapters.PostgresTest do
   use ExUnit.Case, async: true
 
-  import Ecto.Query
+  import EctoOne.Query
 
-  alias Ecto.Queryable
-  alias Ecto.Adapters.Postgres.Connection, as: SQL
+  alias EctoOne.Queryable
+  alias EctoOne.Adapters.Postgres.Connection, as: SQL
 
   defmodule Model do
-    use Ecto.Schema
+    use EctoOne.Schema
 
     schema "model" do
       field :x, :integer
@@ -17,27 +17,27 @@ defmodule Ecto.Adapters.PostgresTest do
       field :z, :integer
       field :w, {:array, :integer}
 
-      has_many :comments, Ecto.Adapters.PostgresTest.Model2,
+      has_many :comments, EctoOne.Adapters.PostgresTest.Model2,
         references: :x,
         foreign_key: :z
-      has_one :permalink, Ecto.Adapters.PostgresTest.Model3,
+      has_one :permalink, EctoOne.Adapters.PostgresTest.Model3,
         references: :y,
         foreign_key: :id
     end
   end
 
   defmodule Model2 do
-    use Ecto.Schema
+    use EctoOne.Schema
 
     schema "model2" do
-      belongs_to :post, Ecto.Adapters.PostgresTest.Model,
+      belongs_to :post, EctoOne.Adapters.PostgresTest.Model,
         references: :x,
         foreign_key: :z
     end
   end
 
   defmodule Model3 do
-    use Ecto.Schema
+    use EctoOne.Schema
 
     schema "model3" do
       field :list1, {:array, :string}
@@ -47,8 +47,8 @@ defmodule Ecto.Adapters.PostgresTest do
   end
 
   defp normalize(query, operation \\ :all) do
-    {query, _params, _key} = Ecto.Query.Planner.prepare(query, operation, Ecto.Adapters.Postgres)
-    Ecto.Query.Planner.normalize(query, operation, Ecto.Adapters.Postgres)
+    {query, _params, _key} = EctoOne.Query.Planner.prepare(query, operation, EctoOne.Adapters.Postgres)
+    EctoOne.Query.Planner.normalize(query, operation, EctoOne.Adapters.Postgres)
   end
 
   test "from" do
@@ -60,7 +60,7 @@ defmodule Ecto.Adapters.PostgresTest do
     query = "posts" |> select([r], r.x) |> normalize
     assert SQL.all(query) == ~s{SELECT p0."x" FROM "posts" AS p0}
 
-    assert_raise Ecto.QueryError, ~r"PostgreSQL requires a model", fn ->
+    assert_raise EctoOne.QueryError, ~r"PostgreSQL requires a model", fn ->
       SQL.all from(p in "posts", select: p) |> normalize()
     end
   end
@@ -190,7 +190,7 @@ defmodule Ecto.Adapters.PostgresTest do
     assert SQL.all(query) == ~s{SELECT downcase(m0."x", $1) FROM "model" AS m0}
 
     query = Model |> select([], fragment(title: 2)) |> normalize
-    assert_raise Ecto.QueryError, fn ->
+    assert_raise EctoOne.QueryError, fn ->
       SQL.all(query)
     end
   end
@@ -219,7 +219,7 @@ defmodule Ecto.Adapters.PostgresTest do
   end
 
   test "tagged type" do
-    query = Model |> select([], type(^"601d74e4-a8d3-4b6e-8365-eddb4c893327", Ecto.UUID)) |> normalize
+    query = Model |> select([], type(^"601d74e4-a8d3-4b6e-8365-eddb4c893327", EctoOne.UUID)) |> normalize
     assert SQL.all(query) == ~s{SELECT $1::uuid FROM "model" AS m0}
 
     query = Model |> select([], type(^1, Custom.Permalink)) |> normalize
@@ -537,7 +537,7 @@ defmodule Ecto.Adapters.PostgresTest do
 
   # DDL
 
-  import Ecto.Migration, only: [table: 1, table: 2, index: 2, index: 3, references: 1, references: 2]
+  import EctoOne.Migration, only: [table: 1, table: 2, index: 2, index: 3, references: 1, references: 2]
 
   test "executing a string during migration" do
     assert SQL.execute_ddl("example") == "example"

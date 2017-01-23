@@ -1,11 +1,11 @@
-defmodule Ecto.Pools.SojournBroker.Worker do
+defmodule EctoOne.Pools.SojournBroker.Worker do
   @moduledoc false
 
   use GenServer
   use Bitwise
 
   require Logger
-  alias Ecto.Adapters.Connection
+  alias EctoOne.Adapters.Connection
 
   @timeout 5_000
 

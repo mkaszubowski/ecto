@@ -1,7 +1,7 @@
-defmodule Ecto.Query.Builder.Filter do
+defmodule EctoOne.Query.Builder.Filter do
   @moduledoc false
 
-  alias Ecto.Query.Builder
+  alias EctoOne.Query.Builder
 
   @doc """
   Builds a quoted expression.
@@ -14,8 +14,8 @@ defmodule Ecto.Query.Builder.Filter do
   def build(kind, query, _binding, {:^, _, [var]}, env) do
     expr =
       quote do
-        {expr, params} = Ecto.Query.Builder.Filter.runtime!(unquote(kind), unquote(var))
-        %Ecto.Query.QueryExpr{expr: expr, params: params,
+        {expr, params} = EctoOne.Query.Builder.Filter.runtime!(unquote(kind), unquote(var))
+        %EctoOne.Query.QueryExpr{expr: expr, params: params,
                               file: unquote(env.file), line: unquote(env.line)}
       end
     Builder.apply_query(query, __MODULE__, [kind, expr], env)
@@ -26,7 +26,7 @@ defmodule Ecto.Query.Builder.Filter do
     {expr, params} = escape(kind, expr, binding, env)
     params         = Builder.escape_params(params)
 
-    expr = quote do: %Ecto.Query.QueryExpr{
+    expr = quote do: %EctoOne.Query.QueryExpr{
                         expr: unquote(expr),
                         params: unquote(params),
                         file: unquote(env.file),
@@ -37,18 +37,18 @@ defmodule Ecto.Query.Builder.Filter do
   @doc """
   The callback applied by `build/4` to build the query.
   """
-  @spec apply(Ecto.Queryable.t, :where | :having, term) :: Ecto.Query.t
+  @spec apply(EctoOne.Queryable.t, :where | :having, term) :: EctoOne.Query.t
   def apply(query, _, %{expr: true}) do
     query
   end
 
   def apply(query, :where, expr) do
-    query = Ecto.Queryable.to_query(query)
+    query = EctoOne.Queryable.to_query(query)
     %{query | wheres: query.wheres ++ [expr]}
   end
 
   def apply(query, :having, expr) do
-    query = Ecto.Queryable.to_query(query)
+    query = EctoOne.Queryable.to_query(query)
     %{query | havings: query.havings ++ [expr]}
   end
 

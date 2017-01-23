@@ -1,4 +1,4 @@
-defmodule Ecto.Query.API do
+defmodule EctoOne.Query.API do
   @moduledoc """
   This module lists all functions allowed in the query API.
 
@@ -14,7 +14,7 @@ defmodule Ecto.Query.API do
   Note the functions in this module exist for documentation
   purposes and one should never need to invoke them directly.
   Furthermore, it is possible to define your own macros and
-  use them in Ecto queries.
+  use them in EctoOne queries.
   """
 
   @doc """
@@ -150,7 +150,7 @@ defmodule Ecto.Query.API do
 
       # Get all items published since the last month
       from p in Post, where: p.published_at >
-                             datetime_add(^Ecto.DateTime.utc, -1, "month")
+                             datetime_add(^EctoOne.DateTime.utc, -1, "month")
 
   In the example above, we used `datetime_add/3` to subtract one month
   from the current datetime and compared it with the `p.published_at`.
@@ -172,7 +172,7 @@ defmodule Ecto.Query.API do
   Send fragments directly to the database.
 
   It is not possible to represent all possible database queries using
-  Ecto's query syntax. When such is required, it is possible to use
+  EctoOne's query syntax. When such is required, it is possible to use
   fragments to send any expression to the database:
 
       def unpublished_by_title(title) do
@@ -184,9 +184,9 @@ defmodule Ecto.Query.API do
   In the example above, we are using the downcase procedure in the
   database to downcase the title column.
 
-  It is very important to keep in mind that Ecto is unable to do any
+  It is very important to keep in mind that EctoOne is unable to do any
   type casting described above when fragments are used. You can
-  however use the `type/2` function to give Ecto some hints:
+  however use the `type/2` function to give EctoOne some hints:
 
       fragment("downcase(?)", p.title) == type(^title, :string)
 
@@ -226,10 +226,10 @@ defmodule Ecto.Query.API do
   @doc """
   Casts the given value to the given type.
 
-  Most of the times, Ecto is able to proper cast interpolated
+  Most of the times, EctoOne is able to proper cast interpolated
   values due to its type checking mechanism. In some situations
   though, in particular when using fragments with `fragment/1`,
-  you may want to tell Ecto you are expecting a particular type:
+  you may want to tell EctoOne you are expecting a particular type:
 
       fragment("downcase(?)", p.title) == type(^title, :string)
 
@@ -240,7 +240,7 @@ defmodule Ecto.Query.API do
   def type(interpolated_value, type), do: doc! [interpolated_value, type]
 
   defp doc!(_) do
-    raise "the functions in Ecto.Query.API should not be invoked directly, " <>
+    raise "the functions in EctoOne.Query.API should not be invoked directly, " <>
           "they serve for documentation purposes only"
   end
 end

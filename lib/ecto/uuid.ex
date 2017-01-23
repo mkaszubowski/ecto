@@ -1,12 +1,12 @@
-defmodule Ecto.UUID do
+defmodule EctoOne.UUID do
   @moduledoc """
-  An Ecto type for UUIDs strings.
+  An EctoOne type for UUIDs strings.
   """
 
-  @behaviour Ecto.Type
+  @behaviour EctoOne.Type
 
   @doc """
-  The Ecto type.
+  The EctoOne type.
   """
   def type, do: :uuid
 
@@ -37,7 +37,7 @@ defmodule Ecto.UUID do
       :error -> :error
     else
       binary ->
-        {:ok, %Ecto.Query.Tagged{type: :uuid, value: binary}}
+        {:ok, %EctoOne.Query.Tagged{type: :uuid, value: binary}}
     end
   end
   def dump(_), do: :error
@@ -75,10 +75,10 @@ defmodule Ecto.UUID do
    {:ok, encode(uuid)}
   end
   def load(<<_::64, ?-, _::32, ?-, _::32, ?-, _::32, ?-, _::96>> = string) do
-    raise "trying to load string UUID as Ecto.UUID: #{inspect string}. " <>
+    raise "trying to load string UUID as EctoOne.UUID: #{inspect string}. " <>
           "Maybe you wanted to declare :uuid as your database field?"
   end
-  def load(%Ecto.Query.Tagged{type: :uuid, value: uuid}) do
+  def load(%EctoOne.Query.Tagged{type: :uuid, value: uuid}) do
     {:ok, encode(uuid)}
   end
   def load(_), do: :error
@@ -101,7 +101,7 @@ defmodule Ecto.UUID do
   # Callback invoked by autogenerate in schema.
   @doc false
   def autogenerate do
-    %Ecto.Query.Tagged{type: :uuid, value: bingenerate()}
+    %EctoOne.Query.Tagged{type: :uuid, value: bingenerate()}
   end
 
   defp encode(<<u0::32, u1::16, u2::16, u3::16, u4::48>>) do

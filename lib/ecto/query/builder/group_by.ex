@@ -1,12 +1,12 @@
-defmodule Ecto.Query.Builder.GroupBy do
+defmodule EctoOne.Query.Builder.GroupBy do
   @moduledoc false
 
-  alias Ecto.Query.Builder
+  alias EctoOne.Query.Builder
 
   @doc """
   Escapes a list of quoted expressions.
 
-  See `Ecto.Builder.escape/2`.
+  See `EctoOne.Builder.escape/2`.
 
       iex> escape(quote do [x.x, 13] end, [x: 0], __ENV__)
       {[{:{}, [], [{:{}, [], [:., [], [{:{}, [], [:&, [], [0]]}, :x]]}, [], []]},
@@ -33,7 +33,7 @@ defmodule Ecto.Query.Builder.GroupBy do
     {expr, params} = escape(expr, binding, env)
     params         = Builder.escape_params(params)
 
-    group_by = quote do: %Ecto.Query.QueryExpr{
+    group_by = quote do: %EctoOne.Query.QueryExpr{
                            expr: unquote(expr),
                            params: unquote(params),
                            file: unquote(env.file),
@@ -44,9 +44,9 @@ defmodule Ecto.Query.Builder.GroupBy do
   @doc """
   The callback applied by `build/4` to build the query.
   """
-  @spec apply(Ecto.Queryable.t, term) :: Ecto.Query.t
+  @spec apply(EctoOne.Queryable.t, term) :: EctoOne.Query.t
   def apply(query, expr) do
-    query = Ecto.Queryable.to_query(query)
+    query = EctoOne.Queryable.to_query(query)
     %{query | group_bys: query.group_bys ++ [expr]}
   end
 end

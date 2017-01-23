@@ -1,21 +1,21 @@
-defprotocol Ecto.DataType do
+defprotocol EctoOne.DataType do
   @moduledoc """
-  Casts a given data type into an `Ecto.Type`.
+  Casts a given data type into an `EctoOne.Type`.
 
-  While `Ecto.Type` allows developers to cast/load/dump
+  While `EctoOne.Type` allows developers to cast/load/dump
   any value from the storage into the struct based on the
-  schema, `Ecto.DataType` allows developers to convert
-  existing data types into existing Ecto types, be them
+  schema, `EctoOne.DataType` allows developers to convert
+  existing data types into existing EctoOne types, be them
   primitive or custom.
 
-  For example, `Ecto.Date` is a custom type, represented
-  by the `%Ecto.Date{}` struct that can be used in place
-  of Ecto's primitive `:date` type. Therefore, we need to
-  tell Ecto how to convert `%Ecto.Date{}` into `:date` and
-  such is done with the `Ecto.DataType` protocol:
+  For example, `EctoOne.Date` is a custom type, represented
+  by the `%EctoOne.Date{}` struct that can be used in place
+  of EctoOne's primitive `:date` type. Therefore, we need to
+  tell EctoOne how to convert `%EctoOne.Date{}` into `:date` and
+  such is done with the `EctoOne.DataType` protocol:
 
-      defimpl Ecto.DataType, for: Ecto.DateTime do
-        def cast(%Ecto.Date{day: day, month: month, year: year}, :date) do
+      defimpl EctoOne.DataType, for: EctoOne.DateTime do
+        def cast(%EctoOne.Date{day: day, month: month, year: year}, :date) do
           {:ok, {year, month, day}}
         end
         def cast(_, _) do
@@ -28,7 +28,7 @@ defprotocol Ecto.DataType do
   def cast(value, type)
 end
 
-defimpl Ecto.DataType, for: Any do
+defimpl EctoOne.DataType, for: Any do
   def cast(_value, _type) do
     :error
   end

@@ -1,12 +1,12 @@
-defmodule Ecto.Query.Planner do
+defmodule EctoOne.Query.Planner do
   # Normalizes a query and its parameters.
   @moduledoc false
 
-  alias Ecto.Query.SelectExpr
-  alias Ecto.Query.JoinExpr
+  alias EctoOne.Query.SelectExpr
+  alias EctoOne.Query.JoinExpr
 
-  if map_size(%Ecto.Query{}) != 17 do
-    raise "Ecto.Query match out of date in builder"
+  if map_size(%EctoOne.Query{}) != 17 do
+    raise "EctoOne.Query match out of date in builder"
   end
 
   @doc """
@@ -22,7 +22,7 @@ defmodule Ecto.Query.Planner do
       type = Map.get(types, field)
 
       unless type do
-        raise Ecto.ChangeError,
+        raise EctoOne.ChangeError,
           message: "field `#{inspect model}.#{field}` in `#{kind}` does not exist in the model source"
       end
 
@@ -30,7 +30,7 @@ defmodule Ecto.Query.Planner do
         {:ok, value} ->
           {field, value}
         :error ->
-          raise Ecto.ChangeError,
+          raise EctoOne.ChangeError,
             message: "value `#{inspect value}` for `#{inspect model}.#{field}` " <>
                      "in `#{kind}` does not match type #{inspect type}"
       end
@@ -222,8 +222,8 @@ defmodule Ecto.Query.Planner do
           error! query, expr, error
       end
     catch
-      :error, %Ecto.QueryError{} = e when not is_nil(model) ->
-        raise Ecto.CastError, model: model, field: field, value: v, type: type,
+      :error, %EctoOne.QueryError{} = e when not is_nil(model) ->
+        raise EctoOne.CastError, model: model, field: field, value: v, type: type,
                               message: Exception.message(e) <>
                                        "\nError when casting value to `#{inspect model}.#{field}`"
     end
@@ -248,7 +248,7 @@ defmodule Ecto.Query.Planner do
   end
 
   defp cast_param(kind, type, v) do
-    case Ecto.Type.cast(type, v) do
+    case EctoOne.Type.cast(type, v) do
       {:ok, v} ->
         {:dump, type, v}
       :error ->
@@ -256,13 +256,13 @@ defmodule Ecto.Query.Planner do
     end
   end
 
-  defp unfold_in(%Ecto.Query.Tagged{value: value, type: {:array, type}}, acc),
+  defp unfold_in(%EctoOne.Query.Tagged{value: value, type: {:array, type}}, acc),
     do: unfold_in(value, type, acc)
   defp unfold_in(value, acc) when is_list(value),
     do: Enum.reverse(value, acc)
 
   defp unfold_in([h|t], type, acc),
-    do: unfold_in(t, type, [%Ecto.Query.Tagged{value: h, type: type}|acc])
+    do: unfold_in(t, type, [%EctoOne.Query.Tagged{value: h, type: type}|acc])
   defp unfold_in([], _type, acc),
     do: acc
 
@@ -452,17 +452,17 @@ defmodule Ecto.Query.Planner do
 
   defp prewalk({{:., _, [{:&, _, [source]}, field]} = dot, meta, []}, kind, query, expr, acc, _adapter) do
     type = type!(kind, query, expr, source, field)
-    {{dot, [ecto_type: type] ++ meta, []}, acc}
+    {{dot, [ecto_one_type: type] ++ meta, []}, acc}
   end
 
   defp prewalk({:type, _, [{:^, meta, [ix]}, _expr]}, kind, query, expr, acc, _adapter) when is_integer(ix) do
     {_, t} = Enum.fetch!(expr.params, ix)
     {_, _, type} = type_for_param!(kind, query, expr, t)
-    {%Ecto.Query.Tagged{value: {:^, meta, [acc]}, tag: type,
-                        type: Ecto.Type.type(type)}, acc + 1}
+    {%EctoOne.Query.Tagged{value: {:^, meta, [acc]}, tag: type,
+                        type: EctoOne.Type.type(type)}, acc + 1}
   end
 
-  defp prewalk(%Ecto.Query.Tagged{value: v, type: type}, kind, query, expr, acc, adapter) do
+  defp prewalk(%EctoOne.Query.Tagged{value: v, type: type}, kind, query, expr, acc, adapter) do
     {v, acc} = prewalk(v, kind, query, expr, acc, adapter)
     {cast_param(kind, query, expr, v, type, adapter), acc}
   end
@@ -671,7 +671,7 @@ defmodule Ecto.Query.Planner do
     {nil, nil, type}
   end
 
-  defp assert_update!(%Ecto.Query{updates: updates} = query, operation) do
+  defp assert_update!(%EctoOne.Query{updates: updates} = query, operation) do
     changes =
       Enum.reduce(updates, %{}, fn update, acc ->
         Enum.reduce(update.expr, acc, fn {_op, kw}, acc ->
@@ -690,7 +690,7 @@ defmodule Ecto.Query.Planner do
 
   defp assert_no_update!(query, operation) do
     case query do
-      %Ecto.Query{updates: []} -> query
+      %EctoOne.Query{updates: []} -> query
       _ ->
         error! query, "`#{operation}` does not allow `update` expressions"
     end
@@ -698,7 +698,7 @@ defmodule Ecto.Query.Planner do
 
   defp assert_only_filter_expressions!(query, operation) do
     case query do
-      %Ecto.Query{select: nil, order_bys: [], limit: nil, offset: nil,
+      %EctoOne.Query{select: nil, order_bys: [], limit: nil, offset: nil,
                   group_bys: [], havings: [], preloads: [], assocs: [],
                   distinct: nil, lock: nil} ->
         query
@@ -712,10 +712,10 @@ defmodule Ecto.Query.Planner do
   end
 
   defp error!(query, message) do
-    raise Ecto.QueryError, message: message, query: query
+    raise EctoOne.QueryError, message: message, query: query
   end
 
   defp error!(query, expr, message) do
-    raise Ecto.QueryError, message: message, query: query, file: expr.file, line: expr.line
+    raise EctoOne.QueryError, message: message, query: query, file: expr.file, line: expr.line
   end
 end

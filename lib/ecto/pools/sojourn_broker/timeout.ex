@@ -1,4 +1,4 @@
-defmodule Ecto.Pools.SojournBroker.Timeout do
+defmodule EctoOne.Pools.SojournBroker.Timeout do
   @moduledoc """
   Timeout based broker.
 

@@ -1,12 +1,12 @@
-defmodule Ecto.MigratorTest do
+defmodule EctoOne.MigratorTest do
   use ExUnit.Case
 
   import Support.FileHelpers
-  import Ecto.Migrator
-  alias Ecto.TestRepo
+  import EctoOne.Migrator
+  alias EctoOne.TestRepo
 
   defmodule Migration do
-    use Ecto.Migration
+    use EctoOne.Migration
 
     def up do
       execute "up"
@@ -18,7 +18,7 @@ defmodule Ecto.MigratorTest do
   end
 
   defmodule ChangeMigration do
-    use Ecto.Migration
+    use EctoOne.Migration
 
     def change do
       create table(:posts) do
@@ -30,7 +30,7 @@ defmodule Ecto.MigratorTest do
   end
 
   defmodule ChangeMigrationPrefix do
-    use Ecto.Migration
+    use EctoOne.Migration
 
     def change do
       create table(:comments, prefix: :foo) do
@@ -42,7 +42,7 @@ defmodule Ecto.MigratorTest do
   end
 
   defmodule UpDownMigration do
-    use Ecto.Migration
+    use EctoOne.Migration
 
     def up do
       alter table(:posts) do
@@ -56,7 +56,7 @@ defmodule Ecto.MigratorTest do
   end
 
   defmodule NoTransactionMigration do
-    use Ecto.Migration
+    use EctoOne.Migration
     @disable_ddl_transaction true
 
     def change do
@@ -65,7 +65,7 @@ defmodule Ecto.MigratorTest do
   end
 
   defmodule InvalidMigration do
-    use Ecto.Migration
+    use EctoOne.Migration
   end
 
   setup do
@@ -78,7 +78,7 @@ defmodule Ecto.MigratorTest do
       :ok = up(TestRepo, 0, ChangeMigration)
     end
 
-    assert output =~ "== Running Ecto.MigratorTest.ChangeMigration.change/0 forward"
+    assert output =~ "== Running EctoOne.MigratorTest.ChangeMigration.change/0 forward"
     assert output =~ "create table posts"
     assert output =~ "create index posts_title_index"
     assert output =~ ~r"== Migrated in \d.\ds"
@@ -87,7 +87,7 @@ defmodule Ecto.MigratorTest do
       :ok = down(TestRepo, 0, ChangeMigration)
     end
 
-    assert output =~ "== Running Ecto.MigratorTest.ChangeMigration.change/0 backward"
+    assert output =~ "== Running EctoOne.MigratorTest.ChangeMigration.change/0 backward"
     assert output =~ "drop table posts"
     assert output =~ "drop index posts_title_index"
     assert output =~ ~r"== Migrated in \d.\ds"
@@ -96,7 +96,7 @@ defmodule Ecto.MigratorTest do
       :ok = up(TestRepo, 0, ChangeMigrationPrefix)
     end
 
-    assert output =~ "== Running Ecto.MigratorTest.ChangeMigrationPrefix.change/0 forward"
+    assert output =~ "== Running EctoOne.MigratorTest.ChangeMigrationPrefix.change/0 forward"
     assert output =~ "create table foo.comments"
     assert output =~ "create index foo.posts_title_index"
     assert output =~ ~r"== Migrated in \d.\ds"
@@ -105,7 +105,7 @@ defmodule Ecto.MigratorTest do
       :ok = down(TestRepo, 0, ChangeMigrationPrefix)
     end
 
-    assert output =~ "== Running Ecto.MigratorTest.ChangeMigrationPrefix.change/0 backward"
+    assert output =~ "== Running EctoOne.MigratorTest.ChangeMigrationPrefix.change/0 backward"
     assert output =~ "drop table foo.comments"
     assert output =~ "drop index foo.posts_title_index"
     assert output =~ ~r"== Migrated in \d.\ds"
@@ -114,7 +114,7 @@ defmodule Ecto.MigratorTest do
       :ok = up(TestRepo, 0, UpDownMigration)
     end
 
-    assert output =~ "== Running Ecto.MigratorTest.UpDownMigration.up/0 forward"
+    assert output =~ "== Running EctoOne.MigratorTest.UpDownMigration.up/0 forward"
     assert output =~ "alter table posts"
     assert output =~ ~r"== Migrated in \d.\ds"
 
@@ -122,7 +122,7 @@ defmodule Ecto.MigratorTest do
       :ok = down(TestRepo, 0, UpDownMigration)
     end
 
-    assert output =~ "== Running Ecto.MigratorTest.UpDownMigration.down/0 forward"
+    assert output =~ "== Running EctoOne.MigratorTest.UpDownMigration.down/0 forward"
     assert output =~ "execute \"foo\""
     assert output =~ ~r"== Migrated in \d.\ds"
   end
@@ -140,14 +140,14 @@ defmodule Ecto.MigratorTest do
   end
 
   test "up raises error when missing up/0 and change/0" do
-    assert_raise Ecto.MigrationError, fn ->
-      Ecto.Migrator.up(TestRepo, 0, InvalidMigration, log: false)
+    assert_raise EctoOne.MigrationError, fn ->
+      EctoOne.Migrator.up(TestRepo, 0, InvalidMigration, log: false)
     end
   end
 
   test "down raises error when missing down/0 and change/0" do
-    assert_raise Ecto.MigrationError, fn ->
-      Ecto.Migrator.down(TestRepo, 1, InvalidMigration, log: false)
+    assert_raise EctoOne.MigrationError, fn ->
+      EctoOne.Migrator.down(TestRepo, 1, InvalidMigration, log: false)
     end
   end
 
@@ -161,7 +161,7 @@ defmodule Ecto.MigratorTest do
   test "fails if there is no migration in file" do
     in_tmp fn path ->
       File.write! "13_sample.exs", ":ok"
-      assert_raise Ecto.MigrationError, "file 13_sample.exs does not contain any Ecto.Migration", fn ->
+      assert_raise EctoOne.MigrationError, "file 13_sample.exs does not contain any EctoOne.Migration", fn ->
         run(TestRepo, path, :up, all: true, log: false)
       end
     end
@@ -171,7 +171,7 @@ defmodule Ecto.MigratorTest do
     in_tmp fn path ->
       create_migration "13_hello.exs"
       create_migration "13_other.exs"
-      assert_raise Ecto.MigrationError, "migrations can't be executed, migration version 13 is duplicated", fn ->
+      assert_raise EctoOne.MigrationError, "migrations can't be executed, migration version 13 is duplicated", fn ->
         run(TestRepo, path, :up, all: true, log: false)
       end
     end
@@ -181,7 +181,7 @@ defmodule Ecto.MigratorTest do
     in_tmp fn path ->
       create_migration "13_hello.exs"
       create_migration "14_hello.exs"
-      assert_raise Ecto.MigrationError, "migrations can't be executed, migration name hello is duplicated", fn ->
+      assert_raise EctoOne.MigrationError, "migrations can't be executed, migration name hello is duplicated", fn ->
         run(TestRepo, path, :up, all: true, log: false)
       end
     end
@@ -250,7 +250,7 @@ defmodule Ecto.MigratorTest do
     end
   end
 
-  test "version migrations work iside directories" do
+  test "version migrations work iside directo_oneries" do
     in_tmp fn path ->
       File.mkdir_p!("foo")
       create_migration "foo/13_version_in_dir.exs"
@@ -292,8 +292,8 @@ defmodule Ecto.MigratorTest do
   defp create_migration(name) do
     module = name |> Path.basename |> Path.rootname
     File.write! name, """
-    defmodule Ecto.MigrationTest.S#{module} do
-      use Ecto.Migration
+    defmodule EctoOne.MigrationTest.S#{module} do
+      use EctoOne.Migration
 
       def up do
         execute "up"

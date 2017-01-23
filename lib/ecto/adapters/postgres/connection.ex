@@ -1,17 +1,17 @@
 if Code.ensure_loaded?(Postgrex) do
 
-  defmodule Ecto.Adapters.Postgres.Connection do
+  defmodule EctoOne.Adapters.Postgres.Connection do
     @moduledoc false
 
     @default_port 5432
-    @behaviour Ecto.Adapters.Connection
-    @behaviour Ecto.Adapters.SQL.Query
+    @behaviour EctoOne.Adapters.Connection
+    @behaviour EctoOne.Adapters.SQL.Query
 
     ## Connection
 
     def connect(opts) do
-      json = Application.get_env(:ecto, :json_library)
-      extensions = [{Ecto.Adapters.Postgres.DateTime, []},
+      json = Application.get_env(:ecto_one, :json_library)
+      extensions = [{EctoOne.Adapters.Postgres.DateTime, []},
                     {Postgrex.Extensions.JSON, library: json}]
 
       opts =
@@ -25,7 +25,7 @@ if Code.ensure_loaded?(Postgrex) do
 
     def query(conn, sql, params, opts) do
       params = Enum.map params, fn
-        %Ecto.Query.Tagged{value: value} -> value
+        %EctoOne.Query.Tagged{value: value} -> value
         value -> value
       end
 
@@ -98,10 +98,10 @@ if Code.ensure_loaded?(Postgrex) do
 
     ## Query
 
-    alias Ecto.Query
-    alias Ecto.Query.SelectExpr
-    alias Ecto.Query.QueryExpr
-    alias Ecto.Query.JoinExpr
+    alias EctoOne.Query
+    alias EctoOne.Query.SelectExpr
+    alias EctoOne.Query.QueryExpr
+    alias EctoOne.Query.JoinExpr
 
     def all(query) do
       sources        = create_names(query)
@@ -378,7 +378,7 @@ if Code.ensure_loaded?(Postgrex) do
     defp expr({:&, _, [idx]}, sources, query) do
       {table, name, model} = elem(sources, idx)
       unless model do
-        error!(query, "PostgreSQL requires a model when using selector " <>
+        error!(query, "PostgreSQL requires a model when using selecto_oner " <>
           "#{inspect name} but only the table #{inspect table} was given. " <>
           "Please specify a model or specify exactly which fields from " <>
           "#{inspect name} you desire")
@@ -461,14 +461,14 @@ if Code.ensure_loaded?(Postgrex) do
       Decimal.to_string(decimal, :normal)
     end
 
-    defp expr(%Ecto.Query.Tagged{value: binary, type: :binary}, _sources, _query)
+    defp expr(%EctoOne.Query.Tagged{value: binary, type: :binary}, _sources, _query)
         when is_binary(binary) do
       hex = Base.encode16(binary, case: :lower)
       "'\\x#{hex}'::bytea"
     end
 
-    defp expr(%Ecto.Query.Tagged{value: other, type: type}, sources, query) do
-      expr(other, sources, query) <> "::" <> ecto_to_db(type)
+    defp expr(%EctoOne.Query.Tagged{value: other, type: type}, sources, query) do
+      expr(other, sources, query) <> "::" <> ecto_one_to_db(type)
     end
 
     defp expr(nil, _sources, _query),   do: "NULL"
@@ -536,9 +536,9 @@ if Code.ensure_loaded?(Postgrex) do
 
     # DDL
 
-    alias Ecto.Migration.Table
-    alias Ecto.Migration.Index
-    alias Ecto.Migration.Reference
+    alias EctoOne.Migration.Table
+    alias EctoOne.Migration.Index
+    alias EctoOne.Migration.Reference
 
     @drops [:drop, :drop_if_exists]
 
@@ -681,7 +681,7 @@ if Code.ensure_loaded?(Postgrex) do
     defp default_expr({:ok, nil}, _type),
       do: "DEFAULT NULL"
     defp default_expr({:ok, []}, type),
-      do: "DEFAULT ARRAY[]::#{ecto_to_db(type)}"
+      do: "DEFAULT ARRAY[]::#{ecto_one_to_db(type)}"
     defp default_expr({:ok, literal}, _type) when is_binary(literal),
       do: "DEFAULT '#{escape_string(literal)}'"
     defp default_expr({:ok, literal}, _type) when is_number(literal) or is_boolean(literal),
@@ -712,7 +712,7 @@ if Code.ensure_loaded?(Postgrex) do
       size      = Keyword.get(opts, :size)
       precision = Keyword.get(opts, :precision)
       scale     = Keyword.get(opts, :scale)
-      type_name = ecto_to_db(type)
+      type_name = ecto_one_to_db(type)
 
       cond do
         size            -> "#{type_name}(#{size})"
@@ -784,20 +784,20 @@ if Code.ensure_loaded?(Postgrex) do
       :binary.replace(value, "'", "''", [:global])
     end
 
-    defp ecto_to_db({:array, t}), do: ecto_to_db(t) <> "[]"
-    defp ecto_to_db(:id),         do: "integer"
-    defp ecto_to_db(:binary_id),  do: "uuid"
-    defp ecto_to_db(:string),     do: "varchar"
-    defp ecto_to_db(:datetime),   do: "timestamp"
-    defp ecto_to_db(:binary),     do: "bytea"
-    defp ecto_to_db(:map),        do: "jsonb"
-    defp ecto_to_db(other),       do: Atom.to_string(other)
+    defp ecto_one_to_db({:array, t}), do: ecto_one_to_db(t) <> "[]"
+    defp ecto_one_to_db(:id),         do: "integer"
+    defp ecto_one_to_db(:binary_id),  do: "uuid"
+    defp ecto_one_to_db(:string),     do: "varchar"
+    defp ecto_one_to_db(:datetime),   do: "timestamp"
+    defp ecto_one_to_db(:binary),     do: "bytea"
+    defp ecto_one_to_db(:map),        do: "jsonb"
+    defp ecto_one_to_db(other),       do: Atom.to_string(other)
 
     defp error!(nil, message) do
       raise ArgumentError, message
     end
     defp error!(query, message) do
-      raise Ecto.QueryError, query: query, message: message
+      raise EctoOne.QueryError, query: query, message: message
     end
   end
 end

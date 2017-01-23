@@ -61,8 +61,8 @@ defmodule Seeds do
   # Import weather
   defp import_weather(_,[]), do: nil
   defp import_weather(city, [{wdate,temp_lo,temp_hi,prcp}=h|t]) do
-    {:ok, ecto_date} = Ecto.Date.cast(wdate)
-    Simple.Repo.insert!(%Weather{wdate: ecto_date, temp_lo: temp_lo, temp_hi: temp_hi, prcp: prcp, city_id: city.id})
+    {:ok, ecto_one_date} = EctoOne.Date.cast(wdate)
+    Simple.Repo.insert!(%Weather{wdate: ecto_one_date, temp_lo: temp_lo, temp_hi: temp_hi, prcp: prcp, city_id: city.id})
     import_weather city, t
   end
 end

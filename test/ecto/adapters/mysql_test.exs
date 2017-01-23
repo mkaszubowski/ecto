@@ -1,42 +1,42 @@
 Code.require_file "../../../integration_test/support/types.exs", __DIR__
 
-defmodule Ecto.Adapters.MySQLTest do
+defmodule EctoOne.Adapters.MySQLTest do
   use ExUnit.Case, async: true
 
-  import Ecto.Query
+  import EctoOne.Query
 
-  alias Ecto.Queryable
-  alias Ecto.Adapters.MySQL.Connection, as: SQL
+  alias EctoOne.Queryable
+  alias EctoOne.Adapters.MySQL.Connection, as: SQL
 
   defmodule Model do
-    use Ecto.Schema
+    use EctoOne.Schema
 
     schema "model" do
       field :x, :integer
       field :y, :integer
       field :z, :integer
 
-      has_many :comments, Ecto.Adapters.MySQLTest.Model2,
+      has_many :comments, EctoOne.Adapters.MySQLTest.Model2,
         references: :x,
         foreign_key: :z
-      has_one :permalink, Ecto.Adapters.MySQLTest.Model3,
+      has_one :permalink, EctoOne.Adapters.MySQLTest.Model3,
         references: :y,
         foreign_key: :id
     end
   end
 
   defmodule Model2 do
-    use Ecto.Schema
+    use EctoOne.Schema
 
     schema "model2" do
-      belongs_to :post, Ecto.Adapters.MySQLTest.Model,
+      belongs_to :post, EctoOne.Adapters.MySQLTest.Model,
         references: :x,
         foreign_key: :z
     end
   end
 
   defmodule Model3 do
-    use Ecto.Schema
+    use EctoOne.Schema
 
     schema "model3" do
       field :binary, :binary
@@ -44,8 +44,8 @@ defmodule Ecto.Adapters.MySQLTest do
   end
 
   defp normalize(query, operation \\ :all) do
-    {query, _params, _key} = Ecto.Query.Planner.prepare(query, operation, Ecto.Adapters.MySQL)
-    Ecto.Query.Planner.normalize(query, operation, Ecto.Adapters.MySQL)
+    {query, _params, _key} = EctoOne.Query.Planner.prepare(query, operation, EctoOne.Adapters.MySQL)
+    EctoOne.Query.Planner.normalize(query, operation, EctoOne.Adapters.MySQL)
   end
 
   test "from" do
@@ -57,7 +57,7 @@ defmodule Ecto.Adapters.MySQLTest do
     query = "posts" |> select([r], r.x) |> normalize
     assert SQL.all(query) == ~s{SELECT p0.`x` FROM `posts` AS p0}
 
-    assert_raise Ecto.QueryError, ~r"MySQL requires a model", fn ->
+    assert_raise EctoOne.QueryError, ~r"MySQL requires a model", fn ->
       SQL.all from(p in "posts", select: p) |> normalize()
     end
   end
@@ -83,7 +83,7 @@ defmodule Ecto.Adapters.MySQLTest do
     query = Model |> distinct(false) |> select([r], {r.x, r.y}) |> normalize
     assert SQL.all(query) == ~s{SELECT m0.`x`, m0.`y` FROM `model` AS m0}
 
-    assert_raise Ecto.QueryError, ~r"DISTINCT with multiple columns is not supported by MySQL", fn ->
+    assert_raise EctoOne.QueryError, ~r"DISTINCT with multiple columns is not supported by MySQL", fn ->
       query = Model |> distinct([r], [r.x, r.y]) |> select([r], {r.x, r.y}) |> normalize
       SQL.all(query)
     end
@@ -172,7 +172,7 @@ defmodule Ecto.Adapters.MySQLTest do
     assert SQL.all(query) == ~s{SELECT lcase(m0.`x`, ?) FROM `model` AS m0}
 
     query = Model |> select([], fragment(title: 2)) |> normalize
-    assert_raise Ecto.QueryError, fn ->
+    assert_raise EctoOne.QueryError, fn ->
       SQL.all(query)
     end
   end
@@ -198,7 +198,7 @@ defmodule Ecto.Adapters.MySQLTest do
   end
 
   test "tagged type" do
-    query = Model |> select([], type(^"601d74e4-a8d3-4b6e-8365-eddb4c893327", Ecto.UUID)) |> normalize
+    query = Model |> select([], type(^"601d74e4-a8d3-4b6e-8365-eddb4c893327", EctoOne.UUID)) |> normalize
     assert SQL.all(query) == ~s{SELECT CAST(? AS binary(16)) FROM `model` AS m0}
   end
 
@@ -453,7 +453,7 @@ defmodule Ecto.Adapters.MySQLTest do
 
   # DDL
 
-  import Ecto.Migration, only: [table: 1, table: 2, index: 2, index: 3, references: 1, references: 2]
+  import EctoOne.Migration, only: [table: 1, table: 2, index: 2, index: 3, references: 1, references: 2]
 
   test "executing a string during migration" do
     assert SQL.execute_ddl("example") == "example"
@@ -658,7 +658,7 @@ defmodule Ecto.Adapters.MySQLTest do
   # Unsupported types and clauses
 
   test "arrays" do
-    assert_raise Ecto.QueryError, ~r"Array type is not supported by MySQL", fn ->
+    assert_raise EctoOne.QueryError, ~r"Array type is not supported by MySQL", fn ->
       query = Model |> select([], fragment("?", [1, 2, 3])) |> normalize
       SQL.all(query)
     end

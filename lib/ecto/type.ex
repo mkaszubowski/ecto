@@ -1,11 +1,11 @@
-defmodule Ecto.Type do
+defmodule EctoOne.Type do
   @moduledoc """
-  Defines functions and the `Ecto.Type` behaviour for implementing
+  Defines functions and the `EctoOne.Type` behaviour for implementing
   custom types.
 
   A custom type expects 4 functions to be implemented, all documented
   and described below. We also provide two examples of how custom
-  types can be used in Ecto to augment existing types or providing
+  types can be used in EctoOne to augment existing types or providing
   your own types.
 
   ## Augmenting types
@@ -16,13 +16,13 @@ defmodule Ecto.Type do
       permalink = "10-how-to-be-productive-with-elixir"
       from p in Post, where: p.id == ^permalink
 
-  If `id` is an integer field, Ecto will fail in the query above
+  If `id` is an integer field, EctoOne will fail in the query above
   because it cannot cast the string to an integer. By using a
   custom type, we can provide special casting behaviour while
-  still keeping the underlying Ecto type the same:
+  still keeping the underlying EctoOne type the same:
 
       defmodule Permalink do
-        @behaviour Ecto.Type
+        @behaviour EctoOne.Type
         def type, do: :integer
 
         # Provide our own casting rules.
@@ -54,7 +54,7 @@ defmodule Ecto.Type do
   Now, we can use our new field above as our primary key type in models:
 
       defmodule Post do
-        use Ecto.Schema
+        use EctoOne.Schema
 
         @primary_key {:id, Permalink, autogenerate: true}
         schema "posts" do
@@ -68,28 +68,28 @@ defmodule Ecto.Type do
   because we were keeping the underlying representation the same, the
   value stored in the struct and the database was always an integer.
 
-  Ecto types also allow developers to create completely new types as
-  long as they can be encoded by the database. `Ecto.DateTime` and
-  `Ecto.UUID` are such examples.
+  EctoOne types also allow developers to create completely new types as
+  long as they can be encoded by the database. `EctoOne.DateTime` and
+  `EctoOne.UUID` are such examples.
 
   In order for this to work, callbacks should take care of encoding your custom
-  Ecto type into its db representation, as well as decoding it from the db back
-  into the Ecto type. Each callback should behave as follows.
+  EctoOne type into its db representation, as well as decoding it from the db back
+  into the EctoOne type. Each callback should behave as follows.
 
     * `type` should output the name of the db type
-    * `cast` should receive any type and output your custom Ecto type
-    * `load` should receive the db type and output your custom Ecto type
-    * `dump` should receive your custom Ecto type and output the db type
+    * `cast` should receive any type and output your custom EctoOne type
+    * `load` should receive the db type and output your custom EctoOne type
+    * `dump` should receive your custom EctoOne type and output the db type
   """
 
   import Kernel, except: [match?: 2]
 
   use Behaviour
 
-  @typedoc "An Ecto type, primitive or custom."
+  @typedoc "An EctoOne type, primitive or custom."
   @type t         :: primitive | custom
 
-  @typedoc "Primitive Ecto types (handled by Ecto)."
+  @typedoc "Primitive EctoOne types (handled by EctoOne)."
   @type primitive :: base | composite
 
   @typedoc "Custom types are represented by user-defined modules."
@@ -98,7 +98,7 @@ defmodule Ecto.Type do
   @typep base      :: :integer | :float | :boolean | :string | :map |
                       :binary | :decimal | :id | :binary_id |
                       :datetime | :date | :time | :any
-  @typep composite :: {:array, base} | {:embed, Ecto.Embedded.t}
+  @typep composite :: {:array, base} | {:embed, EctoOne.Embedded.t}
 
   @base      ~w(integer float boolean string binary decimal datetime date time id binary_id map any)a
   @composite ~w(array embed)a
@@ -109,7 +109,7 @@ defmodule Ecto.Type do
   For example, if you want to provide your own datetime
   structures, the type function should return `:datetime`.
 
-  Note this function is not required to return Ecto primitive
+  Note this function is not required to return EctoOne primitive
   types, the type is only required to be known by the adapter.
   """
   defcallback type :: t
@@ -119,11 +119,11 @@ defmodule Ecto.Type do
 
   This callback is called on external input and can return any type,
   as long as the `dump/1` function is able to convert the returned
-  value back into an Ecto native type. There are two situations where
+  value back into an EctoOne native type. There are two situations where
   this callback is called:
 
-    1. When casting values by `Ecto.Changeset`
-    2. When passing arguments to `Ecto.Query`
+    1. When casting values by `EctoOne.Changeset`
+    2. When passing arguments to `EctoOne.Query`
 
   """
   defcallback cast(term) :: {:ok, term} | :error
@@ -132,17 +132,17 @@ defmodule Ecto.Type do
   Loads the given term into a custom type.
 
   This callback is called when loading data from the database and
-  receive an Ecto native type. It can return any type, as long as
+  receive an EctoOne native type. It can return any type, as long as
   the `dump/1` function is able to convert the returned value back
-  into an Ecto native type.
+  into an EctoOne native type.
   """
   defcallback load(term) :: {:ok, term} | :error
 
   @doc """
-  Dumps the given term into an Ecto native type.
+  Dumps the given term into an EctoOne native type.
 
   This callback is called with any term that was stored in the struct
-  and it needs to validate them and convert it to an Ecto native type.
+  and it needs to validate them and convert it to an EctoOne native type.
   """
   defcallback dump(term) :: {:ok, term} | :error
 
@@ -198,12 +198,12 @@ defmodule Ecto.Type do
 
       iex> type(:string)
       :string
-      iex> type(Ecto.DateTime)
+      iex> type(EctoOne.DateTime)
       :datetime
 
       iex> type({:array, :string})
       {:array, :string}
-      iex> type({:array, Ecto.DateTime})
+      iex> type({:array, EctoOne.DateTime})
       {:array, :datetime}
 
   """
@@ -234,9 +234,9 @@ defmodule Ecto.Type do
       iex> match?({:array, :string}, {:array, :any})
       true
 
-      iex> match?(Ecto.DateTime, :datetime)
+      iex> match?(EctoOne.DateTime, :datetime)
       true
-      iex> match?(Ecto.DateTime, :string)
+      iex> match?(EctoOne.DateTime, :string)
       false
 
   """
@@ -263,11 +263,11 @@ defmodule Ecto.Type do
   Dumps a value to the given type.
 
   Opposite to casting, dumping requires the returned value
-  to be a valid Ecto type, as it will be sent to the
+  to be a valid EctoOne type, as it will be sent to the
   underlying data store.
 
       iex> dump(:string, nil)
-      {:ok, %Ecto.Query.Tagged{value: nil, type: :string}}
+      {:ok, %EctoOne.Query.Tagged{value: nil, type: :string}}
       iex> dump(:string, "foo")
       {:ok, "foo"}
 
@@ -277,7 +277,7 @@ defmodule Ecto.Type do
       :error
 
       iex> dump(:binary, "foo")
-      {:ok, %Ecto.Query.Tagged{value: "foo", type: :binary}}
+      {:ok, %EctoOne.Query.Tagged{value: "foo", type: :binary}}
       iex> dump(:binary, 1)
       :error
 
@@ -286,7 +286,7 @@ defmodule Ecto.Type do
       iex> dump({:array, :integer}, [1, "2", 3])
       :error
       iex> dump({:array, :binary}, ["1", "2", "3"])
-      {:ok, %Ecto.Query.Tagged{value: ["1", "2", "3"], type: {:array, :binary}}}
+      {:ok, %EctoOne.Query.Tagged{value: ["1", "2", "3"], type: {:array, :binary}}}
 
   A `dumper` function may be given for handling recursive types.
   """
@@ -298,7 +298,7 @@ defmodule Ecto.Type do
   end
 
   def dump(type, nil, _dumper) do
-    {:ok, %Ecto.Query.Tagged{value: nil, type: type(type)}}
+    {:ok, %EctoOne.Query.Tagged{value: nil, type: type(type)}}
   end
 
   def dump(:binary_id, value, _dumper) do
@@ -325,13 +325,13 @@ defmodule Ecto.Type do
   end
 
   defp tag(:binary, value),
-    do: %Ecto.Query.Tagged{type: :binary, value: value}
+    do: %EctoOne.Query.Tagged{type: :binary, value: value}
   defp tag(_type, value),
     do: value
 
   defp dump_array(type, [h|t], dumper, acc, tagged) do
     case dumper.(type, h) do
-      {:ok, %Ecto.Query.Tagged{value: h}} ->
+      {:ok, %EctoOne.Query.Tagged{value: h}} ->
         dump_array(type, t, dumper, [h|acc], true)
       {:ok, h} ->
         dump_array(type, t, dumper, [h|acc], tagged)
@@ -341,7 +341,7 @@ defmodule Ecto.Type do
   end
 
   defp dump_array(type, [], _dumper, acc, true) do
-    {:ok, %Ecto.Query.Tagged{value: Enum.reverse(acc), type: type({:array, type})}}
+    {:ok, %EctoOne.Query.Tagged{value: Enum.reverse(acc), type: type({:array, type})}}
   end
 
   defp dump_array(_type, [], _dumper, acc, false) do
@@ -349,7 +349,7 @@ defmodule Ecto.Type do
   end
 
   defp dump_embed(%{cardinality: :one} = embed, nil, _fun) do
-    {:ok, %Ecto.Query.Tagged{value: nil, type: type({:embed, embed})}}
+    {:ok, %EctoOne.Query.Tagged{value: nil, type: type({:embed, embed})}}
   end
 
   defp dump_embed(%{cardinality: :one, related: model, field: field} = embed,
@@ -371,11 +371,11 @@ defmodule Ecto.Type do
     :error
   end
 
-  defp dump_embed(_field, _model, %Ecto.Changeset{action: :delete}, _types, _fun) do
+  defp dump_embed(_field, _model, %EctoOne.Changeset{action: :delete}, _types, _fun) do
     nil
   end
 
-  defp dump_embed(_field, model, %Ecto.Changeset{model: %{__struct__: model}} = changeset, types, dumper) do
+  defp dump_embed(_field, model, %EctoOne.Changeset{model: %{__struct__: model}} = changeset, types, dumper) do
     %{model: struct, changes: changes} = changeset
 
     Enum.reduce(types, %{}, fn {field, type}, acc ->
@@ -464,7 +464,7 @@ defmodule Ecto.Type do
   end
 
   defp load_embed(_field, model, value, loader) when is_map(value) do
-    Ecto.Schema.__load__(model, nil, nil, nil, value, loader)
+    EctoOne.Schema.__load__(model, nil, nil, nil, value, loader)
   end
 
   defp load_embed(field, _model, value, _fun) do
@@ -580,16 +580,16 @@ defmodule Ecto.Type do
     end
   end
 
-  # This would be equivalent to implementing Ecto.DataType
+  # This would be equivalent to implementing EctoOne.DataType
   # for those types. We skip the protocol for performance.
-  def cast(:datetime, %{__struct__: Ecto.DateTime} = datetime), do: Ecto.DateTime.dump(datetime)
-  def cast(:date, %{__struct__: Ecto.Date} = date), do: Ecto.Date.dump(date)
-  def cast(:time, %{__struct__: Ecto.Time} = time), do: Ecto.Time.dump(time)
+  def cast(:datetime, %{__struct__: EctoOne.DateTime} = datetime), do: EctoOne.DateTime.dump(datetime)
+  def cast(:date, %{__struct__: EctoOne.Date} = date), do: EctoOne.Date.dump(date)
+  def cast(:time, %{__struct__: EctoOne.Time} = time), do: EctoOne.Time.dump(time)
 
   def cast(type, term) do
     case try_cast(type, term) do
       {:ok, _} = ok -> ok
-      :error -> Ecto.DataType.cast(term, type)
+      :error -> EctoOne.DataType.cast(term, type)
     end
   end
 

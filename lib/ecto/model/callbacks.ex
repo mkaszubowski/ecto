@@ -1,20 +1,20 @@
-defmodule Ecto.Model.Callbacks do
+defmodule EctoOne.Model.Callbacks do
   @moduledoc """
-  Warning: Ecto callbacks are deprecated.
+  Warning: EctoOne callbacks are deprecated.
   """
 
   @doc false
   defmacro __using__(_opts) do
     quote do
-      import Ecto.Model.Callbacks
-      @before_compile Ecto.Model.Callbacks
-      @ecto_callbacks %{}
+      import EctoOne.Model.Callbacks
+      @before_compile EctoOne.Model.Callbacks
+      @ecto_one_callbacks %{}
     end
   end
 
   @doc false
   defmacro __before_compile__(env) do
-    callbacks = Module.get_attribute env.module, :ecto_callbacks
+    callbacks = Module.get_attribute env.module, :ecto_one_callbacks
 
     for {event, callbacks} <- callbacks do
       body = Enum.reduce Enum.reverse(callbacks),
@@ -34,7 +34,7 @@ defmodule Ecto.Model.Callbacks do
 
   Since on insert all the model fields plus changeset changes
   are sent to the repository, the callback receives an
-  `Ecto.Changeset` with all the model fields and changes in
+  `EctoOne.Changeset` with all the model fields and changes in
   the `changeset.changes` field. At this point, the changeset
   has already been validated and is always valid.
 
@@ -59,7 +59,7 @@ defmodule Ecto.Model.Callbacks do
   Adds a callback that is invoked after the model is inserted
   into the repository.
 
-  The callback receives an `Ecto.Changeset` with both repository
+  The callback receives an `EctoOne.Changeset` with both repository
   values and changeset changes already applied to the model.
 
   The callback must return a changeset and always runs inside
@@ -82,7 +82,7 @@ defmodule Ecto.Model.Callbacks do
   @doc """
   Adds a callback that is invoked before the model is updated.
 
-  The callback receives an `Ecto.Changeset` with the changes
+  The callback receives an `EctoOne.Changeset` with the changes
   to be sent to the database in the `changeset.changes` field.
   At this point, the changeset has already been validated and is
   always valid.
@@ -107,7 +107,7 @@ defmodule Ecto.Model.Callbacks do
   @doc """
   Adds a callback that is invoked after the model is updated.
 
-  The callback receives an `Ecto.Changeset` with both repository
+  The callback receives an `EctoOne.Changeset` with both repository
   values and changeset changes already applied to the model.
 
   The callback must return a changeset and always runs inside
@@ -131,7 +131,7 @@ defmodule Ecto.Model.Callbacks do
   Adds a callback that is invoked before the model is deleted
   from the repository.
 
-  The callback receives an `Ecto.Changeset`. At this point, the
+  The callback receives an `EctoOne.Changeset`. At this point, the
   changeset has already been validated and is always valid.
 
   The callback must return a changeset and always runs inside
@@ -155,7 +155,7 @@ defmodule Ecto.Model.Callbacks do
   Adds a callback that is invoked after the model is deleted
   from the repository.
 
-  The callback receives an `Ecto.Changeset` with the model
+  The callback receives an `EctoOne.Changeset` with the model
   stored in it.
 
   The callback must return a changeset and always runs inside
@@ -163,7 +163,7 @@ defmodule Ecto.Model.Callbacks do
 
   ## Example
 
-      after_delete User, :notify_garbage_collectors
+      after_delete User, :notify_garbage_collecto_oners
 
   """
   defmacro after_delete(function, args \\ []),
@@ -216,7 +216,7 @@ defmodule Ecto.Model.Callbacks do
                       Exception.format_stacktrace(Macro.Env.stacktrace(caller))
     quote bind_quoted: [event: event, module: module, function: function, args: args] do
       callback = {module, function, args}
-      @ecto_callbacks Map.update(@ecto_callbacks, event, [callback], &[callback|&1])
+      @ecto_one_callbacks Map.update(@ecto_one_callbacks, event, [callback], &[callback|&1])
     end
   end
 
@@ -244,9 +244,9 @@ defmodule Ecto.Model.Callbacks do
 
   ## Examples
 
-      iex> changeset = Ecto.Changeset.cast(params, %User{}, ~w(name), ~w())
-      iex> Ecto.Model.Callbacks.__apply__ User, :before_delete, changeset
-      %Ecto.Changeset{...}
+      iex> changeset = EctoOne.Changeset.cast(params, %User{}, ~w(name), ~w())
+      iex> EctoOne.Model.Callbacks.__apply__ User, :before_delete, changeset
+      %EctoOne.Changeset{...}
 
   """
   def __apply__(module, callback, %{__struct__: expected} = data) do

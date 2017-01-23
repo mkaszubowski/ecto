@@ -1,4 +1,4 @@
-defmodule Ecto.Pools.SojournBroker do
+defmodule EctoOne.Pools.SojournBroker do
   @moduledoc """
   Start a pool of connections using `sbroker`.
 
@@ -8,19 +8,19 @@ defmodule Ecto.Pools.SojournBroker do
     * `:pool_size` - The number of connections to keep in the pool (default: 10)
     * `:min_backoff` - The minimum backoff on failed connect in milliseconds (default: 50)
     * `:max_backoff` - The maximum backoff on failed connect in milliseconds (default: 5000)
-    * `:broker` - The `sbroker` module to use (default: `Ecto.Pools.SojournBroker.Timeout`)
+    * `:broker` - The `sbroker` module to use (default: `EctoOne.Pools.SojournBroker.Timeout`)
     * `:lazy` - When true, initial connections to the repo are lazily started (default: true)
     * `:shutdown` - The shutdown method for the connections (default: 5000) (see Supervisor.Spec)
 
   """
 
-  alias Ecto.Pools.SojournBroker.Worker
-  @behaviour Ecto.Pool
+  alias EctoOne.Pools.SojournBroker.Worker
+  @behaviour EctoOne.Pool
 
   @doc """
   Starts a pool of connections for the given connection module and options.
 
-    * `conn_mod` - The connection module, see `Ecto.Adapters.Connection`
+    * `conn_mod` - The connection module, see `EctoOne.Adapters.Connection`
     * `opts` - The options for the pool, the broker and the connections
 
   """
@@ -93,7 +93,7 @@ defmodule Ecto.Pools.SojournBroker do
       |> Keyword.put(:timeout, Keyword.get(opts, :connect_timeout, 5_000))
 
     name   = Keyword.fetch!(pool_opts, :pool_name)
-    broker = Keyword.get(pool_opts, :broker, Ecto.Pools.SojournBroker.Timeout)
+    broker = Keyword.get(pool_opts, :broker, EctoOne.Pools.SojournBroker.Timeout)
     size   = Keyword.get(pool_opts, :pool_size, 10)
 
     {name, broker, size, conn_opts}

@@ -1,8 +1,8 @@
-defmodule Ecto.Query.Builder.GroupByTest do
+defmodule EctoOne.Query.Builder.GroupByTest do
   use ExUnit.Case, async: true
 
-  import Ecto.Query.Builder.GroupBy
-  doctest Ecto.Query.Builder.GroupBy
+  import EctoOne.Query.Builder.GroupBy
+  doctest EctoOne.Query.Builder.GroupBy
 
   test "escape" do
     assert {Macro.escape(quote do [&0.y] end), %{}} ==
@@ -17,7 +17,7 @@ defmodule Ecto.Query.Builder.GroupByTest do
   end
 
   test "escape raise" do
-    assert_raise Ecto.Query.CompileError, "unbound variable `x` in query", fn ->
+    assert_raise EctoOne.Query.CompileError, "unbound variable `x` in query", fn ->
       escape(quote do x.y end, [], __ENV__)
     end
   end

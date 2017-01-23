@@ -1,10 +1,10 @@
-defmodule Ecto.Pools.Poolboy.Worker do
+defmodule EctoOne.Pools.Poolboy.Worker do
   @moduledoc false
 
   use GenServer
   use Behaviour
   require Logger
-  alias Ecto.Adapters.Connection
+  alias EctoOne.Adapters.Connection
 
   @type modconn :: {module :: atom, conn :: pid}
 

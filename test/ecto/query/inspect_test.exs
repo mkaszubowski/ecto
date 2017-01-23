@@ -1,5 +1,5 @@
 defmodule Inspect.Post do
-  use Ecto.Schema
+  use EctoOne.Schema
 
   schema "posts" do
     field :visits, :integer
@@ -9,15 +9,15 @@ defmodule Inspect.Post do
 end
 
 defmodule Inspect.Comment do
-  use Ecto.Schema
+  use EctoOne.Schema
 
   schema "comments" do
   end
 end
 
-defmodule Ecto.Query.InspectTest do
+defmodule EctoOne.Query.InspectTest do
   use ExUnit.Case, async: true
-  import Ecto.Query
+  import EctoOne.Query
 
   alias Inspect.Post
   alias Inspect.Comment
@@ -157,7 +157,7 @@ defmodule Ecto.Query.InspectTest do
     """
     |> String.rstrip
 
-    assert Inspect.Ecto.Query.to_string(
+    assert Inspect.EctoOne.Query.to_string(
       from(x in Post, join: y in assoc(x, :comments), where: true, group_by: x.id,
                       having: true, order_by: x.id, limit: 1, offset: 1, update: [set: [id: 3]],
                       lock: "FOO", distinct: 1, select: 1, preload: [:likes, comments: y])
@@ -199,12 +199,12 @@ defmodule Ecto.Query.InspectTest do
   end
 
   def plan(query) do
-    {query, _params, _key} = Ecto.Query.Planner.prepare(query, :all, Ecto.TestAdapter)
-    Ecto.Query.Planner.normalize(query, :all, Ecto.TestAdapter)
+    {query, _params, _key} = EctoOne.Query.Planner.prepare(query, :all, EctoOne.TestAdapter)
+    EctoOne.Query.Planner.normalize(query, :all, EctoOne.TestAdapter)
   end
 
   def i(query) do
-    assert "#Ecto.Query<" <> rest = inspect query
+    assert "#EctoOne.Query<" <> rest = inspect query
     size = byte_size(rest)
     assert ">" = :binary.part(rest, size-1, 1)
     :binary.part(rest, 0, size-1)

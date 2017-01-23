@@ -1,4 +1,4 @@
-defmodule Ecto.Pools.Poolboy do
+defmodule EctoOne.Pools.Poolboy do
   @moduledoc """
   Start a pool of connections using `poolboy`.
 
@@ -12,13 +12,13 @@ defmodule Ecto.Pools.Poolboy do
 
   """
 
-  alias Ecto.Pools.Poolboy.Worker
-  @behaviour Ecto.Pool
+  alias EctoOne.Pools.Poolboy.Worker
+  @behaviour EctoOne.Pool
 
   @doc """
   Starts a pool of connections for the given connection module and options.
 
-    * `conn_mod` - The connection module, see `Ecto.Adapters.Connection`
+    * `conn_mod` - The connection module, see `EctoOne.Adapters.Connection`
     * `opts` - The options for the pool and the connections
 
   """

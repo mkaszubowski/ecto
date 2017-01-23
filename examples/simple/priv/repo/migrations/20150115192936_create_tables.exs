@@ -1,5 +1,5 @@
 defmodule Repo.CreateTables do
-  use Ecto.Migration
+  use EctoOne.Migration
 
   def up do
     create table(:weather) do

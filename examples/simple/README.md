@@ -5,8 +5,8 @@ To run this example, you need to ensure postgres is up and running with a `postg
 Then, from the command line:
 
 * `mix do deps.get, compile`
-* `mix ecto.create`
-* `mix ecto.migrate`
+* `mix ecto_one.create`
+* `mix ecto_one.migrate`
 * `mix run priv/repo/seeds.exs`
 * `iex -S mix`
 

@@ -1,13 +1,13 @@
 Code.require_file "../support/file_helpers.exs", __DIR__
 
-defmodule Ecto.Integration.MigratorTest do
+defmodule EctoOne.Integration.MigratorTest do
   use ExUnit.Case
 
   import Support.FileHelpers
-  import Ecto.Migrator, only: [migrated_versions: 1]
+  import EctoOne.Migrator, only: [migrated_versions: 1]
 
-  alias Ecto.Integration.TestRepo
-  alias Ecto.Migration.SchemaMigration
+  alias EctoOne.Integration.TestRepo
+  alias EctoOne.Migration.SchemaMigration
 
   setup do
     TestRepo.delete_all(SchemaMigration)
@@ -15,7 +15,7 @@ defmodule Ecto.Integration.MigratorTest do
   end
 
   defmodule GoodMigration do
-    use Ecto.Migration
+    use EctoOne.Migration
 
     def up do
       :ok
@@ -27,14 +27,14 @@ defmodule Ecto.Integration.MigratorTest do
   end
 
   defmodule BadMigration do
-    use Ecto.Migration
+    use EctoOne.Migration
 
     def change do
       execute "CREATE WHAT"
     end
   end
 
-  import Ecto.Migrator
+  import EctoOne.Migrator
 
   test "schema migration" do
     up(TestRepo, 20100906120000, GoodMigration, log: false)
@@ -119,7 +119,7 @@ defmodule Ecto.Integration.MigratorTest do
 
     File.write! "#{num}_migration_#{num}.exs", """
     defmodule #{module} do
-      use Ecto.Migration
+      use EctoOne.Migration
 
 
       def up do

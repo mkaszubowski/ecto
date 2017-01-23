@@ -1,7 +1,7 @@
-defmodule Ecto.Query.Builder.OrderBy do
+defmodule EctoOne.Query.Builder.OrderBy do
   @moduledoc false
 
-  alias Ecto.Query.Builder
+  alias EctoOne.Query.Builder
 
   @doc """
   Escapes an order by query.
@@ -20,7 +20,7 @@ defmodule Ecto.Query.Builder.OrderBy do
   """
   @spec escape(Macro.t, Keyword.t, Macro.Env.t) :: Macro.t
   def escape({:^, _, [expr]}, _vars, _env) do
-    {quote(do: Ecto.Query.Builder.OrderBy.order_by!(unquote(expr))), %{}}
+    {quote(do: EctoOne.Query.Builder.OrderBy.order_by!(unquote(expr))), %{}}
   end
 
   def escape(expr, vars, env) do
@@ -29,11 +29,11 @@ defmodule Ecto.Query.Builder.OrderBy do
   end
 
   defp do_escape({dir, {:^, _, [expr]}}, params, _vars, _env) do
-    {{quoted_dir!(dir), quote(do: Ecto.Query.Builder.OrderBy.field!(unquote(expr)))}, params}
+    {{quoted_dir!(dir), quote(do: EctoOne.Query.Builder.OrderBy.field!(unquote(expr)))}, params}
   end
 
   defp do_escape({:^, _, [expr]}, params, _vars, _env) do
-    {{:asc, quote(do: Ecto.Query.Builder.OrderBy.field!(unquote(expr)))}, params}
+    {{:asc, quote(do: EctoOne.Query.Builder.OrderBy.field!(unquote(expr)))}, params}
   end
 
   defp do_escape({dir, field}, params, _vars, _env) when is_atom(field) do
@@ -59,7 +59,7 @@ defmodule Ecto.Query.Builder.OrderBy do
   delegate the check to runtime for interpolation.
   """
   def quoted_dir!({:^, _, [expr]}),
-    do: quote(do: Ecto.Query.Builder.OrderBy.dir!(unquote(expr)))
+    do: quote(do: EctoOne.Query.Builder.OrderBy.dir!(unquote(expr)))
   def quoted_dir!(dir) when dir in [:asc, :desc],
     do: dir
   def quoted_dir!(other),
@@ -110,7 +110,7 @@ defmodule Ecto.Query.Builder.OrderBy do
     {expr, params} = escape(expr, binding, env)
     params         = Builder.escape_params(params)
 
-    order_by = quote do: %Ecto.Query.QueryExpr{
+    order_by = quote do: %EctoOne.Query.QueryExpr{
                            expr: unquote(expr),
                            params: unquote(params),
                            file: unquote(env.file),
@@ -121,9 +121,9 @@ defmodule Ecto.Query.Builder.OrderBy do
   @doc """
   The callback applied by `build/4` to build the query.
   """
-  @spec apply(Ecto.Queryable.t, term) :: Ecto.Query.t
+  @spec apply(EctoOne.Queryable.t, term) :: EctoOne.Query.t
   def apply(query, expr) do
-    query = Ecto.Queryable.to_query(query)
+    query = EctoOne.Queryable.to_query(query)
     %{query | order_bys: query.order_bys ++ [expr]}
   end
 end

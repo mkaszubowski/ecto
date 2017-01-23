@@ -1,8 +1,8 @@
-defmodule Ecto.Pool.TransactionTest do
+defmodule EctoOne.Pool.TransactionTest do
   use ExUnit.Case, async: true
 
-  alias Ecto.Pool
-  alias Ecto.TestPool
+  alias EctoOne.Pool
+  alias EctoOne.TestPool
 
   @timeout :infinity
 

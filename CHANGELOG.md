@@ -64,42 +64,42 @@
 
 ### Deprecations
 
-* Add missing deprecation on `Ecto.Changeset.cast/3`
+* Add missing deprecation on `EctoOne.Changeset.cast/3`
 
 ## v1.1.0
 
-Ecto v1.1.0 brings many improvements and bug fixes.
+EctoOne v1.1.0 brings many improvements and bug fixes.
 
 In particular v1.1.0 deprecates functionality that has been shown by developers to be confusing, unclear or error prone. They include:
 
-* `Ecto.Model`'s callbacks have been deprecated in favor of composing with changesets and of schema serializers
-* `Ecto.Model`'s `optimistic_lock/1` has been deprecated in favor of `Ecto.Changeset.optimistic_lock/3`, which gives more fine grained control over the lock by relying on changesets
-* Giving a model to `Ecto.Repo.update/2` has been deprecated as it is ineffective and error prone since changes cannot be tracked
-* `Ecto.DateTime.local/0` has been deprecated
-* The association and embedded functionality from `Ecto.Changeset.cast/4` has been moved to `Ecto.Changeset.cast_assoc/3` and `Ecto.Changeset.cast_embed/3`
-* The association and embedded functionality from `Ecto.Changeset.put_change/3` has been moved to `Ecto.Changeset.put_assoc/3` and `Ecto.Changeset.put_embed/3`
+* `EctoOne.Model`'s callbacks have been deprecated in favor of composing with changesets and of schema serializers
+* `EctoOne.Model`'s `optimistic_lock/1` has been deprecated in favor of `EctoOne.Changeset.optimistic_lock/3`, which gives more fine grained control over the lock by relying on changesets
+* Giving a model to `EctoOne.Repo.update/2` has been deprecated as it is ineffective and error prone since changes cannot be tracked
+* `EctoOne.DateTime.local/0` has been deprecated
+* The association and embedded functionality from `EctoOne.Changeset.cast/4` has been moved to `EctoOne.Changeset.cast_assoc/3` and `EctoOne.Changeset.cast_embed/3`
+* The association and embedded functionality from `EctoOne.Changeset.put_change/3` has been moved to `EctoOne.Changeset.put_assoc/3` and `EctoOne.Changeset.put_embed/3`
 
-Furthermore, the following functionality has been soft-deprecated (they won't emit warnings for now, only on Ecto v2.0):
+Furthermore, the following functionality has been soft-deprecated (they won't emit warnings for now, only on EctoOne v2.0):
 
-* `Ecto.Model` has been soft deprecated. `use Ecto.Schema` instead of `use Ecto.Model` and invoke the functions in `Ecto` instead of the ones in `Ecto.Model`
+* `EctoOne.Model` has been soft deprecated. `use EctoOne.Schema` instead of `use EctoOne.Model` and invoke the functions in `EctoOne` instead of the ones in `EctoOne.Model`
 
 Keep on reading for more general information about this release.
 
 ### Enhancements
 
-* Optimize Ecto.UUID encoding/decoding
+* Optimize EctoOne.UUID encoding/decoding
 * Introduce pool timeout and set default value to 15000ms
-* Support lists in `Ecto.Changeset.validate_length/3`
-* Add `Ecto.DataType` protocol that allows an Elixir data type to be cast to any Ecto type
-* Add `Ecto.Changeset.prepare_changes/2` allowing the changeset to be prepared before sent to the storage
-* Add `Ecto.Changeset.traverse_errors/2` for traversing all errors in a changeset, including the ones from embeds and associations
-* Add `Ecto.Repo.insert_or_update/2`
+* Support lists in `EctoOne.Changeset.validate_length/3`
+* Add `EctoOne.DataType` protocol that allows an Elixir data type to be cast to any EctoOne type
+* Add `EctoOne.Changeset.prepare_changes/2` allowing the changeset to be prepared before sent to the storage
+* Add `EctoOne.Changeset.traverse_errors/2` for traversing all errors in a changeset, including the ones from embeds and associations
+* Add `EctoOne.Repo.insert_or_update/2`
 * Add support for exclusion constraints
-* Add support for precision on `Ecto.Time.utc/1` and `Ecto.DateTime.utc/1`
+* Add support for precision on `EctoOne.Time.utc/1` and `EctoOne.DateTime.utc/1`
 * Support `count(expr, :distinct)` in query expressions
 * Support prefixes in `table` and `index` in migrations
 * Allow multiple repos to be given to Mix tasks
-* Allow optional binding on `Ecto.Query` operations
+* Allow optional binding on `EctoOne.Query` operations
 * Allow keyword lists on `where`, for example: `from Post, where: [published: true]`
 
 ### Bug fixes

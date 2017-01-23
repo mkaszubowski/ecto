@@ -1,7 +1,7 @@
-defmodule Ecto.Query.Builder.Select do
+defmodule EctoOne.Query.Builder.Select do
   @moduledoc false
 
-  alias Ecto.Query.Builder
+  alias EctoOne.Query.Builder
 
   @doc """
   Escapes a select.
@@ -84,7 +84,7 @@ defmodule Ecto.Query.Builder.Select do
     {expr, params} = escape(expr, binding, env)
     params         = Builder.escape_params(params)
 
-    select = quote do: %Ecto.Query.SelectExpr{
+    select = quote do: %EctoOne.Query.SelectExpr{
                          expr: unquote(expr),
                          params: unquote(params),
                          file: unquote(env.file),
@@ -95,9 +95,9 @@ defmodule Ecto.Query.Builder.Select do
   @doc """
   The callback applied by `build/4` to build the query.
   """
-  @spec apply(Ecto.Queryable.t, term) :: Ecto.Query.t
+  @spec apply(EctoOne.Queryable.t, term) :: EctoOne.Query.t
   def apply(query, select) do
-    query = Ecto.Queryable.to_query(query)
+    query = EctoOne.Queryable.to_query(query)
 
     if query.select do
       Builder.error! "only one select expression is allowed in query"

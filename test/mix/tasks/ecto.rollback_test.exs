@@ -1,7 +1,7 @@
-defmodule Mix.Tasks.Ecto.RollbackTest do
+defmodule Mix.Tasks.EctoOne.RollbackTest do
   use ExUnit.Case, async: true
 
-  import Mix.Tasks.Ecto.Rollback, only: [run: 2]
+  import Mix.Tasks.EctoOne.Rollback, only: [run: 2]
 
   defmodule Repo do
     def start_link do
@@ -23,7 +23,7 @@ defmodule Mix.Tasks.Ecto.RollbackTest do
     end
 
     def config do
-      [priv: "hello", otp_app: :ecto]
+      [priv: "hello", otp_app: :ecto_one]
     end
   end
 
@@ -41,7 +41,7 @@ defmodule Mix.Tasks.Ecto.RollbackTest do
     end
 
     def config do
-      [priv: "hello", otp_app: :ecto]
+      [priv: "hello", otp_app: :ecto_one]
     end
   end
 
@@ -63,7 +63,7 @@ defmodule Mix.Tasks.Ecto.RollbackTest do
   test "runs the migrator yielding the repository and migrations path" do
     run ["-r", to_string(Repo)], fn repo, path, direction, strategy ->
       assert repo == Repo
-      assert path == Application.app_dir(:ecto, "hello/migrations")
+      assert path == Application.app_dir(:ecto_one, "hello/migrations")
       assert direction == :down
       assert strategy[:step] == 1
     end

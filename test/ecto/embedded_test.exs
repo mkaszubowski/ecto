@@ -1,17 +1,17 @@
-defmodule Ecto.EmbeddedTest do
+defmodule EctoOne.EmbeddedTest do
   use ExUnit.Case, async: true
-  doctest Ecto.Embedded
+  doctest EctoOne.Embedded
 
-  alias Ecto.Changeset
-  alias Ecto.Changeset.Relation
-  alias Ecto.Embedded
+  alias EctoOne.Changeset
+  alias EctoOne.Changeset.Relation
+  alias EctoOne.Embedded
 
   alias __MODULE__.Author
   alias __MODULE__.Profile
   alias __MODULE__.Post
 
   defmodule Author do
-    use Ecto.Schema
+    use EctoOne.Schema
 
     schema "authors" do
       field :name, :string
@@ -26,8 +26,8 @@ defmodule Ecto.EmbeddedTest do
   end
 
   defmodule Post do
-    use Ecto.Schema
-    import Ecto.Changeset
+    use EctoOne.Schema
+    import EctoOne.Changeset
 
     schema "posts" do
       field :title, :string
@@ -49,7 +49,7 @@ defmodule Ecto.EmbeddedTest do
   end
 
   defmodule Profile do
-    use Ecto.Schema
+    use EctoOne.Schema
 
     embedded_schema do
       field :name
@@ -570,7 +570,7 @@ defmodule Ecto.EmbeddedTest do
     base_changeset = Changeset.change(%Author{})
 
     changeset = Changeset.put_embed(base_changeset, :profile, %Profile{name: "michal"})
-    assert %Ecto.Changeset{} = changeset.changes.profile
+    assert %EctoOne.Changeset{} = changeset.changes.profile
 
     base_changeset = Changeset.change(%Author{profile: %Profile{name: "michal"}})
     empty_update_changeset = Changeset.change(%Profile{name: "michal"})

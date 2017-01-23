@@ -1,9 +1,9 @@
-defmodule Ecto.Repo do
+defmodule EctoOne.Repo do
   @moduledoc """
   Defines a repository.
 
   A repository maps to an underlying data store, controlled by the
-  adapter. For example, Ecto ships with a Postgres adapter that
+  adapter. For example, EctoOne ships with a Postgres adapter that
   stores data into a PostgreSQL database.
 
   When used, the repository expects the `:otp_app` as option.
@@ -11,24 +11,24 @@ defmodule Ecto.Repo do
   the repository configuration. For example, the repository:
 
       defmodule Repo do
-        use Ecto.Repo, otp_app: :my_app
+        use EctoOne.Repo, otp_app: :my_app
       end
 
   Could be configured with:
 
       config :my_app, Repo,
-        adapter: Ecto.Adapters.Postgres,
-        database: "ecto_simple",
+        adapter: EctoOne.Adapters.Postgres,
+        database: "ecto_one_simple",
         username: "postgres",
         password: "postgres",
         hostname: "localhost"
 
   Most of the configuration that goes into the `config` is specific
-  to the adapter, so check `Ecto.Adapters.Postgres` documentation
+  to the adapter, so check `EctoOne.Adapters.Postgres` documentation
   for more information. However, some configuration is shared across
   all adapters, they are:
 
-    * `:priv` - the directory where to keep repository data, like
+    * `:priv` - the directo_onery where to keep repository data, like
       migrations, schema and more. Defaults to "priv/YOUR_REPO"
 
     * `:url` - an URL that specifies storage information. Read below
@@ -40,12 +40,12 @@ defmodule Ecto.Repo do
   above could be rewriten to:
 
       config :my_app, Repo,
-        url: "ecto://postgres:postgres@localhost/ecto_simple"
+        url: "ecto_one://postgres:postgres@localhost/ecto_one_simple"
 
   The schema can be of any value. The path represents the database name
   while options are simply merged in.
 
-  URLs also support `{:system, "KEY"}` to be given, telling Ecto to load
+  URLs also support `{:system, "KEY"}` to be given, telling EctoOne to load
   the configuration from the system environment instead:
 
       config :my_app, Repo,
@@ -59,9 +59,9 @@ defmodule Ecto.Repo do
   @doc false
   defmacro __using__(opts) do
     quote bind_quoted: [opts: opts] do
-      @behaviour Ecto.Repo
+      @behaviour EctoOne.Repo
 
-      {otp_app, adapter, pool, config} = Ecto.Repo.Supervisor.parse_config(__MODULE__, opts)
+      {otp_app, adapter, pool, config} = EctoOne.Repo.Supervisor.parse_config(__MODULE__, opts)
       @otp_app otp_app
       @adapter adapter
       @config  config
@@ -73,11 +73,11 @@ defmodule Ecto.Repo do
       @log_level config[:log_level] || :debug
 
       def config do
-        Ecto.Repo.Supervisor.config(__MODULE__, @otp_app, [])
+        EctoOne.Repo.Supervisor.config(__MODULE__, @otp_app, [])
       end
 
       def start_link(opts \\ []) do
-        Ecto.Repo.Supervisor.start_link(__MODULE__, @otp_app, @adapter, opts)
+        EctoOne.Repo.Supervisor.start_link(__MODULE__, @otp_app, @adapter, opts)
       end
 
       def stop(pid, timeout \\ 5000) do
@@ -94,75 +94,75 @@ defmodule Ecto.Repo do
       end
 
       def all(queryable, opts \\ []) do
-        Ecto.Repo.Queryable.all(__MODULE__, @adapter, queryable, opts)
+        EctoOne.Repo.Queryable.all(__MODULE__, @adapter, queryable, opts)
       end
 
       def get(queryable, id, opts \\ []) do
-        Ecto.Repo.Queryable.get(__MODULE__, @adapter, queryable, id, opts)
+        EctoOne.Repo.Queryable.get(__MODULE__, @adapter, queryable, id, opts)
       end
 
       def get!(queryable, id, opts \\ []) do
-        Ecto.Repo.Queryable.get!(__MODULE__, @adapter, queryable, id, opts)
+        EctoOne.Repo.Queryable.get!(__MODULE__, @adapter, queryable, id, opts)
       end
 
       def get_by(queryable, clauses, opts \\ []) do
-        Ecto.Repo.Queryable.get_by(__MODULE__, unquote(adapter), queryable, clauses, opts)
+        EctoOne.Repo.Queryable.get_by(__MODULE__, unquote(adapter), queryable, clauses, opts)
       end
 
       def get_by!(queryable, clauses, opts \\ []) do
-        Ecto.Repo.Queryable.get_by!(__MODULE__, unquote(adapter), queryable, clauses, opts)
+        EctoOne.Repo.Queryable.get_by!(__MODULE__, unquote(adapter), queryable, clauses, opts)
       end
 
       def one(queryable, opts \\ []) do
-        Ecto.Repo.Queryable.one(__MODULE__, @adapter, queryable, opts)
+        EctoOne.Repo.Queryable.one(__MODULE__, @adapter, queryable, opts)
       end
 
       def one!(queryable, opts \\ []) do
-        Ecto.Repo.Queryable.one!(__MODULE__, @adapter, queryable, opts)
+        EctoOne.Repo.Queryable.one!(__MODULE__, @adapter, queryable, opts)
       end
 
       def update_all(queryable, updates, opts \\ []) do
-        Ecto.Repo.Queryable.update_all(__MODULE__, @adapter, queryable, updates, opts)
+        EctoOne.Repo.Queryable.update_all(__MODULE__, @adapter, queryable, updates, opts)
       end
 
       def delete_all(queryable, opts \\ []) do
-        Ecto.Repo.Queryable.delete_all(__MODULE__, @adapter, queryable, opts)
+        EctoOne.Repo.Queryable.delete_all(__MODULE__, @adapter, queryable, opts)
       end
 
       def insert(model, opts \\ []) do
-        Ecto.Repo.Schema.insert(__MODULE__, @adapter, model, opts)
+        EctoOne.Repo.Schema.insert(__MODULE__, @adapter, model, opts)
       end
 
       def update(model, opts \\ []) do
-        Ecto.Repo.Schema.update(__MODULE__, @adapter, model, opts)
+        EctoOne.Repo.Schema.update(__MODULE__, @adapter, model, opts)
       end
 
       def insert_or_update(changeset, opts \\ []) do
-        Ecto.Repo.Schema.insert_or_update(__MODULE__, @adapter, changeset, opts)
+        EctoOne.Repo.Schema.insert_or_update(__MODULE__, @adapter, changeset, opts)
       end
 
       def delete(model, opts \\ []) do
-        Ecto.Repo.Schema.delete(__MODULE__, @adapter, model, opts)
+        EctoOne.Repo.Schema.delete(__MODULE__, @adapter, model, opts)
       end
 
       def insert!(model, opts \\ []) do
-        Ecto.Repo.Schema.insert!(__MODULE__, @adapter, model, opts)
+        EctoOne.Repo.Schema.insert!(__MODULE__, @adapter, model, opts)
       end
 
       def update!(model, opts \\ []) do
-        Ecto.Repo.Schema.update!(__MODULE__, @adapter, model, opts)
+        EctoOne.Repo.Schema.update!(__MODULE__, @adapter, model, opts)
       end
 
       def insert_or_update!(changeset, opts \\ []) do
-        Ecto.Repo.Schema.insert_or_update!(__MODULE__, @adapter, changeset, opts)
+        EctoOne.Repo.Schema.insert_or_update!(__MODULE__, @adapter, changeset, opts)
       end
 
       def delete!(model, opts \\ []) do
-        Ecto.Repo.Schema.delete!(__MODULE__, @adapter, model, opts)
+        EctoOne.Repo.Schema.delete!(__MODULE__, @adapter, model, opts)
       end
 
       def preload(model_or_models, preloads) do
-        Ecto.Repo.Preloader.preload(model_or_models, __MODULE__, preloads)
+        EctoOne.Repo.Preloader.preload(model_or_models, __MODULE__, preloads)
       end
 
       def __adapter__ do
@@ -183,9 +183,9 @@ defmodule Ecto.Repo do
 
       def log(entry) do
         Logger.unquote(@log_level)(fn ->
-          {_entry, iodata} = Ecto.LogEntry.to_iodata(entry)
+          {_entry, iodata} = EctoOne.LogEntry.to_iodata(entry)
           iodata
-        end, ecto_conn_pid: entry.connection_pid)
+        end, ecto_one_conn_pid: entry.connection_pid)
       end
 
       defoverridable [log: 1, __pool__: 0]
@@ -195,7 +195,7 @@ defmodule Ecto.Repo do
   @doc """
   Returns the adapter tied to the repository.
   """
-  defcallback __adapter__ :: Ecto.Adapter.t
+  defcallback __adapter__ :: EctoOne.Adapter.t
 
   @doc """
   Simply returns true to mark this module as a repository.
@@ -244,7 +244,7 @@ defmodule Ecto.Repo do
   given id.
 
   Returns `nil` if no result was found. If the model in the queryable
-  has no primary key `Ecto.NoPrimaryKeyFieldError` will be raised.
+  has no primary key `EctoOne.NoPrimaryKeyFieldError` will be raised.
 
   ## Options
 
@@ -255,10 +255,10 @@ defmodule Ecto.Repo do
     * `:log` - When false, does not log the query
 
   """
-  defcallback get(Ecto.Queryable.t, term, Keyword.t) :: Ecto.Schema.t | nil | no_return
+  defcallback get(EctoOne.Queryable.t, term, Keyword.t) :: EctoOne.Schema.t | nil | no_return
 
   @doc """
-  Similar to `get/3` but raises `Ecto.NoResultsError` if no record was found.
+  Similar to `get/3` but raises `EctoOne.NoResultsError` if no record was found.
 
   ## Options
 
@@ -269,7 +269,7 @@ defmodule Ecto.Repo do
     * `:log` - When false, does not log the query
 
   """
-  defcallback get!(Ecto.Queryable.t, term, Keyword.t) :: Ecto.Schema.t | nil | no_return
+  defcallback get!(EctoOne.Queryable.t, term, Keyword.t) :: EctoOne.Schema.t | nil | no_return
 
   @doc """
   Fetches a single result from the query.
@@ -289,10 +289,10 @@ defmodule Ecto.Repo do
       MyRepo.get_by(Post, title: "My post")
 
   """
-  defcallback get_by(Ecto.Queryable.t, Keyword.t | Map.t, Keyword.t) :: Ecto.Schema.t | nil | no_return
+  defcallback get_by(EctoOne.Queryable.t, Keyword.t | Map.t, Keyword.t) :: EctoOne.Schema.t | nil | no_return
 
   @doc """
-  Similar to `get_by/3` but raises `Ecto.NoResultsError` if no record was found.
+  Similar to `get_by/3` but raises `EctoOne.NoResultsError` if no record was found.
 
   ## Options
 
@@ -307,7 +307,7 @@ defmodule Ecto.Repo do
       MyRepo.get_by!(Post, title: "My post")
 
   """
-  defcallback get_by!(Ecto.Queryable.t, Keyword.t | Map.t, Keyword.t) :: Ecto.Schema.t | nil | no_return
+  defcallback get_by!(EctoOne.Queryable.t, Keyword.t | Map.t, Keyword.t) :: EctoOne.Schema.t | nil | no_return
 
   @doc """
   Fetches a single result from the query.
@@ -321,10 +321,10 @@ defmodule Ecto.Repo do
     * `:log` - When false, does not log the query
 
   """
-  defcallback one(Ecto.Queryable.t, Keyword.t) :: Ecto.Schema.t | nil | no_return
+  defcallback one(EctoOne.Queryable.t, Keyword.t) :: EctoOne.Schema.t | nil | no_return
 
   @doc """
-  Similar to `one/2` but raises `Ecto.NoResultsError` if no record was found.
+  Similar to `one/2` but raises `EctoOne.NoResultsError` if no record was found.
 
   ## Options
 
@@ -333,12 +333,12 @@ defmodule Ecto.Repo do
     * `:log` - When false, does not log the query
 
   """
-  defcallback one!(Ecto.Queryable.t, Keyword.t) :: Ecto.Schema.t | nil | no_return
+  defcallback one!(EctoOne.Queryable.t, Keyword.t) :: EctoOne.Schema.t | nil | no_return
 
   @doc """
   Preloads all associations on the given model or models.
 
-  This is similar to `Ecto.Query.preload/3` except it allows
+  This is similar to `EctoOne.Query.preload/3` except it allows
   you to preload models after they have been fetched from the
   database.
 
@@ -352,13 +352,13 @@ defmodule Ecto.Repo do
       posts = Repo.preload posts, comments: from(c in Comment, order_by: c.published_at)
 
   """
-  defcallback preload([Ecto.Schema.t] | Ecto.Schema.t, preloads :: term) ::
-                      [Ecto.Schema.t] | Ecto.Schema.t
+  defcallback preload([EctoOne.Schema.t] | EctoOne.Schema.t, preloads :: term) ::
+                      [EctoOne.Schema.t] | EctoOne.Schema.t
 
   @doc """
   Fetches all entries from the data store matching the given query.
 
-  May raise `Ecto.QueryError` if query validation fails.
+  May raise `EctoOne.QueryError` if query validation fails.
 
   ## Options
 
@@ -375,7 +375,7 @@ defmodule Ecto.Repo do
            select: p.title
       MyRepo.all(query)
   """
-  defcallback all(Ecto.Query.t, Keyword.t) :: [Ecto.Schema.t] | no_return
+  defcallback all(EctoOne.Query.t, Keyword.t) :: [EctoOne.Schema.t] | no_return
 
   @doc """
   Updates all entries matching the given query with the given values.
@@ -385,7 +385,7 @@ defmodule Ecto.Repo do
   does not support RETURNING in UPDATE statements or no
   return result was selected, the second element will be nil.
 
-  See `Ecto.Query.update/3` for update operations that can be
+  See `EctoOne.Query.update/3` for update operations that can be
   performed on fields.
 
   This operation does not run the model `before_update` and
@@ -441,14 +441,14 @@ defmodule Ecto.Repo do
 
       from(p in Post, where: p.id < 10) |> MyRepo.delete_all
   """
-  defcallback delete_all(Ecto.Queryable.t, Keyword.t) :: {integer, nil} | no_return
+  defcallback delete_all(EctoOne.Queryable.t, Keyword.t) :: {integer, nil} | no_return
 
   @doc """
   Inserts a model or a changeset.
 
   In case a model is given, the model is converted into a changeset
   with all model non-virtual fields as part of the changeset.
-  This conversion is done by calling `Ecto.Changeset.change/2` directly.
+  This conversion is done by calling `EctoOne.Changeset.change/2` directly.
 
   In case a changeset is given, the changes in the changeset are
   merged with the model fields, and all of them are sent to the
@@ -471,21 +471,21 @@ defmodule Ecto.Repo do
 
   ## Example
 
-      case MyRepo.insert %Post{title: "Ecto is great"} do
+      case MyRepo.insert %Post{title: "EctoOne is great"} do
         {:ok, model}        -> # Inserted with success
         {:error, changeset} -> # Something went wrong
       end
 
   """
-  defcallback insert(Ecto.Schema.t | Ecto.Changeset.t, Keyword.t) ::
-              {:ok, Ecto.Schema.t} | {:error, Ecto.Changeset.t}
+  defcallback insert(EctoOne.Schema.t | EctoOne.Changeset.t, Keyword.t) ::
+              {:ok, EctoOne.Schema.t} | {:error, EctoOne.Changeset.t}
 
   @doc """
   Updates a model or changeset using its primary key.
 
   In case a model is given, the model is converted into a changeset
   with all model non-virtual fields as part of the changeset. This
-  conversion is done by calling `Ecto.Changeset.change/2` directly.
+  conversion is done by calling `EctoOne.Changeset.change/2` directly.
   For this reason, it is preferred to use changesets when performing
   updates as they perform dirty tracking and avoid sending data that
   did not change to the database over and over. In case there are no
@@ -497,7 +497,7 @@ defmodule Ecto.Repo do
   If any `before_update` or `after_update` callback are registered
   in the given model, they will be invoked with the changeset.
 
-  If the model has no primary key, `Ecto.NoPrimaryKeyFieldError`
+  If the model has no primary key, `EctoOne.NoPrimaryKeyFieldError`
   will be raised.
 
   It returns `{:ok, model}` if the model has been successfully
@@ -519,22 +519,22 @@ defmodule Ecto.Repo do
   ## Example
 
       post = MyRepo.get!(Post, 42)
-      post = Ecto.Changeset.change post, title: "New title"
+      post = EctoOne.Changeset.change post, title: "New title"
       case MyRepo.update post do
         {:ok, model}        -> # Updated with success
         {:error, changeset} -> # Something went wrong
       end
   """
-  defcallback update(Ecto.Changeset.t, Keyword.t) ::
-              {:ok, Ecto.Schema.t} | {:error, Ecto.Changeset.t}
+  defcallback update(EctoOne.Changeset.t, Keyword.t) ::
+              {:ok, EctoOne.Schema.t} | {:error, EctoOne.Changeset.t}
 
   @doc """
   Inserts or updates a changeset depending on whether the model is persisted
   or not.
 
   The distinction whether to insert or update will be made on the
-  `Ecto.Schema.Metadata` field `:state`. The `:state` is automatically set by
-  Ecto when loading or building a schema.
+  `EctoOne.Schema.Metadata` field `:state`. The `:state` is automatically set by
+  EctoOne when loading or building a schema.
 
   Please note that for this to work, you will have to load existing models from
   the database. So even if the model exists, this won't work:
@@ -558,8 +558,8 @@ defmodule Ecto.Repo do
         {:error, changeset} -> # Something went wrong
       end
   """
-  defcallback insert_or_update(Ecto.Changeset.t, Keyword.t) ::
-              {:ok, Ecto.Schema.t} | {:error, Ecto.Changeset.t}
+  defcallback insert_or_update(EctoOne.Changeset.t, Keyword.t) ::
+              {:ok, EctoOne.Schema.t} | {:error, EctoOne.Changeset.t}
 
   @doc """
   Deletes a model using its primary key.
@@ -567,7 +567,7 @@ defmodule Ecto.Repo do
   If any `before_delete` or `after_delete` callback are registered
   in the given model, they will be invoked with the changeset.
 
-  If the model has no primary key, `Ecto.NoPrimaryKeyFieldError`
+  If the model has no primary key, `EctoOne.NoPrimaryKeyFieldError`
   will be raised.
 
   It returns `{:ok, model}` if the model has been successfully
@@ -591,30 +591,30 @@ defmodule Ecto.Repo do
       end
 
   """
-  defcallback delete(Ecto.Schema.t, Keyword.t) ::
-              {:ok, Ecto.Schema.t} | {:error, Ecto.Changeset.t}
+  defcallback delete(EctoOne.Schema.t, Keyword.t) ::
+              {:ok, EctoOne.Schema.t} | {:error, EctoOne.Changeset.t}
 
   @doc """
   Same as `insert/2` but returns the model or raises if the changeset is invalid.
   """
-  defcallback insert!(Ecto.Schema.t, Keyword.t) :: Ecto.Schema.t | no_return
+  defcallback insert!(EctoOne.Schema.t, Keyword.t) :: EctoOne.Schema.t | no_return
 
   @doc """
   Same as `update/2` but returns the model or raises if the changeset is invalid.
   """
-  defcallback update!(Ecto.Schema.t, Keyword.t) :: Ecto.Schema.t | no_return
+  defcallback update!(EctoOne.Schema.t, Keyword.t) :: EctoOne.Schema.t | no_return
 
   @doc """
   Same as `insert_or_update/2` but returns the model or raises if the changeset
   is invalid.
   """
-  defcallback insert_or_update!(Ecto.Changeset.t, Keyword.t) ::
-              Ecto.Schema.t | no_return
+  defcallback insert_or_update!(EctoOne.Changeset.t, Keyword.t) ::
+              EctoOne.Schema.t | no_return
 
   @doc """
   Same as `delete/2` but returns the model or raises if the changeset is invalid.
   """
-  defcallback delete!(Ecto.Schema.t, Keyword.t) :: Ecto.Schema.t | no_return
+  defcallback delete!(EctoOne.Schema.t, Keyword.t) :: EctoOne.Schema.t | no_return
 
   @doc """
   Runs the given function inside a transaction.
@@ -679,11 +679,11 @@ defmodule Ecto.Repo do
 
       def log(entry) do
         Logger.debug(fn ->
-          {_entry, iodata} = Ecto.LogEntry.to_iodata(entry)
+          {_entry, iodata} = EctoOne.LogEntry.to_iodata(entry)
           iodata
-        end, ecto_conn_pid: entry.connection_pid)
+        end, ecto_one_conn_pid: entry.connection_pid)
       end
 
   """
-  defcallback log(Ecto.LogEntry.t) :: any
+  defcallback log(EctoOne.LogEntry.t) :: any
 end

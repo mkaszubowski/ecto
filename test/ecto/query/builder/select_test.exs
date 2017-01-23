@@ -1,9 +1,9 @@
-defmodule Ecto.Query.Builder.SelectTest do
+defmodule EctoOne.Query.Builder.SelectTest do
   use ExUnit.Case, async: true
 
-  import Ecto.Query
-  import Ecto.Query.Builder.Select
-  doctest Ecto.Query.Builder.Select
+  import EctoOne.Query
+  import EctoOne.Query.Builder.Select
+  doctest EctoOne.Query.Builder.Select
 
   test "escape" do
     assert {Macro.escape(quote do &0 end), %{}} ==
@@ -30,8 +30,8 @@ defmodule Ecto.Query.Builder.SelectTest do
 
   test "only one select is allowed" do
     message = "only one select expression is allowed in query"
-    assert_raise Ecto.Query.CompileError, message, fn ->
-      %Ecto.Query{} |> select([], 1) |> select([], 2)
+    assert_raise EctoOne.Query.CompileError, message, fn ->
+      %EctoOne.Query{} |> select([], 1) |> select([], 2)
     end
   end
 end

@@ -1,15 +1,15 @@
-defmodule Ecto.Repo.Preloader do
+defmodule EctoOne.Repo.Preloader do
   # The module invoked by user defined repos
   # for preload related functionality.
   @moduledoc false
 
-  require Ecto.Query
+  require EctoOne.Query
 
   @doc """
   Transforms a result set based on query preloads, loading
   the associations onto their parent model.
   """
-  @spec query([list], Ecto.Repo.t, list, list, fun) :: [list]
+  @spec query([list], EctoOne.Repo.t, list, list, fun) :: [list]
   def query([], _repo, _preloads, _assocs, _fun), do: []
   def query(rows, _repo, [], _assocs, fun), do: Enum.map(rows, fun)
 
@@ -29,9 +29,9 @@ defmodule Ecto.Repo.Preloader do
   defp unextract([], [], _fun),                   do: []
 
   @doc """
-  Implementation for `Ecto.Repo.preload/2`.
+  Implementation for `EctoOne.Repo.preload/2`.
   """
-  @spec preload(models, atom, atom | list) :: models when models: [Ecto.Schema.t] | Ecto.Schema.t
+  @spec preload(models, atom, atom | list) :: models when models: [EctoOne.Schema.t] | EctoOne.Schema.t
   def preload(structs, repo, preloads) when is_list(structs) do
     do_preload(structs, repo, preloads, nil)
   end
@@ -105,7 +105,7 @@ defmodule Ecto.Repo.Preloader do
         :many ->
           # Generate the expression by hand so we prepend it instead of appending it
           update_in query.order_bys, fn order_bys ->
-            [%Ecto.Query.QueryExpr{expr: [asc: {{:., [], [{:&, [], [0]}, related_key]}, [], []}],
+            [%EctoOne.Query.QueryExpr{expr: [asc: {{:., [], [{:&, [], [0]}, related_key]}, [], []}],
                                    file: __ENV__.file, line: __ENV__.line, params: []}|order_bys]
           end
       end
@@ -126,7 +126,7 @@ defmodule Ecto.Repo.Preloader do
 
   defp loaded?(struct, field) do
     case Map.get(struct, field) do
-      %Ecto.Association.NotLoaded{} -> false
+      %EctoOne.Association.NotLoaded{} -> false
       _ -> true
     end
   end
@@ -193,8 +193,8 @@ defmodule Ecto.Repo.Preloader do
       children = struct |> Map.fetch!(assoc) |> List.wrap
 
       Enum.reduce children, acc, fn child, {fresh, set} ->
-        [{_, pk}] = Ecto.primary_key!(child)
-        pk || raise Ecto.NoPrimaryKeyValueError, struct: child
+        [{_, pk}] = EctoOne.primary_key!(child)
+        pk || raise EctoOne.NoPrimaryKeyValueError, struct: child
 
         if HashSet.member?(set, pk) do
           {fresh, set}
@@ -211,12 +211,12 @@ defmodule Ecto.Repo.Preloader do
     normalize_each(wrap(preload, original), [], assocs, original)
   end
 
-  defp normalize_each({atom, {%Ecto.Query{} = query, list}}, acc, assocs, original) when is_atom(atom) do
+  defp normalize_each({atom, {%EctoOne.Query{} = query, list}}, acc, assocs, original) when is_atom(atom) do
     no_assoc!(assocs, atom)
     [{atom, {query, normalize_each(wrap(list, original), [], nil, original)}}|acc]
   end
 
-  defp normalize_each({atom, %Ecto.Query{} = query}, acc, assocs, _original) when is_atom(atom) do
+  defp normalize_each({atom, %EctoOne.Query{} = query}, acc, assocs, _original) when is_atom(atom) do
     no_assoc!(assocs, atom)
     [{atom, {query, []}}|acc]
   end
@@ -261,7 +261,7 @@ defmodule Ecto.Repo.Preloader do
           List.keyreplace(acc, preload, 0,
                           {preload, info, merge_preloads(preload, sub_preloads, extra_preloads)})
         nil ->
-          assoc = Ecto.Association.association_from_model!(model, preload)
+          assoc = EctoOne.Association.association_from_model!(model, preload)
           info  = assoc.__struct__.preload_info(assoc)
 
           case info do

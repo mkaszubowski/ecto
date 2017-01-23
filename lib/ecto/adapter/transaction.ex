@@ -1,4 +1,4 @@
-defmodule Ecto.Adapter.Transaction  do
+defmodule EctoOne.Adapter.Transaction  do
   @moduledoc """
   Specifies the adapter transactions API.
   """
@@ -11,15 +11,15 @@ defmodule Ecto.Adapter.Transaction  do
   or `{:error, value}` if the transaction was rolled back where `value` is the
   value given to `rollback/1`.
 
-  See `Ecto.Repo.transaction/1`.
+  See `EctoOne.Repo.transaction/1`.
   """
-  defcallback transaction(Ecto.Repo.t, Keyword.t, fun) :: {:ok, any} | {:error, any}
+  defcallback transaction(EctoOne.Repo.t, Keyword.t, fun) :: {:ok, any} | {:error, any}
 
   @doc """
   Rolls back the current transaction. The transaction will return the value
   given as `{:error, value}`.
 
-  See `Ecto.Repo.rollback/1`.
+  See `EctoOne.Repo.rollback/1`.
   """
-  defcallback rollback(Ecto.Repo.t, any) :: no_return
+  defcallback rollback(EctoOne.Repo.t, any) :: no_return
 end

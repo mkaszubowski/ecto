@@ -1,4 +1,4 @@
-defmodule Ecto.Migration do
+defmodule EctoOne.Migration do
   @moduledoc """
   Migrations are used to modify your database schema over time.
 
@@ -9,7 +9,7 @@ defmodule Ecto.Migration do
   Here is an example:
 
       defmodule MyRepo.Migrations.CreatePosts do
-        use Ecto.Migration
+        use EctoOne.Migration
 
         def up do
           create table(:weather) do
@@ -31,12 +31,12 @@ defmodule Ecto.Migration do
   `up/0` is used to update your database and `down/0` rolls back
   the prompted changes.
 
-  Ecto provides some mix tasks to help developers work with migrations:
+  EctoOne provides some mix tasks to help developers work with migrations:
 
-    * `mix ecto.gen.migration add_weather_table` - generates a
+    * `mix ecto_one.gen.migration add_weather_table` - generates a
       migration that the user can fill in with particular commands
-    * `mix ecto.migrate` - migrates a repository
-    * `mix ecto.rollback` - rolls back a particular migration
+    * `mix ecto_one.migrate` - migrates a repository
+    * `mix ecto_one.rollback` - rolls back a particular migration
 
   Run the `mix help COMMAND` for more information.
 
@@ -47,7 +47,7 @@ defmodule Ecto.Migration do
   migration above can be written as:
 
       defmodule MyRepo.Migrations.CreatePosts do
-        use Ecto.Migration
+        use EctoOne.Migration
 
         def change do
           create table(:weather) do
@@ -62,7 +62,7 @@ defmodule Ecto.Migration do
       end
 
   Notice not all commands are reversible though. Trying to rollback
-  a non-reversible command will raise an `Ecto.MigrationError`.
+  a non-reversible command will raise an `EctoOne.MigrationError`.
 
   ## Prefixes
 
@@ -94,7 +94,7 @@ defmodule Ecto.Migration do
 
   ## Transactions
 
-  By default, Ecto runs all migrations inside a transaction. That's not always
+  By default, EctoOne runs all migrations inside a transaction. That's not always
   ideal: for example, PostgreSQL allows to create/drop indexes concurrently but
   only outside of any transaction (see the [PostgreSQL
   docs](http://www.postgresql.org/docs/9.2/static/sql-createindex.html#SQL-CREATEINDEX-CONCURRENTLY)).
@@ -103,7 +103,7 @@ defmodule Ecto.Migration do
   `@disable_ddl_transaction` module attribute to `true`:
 
       defmodule MyRepo.Migrations.CreateIndexes do
-        use Ecto.Migration
+        use EctoOne.Migration
         @disable_ddl_transaction true
 
         def change do
@@ -168,14 +168,14 @@ defmodule Ecto.Migration do
     }
   end
 
-  alias Ecto.Migration.Runner
+  alias EctoOne.Migration.Runner
 
   @doc false
   defmacro __using__(_) do
     quote location: :keep do
-      import Ecto.Migration
+      import EctoOne.Migration
       @disable_ddl_transaction false
-      @before_compile Ecto.Migration
+      @before_compile EctoOne.Migration
     end
   end
 
@@ -220,7 +220,7 @@ defmodule Ecto.Migration do
   defp do_create(object, command, block) do
     quote do
       table = %Table{} = unquote(object)
-      Runner.start_command({unquote(command), Ecto.Migration.__prefix__(table)})
+      Runner.start_command({unquote(command), EctoOne.Migration.__prefix__(table)})
 
       if table.primary_key do
         add(:id, :serial, primary_key: true)
@@ -247,7 +247,7 @@ defmodule Ecto.Migration do
   defmacro alter(object, do: block) do
     quote do
       table = %Table{} = unquote(object)
-      Runner.start_command({:alter, Ecto.Migration.__prefix__(table)})
+      Runner.start_command({:alter, EctoOne.Migration.__prefix__(table)})
       unquote(block)
       Runner.end_command
     end
@@ -389,7 +389,7 @@ defmodule Ecto.Migration do
   to `true` when the index is created/dropped.
 
   **Note**: in order for the `:concurrently` option to work, the migration must
-  not be run inside a transaction. See the `Ecto.Migration` docs for more
+  not be run inside a transaction. See the `EctoOne.Migration` docs for more
   information on running migrations outside of a transaction.
 
   ## Index types
@@ -468,7 +468,7 @@ defmodule Ecto.Migration do
   @doc """
   Adds a column when creating or altering a table.
 
-  This function also accepts Ecto primitive types as column types
+  This function also accepts EctoOne primitive types as column types
   and they are normalized by the database adapter. For example,
   `string` is converted to varchar, `datetime` to the underlying
   datetime or timestamp type, `binary` to bits or blob, and so on.
@@ -479,10 +479,10 @@ defmodule Ecto.Migration do
   For this reason, this function also accepts `text` and other columns,
   which are sent as is to the underlying database.
 
-  To sum up, the column type may be either an Ecto primitive type,
+  To sum up, the column type may be either an EctoOne primitive type,
   which is normalized in cases the database does not understand it,
   like `string` or `binary`, or a database type which is passed as is.
-  Custom Ecto types, like `Ecto.Datetime`, are not supported because
+  Custom EctoOne types, like `EctoOne.Datetime`, are not supported because
   they are application level concern and may not always map to the
   database.
 
@@ -670,7 +670,7 @@ defmodule Ecto.Migration do
       is_nil(runner_prefix) or runner_prefix == prefix ->
         index_or_table
       true ->
-        raise Ecto.MigrationError,  message:
+        raise EctoOne.MigrationError,  message:
           "the :prefix option `#{inspect prefix}` does match the migrator prefix `#{inspect runner_prefix}`"
     end
   end

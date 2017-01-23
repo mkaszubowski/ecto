@@ -1,6 +1,6 @@
-defmodule Mix.Tasks.Ecto.Create do
+defmodule Mix.Tasks.EctoOne.Create do
   use Mix.Task
-  import Mix.Ecto
+  import Mix.EctoOne
 
   @shortdoc "Create the storage for the repo"
 
@@ -9,8 +9,8 @@ defmodule Mix.Tasks.Ecto.Create do
 
   ## Examples
 
-      mix ecto.create
-      mix ecto.create -r Custom.Repo
+      mix ecto_one.create
+      mix ecto_one.create -r Custom.Repo
 
   ## Command line options
 
@@ -25,13 +25,13 @@ defmodule Mix.Tasks.Ecto.Create do
     repos = parse_repo(args)
     ensure_repo(repos, args)
 
-    Enum.all?(repos, &ensure_implements(&1.__adapter__, Ecto.Adapter.Storage,
+    Enum.all?(repos, &ensure_implements(&1.__adapter__, EctoOne.Adapter.Storage,
                                         "to create storage for #{inspect &1}"))
 
     {opts, _, _} = OptionParser.parse args, switches: [quiet: :boolean]
 
     Enum.each repos, fn repo ->
-      case Ecto.Storage.up(repo) do
+      case EctoOne.Storage.up(repo) do
         :ok ->
           unless opts[:quiet] do
             Mix.shell.info "The database for #{inspect repo} has been created."

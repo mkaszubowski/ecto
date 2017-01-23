@@ -1,4 +1,4 @@
-defmodule Ecto.Mixfile do
+defmodule EctoOne.Mixfile do
   use Mix.Project
 
   @version "1.1.9"
@@ -6,7 +6,7 @@ defmodule Ecto.Mixfile do
   @pools [:poolboy, :sojourn_timeout, :sojourn_codel]
 
   def project do
-    [app: :ecto,
+    [app: :ecto_one,
      version: @version,
      elixir: "~> 1.0",
      deps: deps,
@@ -25,14 +25,14 @@ defmodule Ecto.Mixfile do
      package: package,
 
      # Docs
-     name: "Ecto",
-     docs: [source_ref: "v#{@version}", main: "Ecto",
-            source_url: "https://github.com/elixir-lang/ecto"]]
+     name: "EctoOne",
+     docs: [source_ref: "v#{@version}", main: "EctoOne",
+            source_url: "https://github.com/elixir-lang/ecto_one"]]
   end
 
   def application do
     [applications: [:logger, :decimal, :poolboy],
-     env: [json_library: Poison], mod: {Ecto.Application, []}]
+     env: [json_library: Poison], mod: {EctoOne.Application, []}]
   end
 
   defp deps do
@@ -49,7 +49,7 @@ defmodule Ecto.Mixfile do
 
   defp test_paths(adapter) when adapter in @adapters, do: ["integration_test/#{adapter}"]
   defp test_paths(pool) when pool in @pools, do: ["test/pool/#{pool(pool)}"]
-  defp test_paths(_), do: ["test/ecto", "test/mix"]
+  defp test_paths(_), do: ["test/ecto_one", "test/mix"]
 
   defp pool(:sojourn_timeout), do: "sojourn_broker"
   defp pool(:sojourn_codel),   do: "sojourn_broker"
@@ -57,14 +57,14 @@ defmodule Ecto.Mixfile do
 
   defp description do
     """
-    Ecto is a domain specific language for writing queries and interacting with databases in Elixir.
+    EctoOne is a domain specific language for writing queries and interacting with databases in Elixir.
     """
   end
 
   defp package do
     [maintainers: ["Eric Meadows-Jönsson", "José Valim", "James Fish", "Michał Muskała"],
      licenses: ["Apache 2.0"],
-     links: %{"GitHub" => "https://github.com/elixir-lang/ecto"},
+     links: %{"GitHub" => "https://github.com/elixir-lang/ecto_one"},
      files: ~w(mix.exs README.md CHANGELOG.md lib) ++
             ~w(integration_test/cases integration_test/sql integration_test/support)]
   end

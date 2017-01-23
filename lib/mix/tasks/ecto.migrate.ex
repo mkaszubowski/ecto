@@ -1,6 +1,6 @@
-defmodule Mix.Tasks.Ecto.Migrate do
+defmodule Mix.Tasks.EctoOne.Migrate do
   use Mix.Task
-  import Mix.Ecto
+  import Mix.EctoOne
 
   @shortdoc "Run migrations up on a repo"
 
@@ -8,7 +8,7 @@ defmodule Mix.Tasks.Ecto.Migrate do
   Runs the pending migrations for the given repository.
 
   By default, migrations are expected at "priv/YOUR_REPO/migrations"
-  directory of the current application but it can be configured
+  directo_onery of the current application but it can be configured
   by specify the `:priv` key under the repository configuration.
 
   Runs all pending migrations by default. To migrate up
@@ -21,14 +21,14 @@ defmodule Mix.Tasks.Ecto.Migrate do
 
   ## Examples
 
-      mix ecto.migrate
-      mix ecto.migrate -r Custom.Repo
+      mix ecto_one.migrate
+      mix ecto_one.migrate -r Custom.Repo
 
-      mix ecto.migrate -n 3
-      mix ecto.migrate --step 3
+      mix ecto_one.migrate -n 3
+      mix ecto_one.migrate --step 3
 
-      mix ecto.migrate -v 20080906120000
-      mix ecto.migrate --to 20080906120000
+      mix ecto_one.migrate -v 20080906120000
+      mix ecto_one.migrate --to 20080906120000
 
   ## Command line options
 
@@ -41,7 +41,7 @@ defmodule Mix.Tasks.Ecto.Migrate do
   """
 
   @doc false
-  def run(args, migrator \\ &Ecto.Migrator.run/4) do
+  def run(args, migrator \\ &EctoOne.Migrator.run/4) do
     repos = parse_repo(args)
 
     {opts, _, _} = OptionParser.parse args,

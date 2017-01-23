@@ -1,8 +1,8 @@
-defmodule Ecto.Query.Builder.FilterTest do
+defmodule EctoOne.Query.Builder.FilterTest do
   use ExUnit.Case, async: true
 
-  import Ecto.Query.Builder.Filter
-  doctest Ecto.Query.Builder.Filter
+  import EctoOne.Query.Builder.Filter
+  doctest EctoOne.Query.Builder.Filter
 
   test "escape" do
     import Kernel, except: [==: 2, and: 2]
@@ -30,14 +30,14 @@ defmodule Ecto.Query.Builder.FilterTest do
   end
 
   test "invalid filter" do
-    assert_raise Ecto.Query.CompileError,
+    assert_raise EctoOne.Query.CompileError,
                  ~r"expected a keyword list at compile time in where, got: `\[\{1, 2\}\]`", fn ->
       escape(:where, quote do [{1, 2}] end, [], __ENV__)
     end
   end
 
   test "nil filter" do
-    assert_raise Ecto.Query.CompileError,
+    assert_raise EctoOne.Query.CompileError,
                  ~r"nil given for :x, comparison with nil is forbidden as it always evaluates to false.", fn ->
       escape(:where, quote do [x: nil] end, [], __ENV__)
     end

@@ -1,8 +1,8 @@
-defmodule Ecto.Query.Builder.Join do
+defmodule EctoOne.Query.Builder.Join do
   @moduledoc false
 
-  alias Ecto.Query.Builder
-  alias Ecto.Query.JoinExpr
+  alias EctoOne.Query.Builder
+  alias EctoOne.Query.JoinExpr
 
   @doc """
   Escapes a join expression (not including the `on` expression).
@@ -70,7 +70,7 @@ defmodule Ecto.Query.Builder.Join do
   end
 
   def escape({:^, _, [expr]}, _vars, _env) do
-    {:_, quote(do: Ecto.Query.Builder.Join.join!(unquote(expr))), nil, %{}}
+    {:_, quote(do: EctoOne.Query.Builder.Join.join!(unquote(expr))), nil, %{}}
   end
 
   def escape(join, _vars, _env) do
@@ -140,7 +140,7 @@ defmodule Ecto.Query.Builder.Join do
       else
         {quote(do: unquote(count_bind) + 1),
          quote do
-           query = Ecto.Queryable.to_query(unquote(query))
+           query = EctoOne.Queryable.to_query(unquote(query))
            unquote(count_setter)
            %{query | joins: query.joins ++ [unquote(join)]}
          end}
@@ -150,7 +150,7 @@ defmodule Ecto.Query.Builder.Join do
   end
 
   def apply(query, expr) do
-    query = Ecto.Queryable.to_query(query)
+    query = EctoOne.Queryable.to_query(query)
     %{query | joins: query.joins ++ [expr]}
   end
 
@@ -158,7 +158,7 @@ defmodule Ecto.Query.Builder.Join do
     {on, params} = Builder.escape(on, :boolean, %{}, binding, env)
     params       = Builder.escape_params(params)
 
-    quote do: %Ecto.Query.QueryExpr{
+    quote do: %EctoOne.Query.QueryExpr{
                 expr: unquote(on),
                 params: unquote(params),
                 line: unquote(env.line),
@@ -170,7 +170,7 @@ defmodule Ecto.Query.Builder.Join do
   end
 
   defp validate_qual(qual) do
-    quote(do: Ecto.Query.Builder.Join.qual!(unquote(qual)))
+    quote(do: EctoOne.Query.Builder.Join.qual!(unquote(qual)))
   end
 
   defp validate_bind(bind, all) do

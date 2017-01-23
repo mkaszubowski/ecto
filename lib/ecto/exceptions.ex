@@ -1,11 +1,11 @@
-defmodule Ecto.Query.CompileError do
+defmodule EctoOne.Query.CompileError do
   @moduledoc """
   Raised at compilation time when the query cannot be compiled.
   """
   defexception [:message]
 end
 
-defmodule Ecto.QueryError do
+defmodule EctoOne.QueryError do
   @moduledoc """
   Raised at runtime when the query is invalid.
   """
@@ -17,7 +17,7 @@ defmodule Ecto.QueryError do
     message = """
     #{message} in query:
 
-    #{Inspect.Ecto.Query.to_string(query)}
+    #{Inspect.EctoOne.Query.to_string(query)}
     """
 
     file = opts[:file]
@@ -33,7 +33,7 @@ defmodule Ecto.QueryError do
   end
 end
 
-defmodule Ecto.InvalidChangesetError do
+defmodule EctoOne.InvalidChangesetError do
   @moduledoc """
   Raised when we cannot perform an action because the
   changeset is invalid.
@@ -59,7 +59,7 @@ defmodule Ecto.InvalidChangesetError do
   end
 end
 
-defmodule Ecto.CastError do
+defmodule EctoOne.CastError do
   @moduledoc """
   Raised at runtime when a value cannot be cast.
   """
@@ -75,7 +75,7 @@ defmodule Ecto.CastError do
   end
 end
 
-defmodule Ecto.InvalidURLError do
+defmodule EctoOne.InvalidURLError do
   defexception [:message, :url]
 
   def exception(opts) do
@@ -86,7 +86,7 @@ defmodule Ecto.InvalidURLError do
   end
 end
 
-defmodule Ecto.NoPrimaryKeyFieldError do
+defmodule EctoOne.NoPrimaryKeyFieldError do
   @moduledoc """
   Raised at runtime when an operation that requires a primary key is invoked
   with a model that does not define a primary key by using `@primary_key false`
@@ -100,7 +100,7 @@ defmodule Ecto.NoPrimaryKeyFieldError do
   end
 end
 
-defmodule Ecto.NoPrimaryKeyValueError do
+defmodule EctoOne.NoPrimaryKeyValueError do
   @moduledoc """
   Raised at runtime when an operation that requires a primary key is invoked
   with a model missing value for its primary key
@@ -115,49 +115,49 @@ defmodule Ecto.NoPrimaryKeyValueError do
 end
 
 
-defmodule Ecto.ChangeError do
+defmodule EctoOne.ChangeError do
   defexception [:message]
 end
 
-defmodule Ecto.NoResultsError do
+defmodule EctoOne.NoResultsError do
   defexception [:message]
 
   def exception(opts) do
-    query = Keyword.fetch!(opts, :queryable) |> Ecto.Queryable.to_query
+    query = Keyword.fetch!(opts, :queryable) |> EctoOne.Queryable.to_query
 
     msg = """
     expected at least one result but got none in query:
 
-    #{Inspect.Ecto.Query.to_string(query)}
+    #{Inspect.EctoOne.Query.to_string(query)}
     """
 
     %__MODULE__{message: msg}
   end
 end
 
-defmodule Ecto.MultipleResultsError do
+defmodule EctoOne.MultipleResultsError do
   defexception [:message]
 
   def exception(opts) do
-    query = Keyword.fetch!(opts, :queryable) |> Ecto.Queryable.to_query
+    query = Keyword.fetch!(opts, :queryable) |> EctoOne.Queryable.to_query
     count = Keyword.fetch!(opts, :count)
 
     msg = """
     expected at most one result but got #{count} in query:
 
-    #{Inspect.Ecto.Query.to_string(query)}
+    #{Inspect.EctoOne.Query.to_string(query)}
     """
 
     %__MODULE__{message: msg}
   end
 end
 
-defmodule Ecto.MigrationError do
+defmodule EctoOne.MigrationError do
   defexception [:message]
 end
 
-# TODO: Rename to Ecto.StaleEntryError on 2.0
-defmodule Ecto.StaleModelError do
+# TODO: Rename to EctoOne.StaleEntryError on 2.0
+defmodule EctoOne.StaleModelError do
   defexception [:message]
 
   def exception(opts) do
@@ -174,7 +174,7 @@ defmodule Ecto.StaleModelError do
   end
 end
 
-defmodule Ecto.ConstraintError do
+defmodule EctoOne.ConstraintError do
   defexception [:type, :constraint, :message]
 
   def exception(opts) do

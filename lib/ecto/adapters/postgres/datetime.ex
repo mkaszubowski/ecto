@@ -1,6 +1,6 @@
 if Code.ensure_loaded?(Postgrex) do
 
-  defmodule Ecto.Adapters.Postgres.DateTime do
+  defmodule EctoOne.Adapters.Postgres.DateTime do
     @moduledoc false
 
     alias Postgrex.TypeInfo

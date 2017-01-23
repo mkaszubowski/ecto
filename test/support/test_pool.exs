@@ -1,11 +1,11 @@
-defmodule Ecto.TestPool do
-  alias Ecto.Pool
+defmodule EctoOne.TestPool do
+  alias EctoOne.Pool
 
-  @pool_opts Application.get_env(:ecto, :pool_opts, [pool: Ecto.Pools.Poolboy])
+  @pool_opts Application.get_env(:ecto_one, :pool_opts, [pool: EctoOne.Pools.Poolboy])
   @pool @pool_opts[:pool]
 
   defmodule Connection do
-    @behaviour Ecto.Adapters.Connection
+    @behaviour EctoOne.Adapters.Connection
 
     def connect(opts) do
       trap = Keyword.get(opts, :trap_exit, false)

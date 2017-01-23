@@ -1,25 +1,25 @@
 Code.require_file "../support/file_helpers.exs", __DIR__
 
-defmodule Ecto.Integration.PoolTest do
+defmodule EctoOne.Integration.PoolTest do
   use ExUnit.Case, async: true
 
   pool =
     case System.get_env("ECTO_POOL") || "poolboy" do
-      "poolboy"        -> Ecto.Pools.Poolboy
-      "sojourn_broker" -> Ecto.Pools.SojournBroker
+      "poolboy"        -> EctoOne.Pools.Poolboy
+      "sojourn_broker" -> EctoOne.Pools.SojournBroker
     end
 
-  repo = Application.get_env(:ecto, Ecto.Integration.TestRepo) ||
-         raise "could not find configuration for Ecto.Integration.TestRepo"
+  repo = Application.get_env(:ecto_one, EctoOne.Integration.TestRepo) ||
+         raise "could not find configuration for EctoOne.Integration.TestRepo"
 
-  Application.put_env(:ecto, __MODULE__.MockRepo,
+  Application.put_env(:ecto_one, __MODULE__.MockRepo,
                       [pool: pool, pool_size: 1] ++ repo)
 
   defmodule MockRepo do
-    use Ecto.Repo, otp_app: :ecto
+    use EctoOne.Repo, otp_app: :ecto_one
 
     def after_connect(conn) do
-      send Application.get_env(:ecto, :pool_test_pid), {:after_connect, conn}
+      send Application.get_env(:ecto_one, :pool_test_pid), {:after_connect, conn}
     end
   end
 
@@ -33,7 +33,7 @@ defmodule Ecto.Integration.PoolTest do
   end
 
   setup do
-    Application.put_env(:ecto, :pool_test_pid, self())
+    Application.put_env(:ecto_one, :pool_test_pid, self())
     :ok
   end
 

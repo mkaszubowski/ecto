@@ -1,11 +1,11 @@
 if Code.ensure_loaded?(Mariaex.Connection) do
 
-  defmodule Ecto.Adapters.MySQL.Connection do
+  defmodule EctoOne.Adapters.MySQL.Connection do
     @moduledoc false
 
     @default_port 3306
-    @behaviour Ecto.Adapters.Connection
-    @behaviour Ecto.Adapters.SQL.Query
+    @behaviour EctoOne.Adapters.Connection
+    @behaviour EctoOne.Adapters.SQL.Query
 
     ## Connection
 
@@ -16,7 +16,7 @@ if Code.ensure_loaded?(Mariaex.Connection) do
 
     def query(conn, sql, params, opts \\ []) do
       params = Enum.map params, fn
-        %Ecto.Query.Tagged{value: value} -> value
+        %EctoOne.Query.Tagged{value: value} -> value
         %{__struct__: _} = value -> value
         %{} = value -> json_library.encode!(value)
         value -> value
@@ -32,7 +32,7 @@ if Code.ensure_loaded?(Mariaex.Connection) do
     defp normalize_port(port) when is_integer(port), do: port
 
     defp json_library do
-      Application.get_env(:ecto, :json_library)
+      Application.get_env(:ecto_one, :json_library)
     end
 
     def to_constraints(%Mariaex.Error{mariadb: %{code: 1062, message: message}}) do
@@ -81,10 +81,10 @@ if Code.ensure_loaded?(Mariaex.Connection) do
 
     ## Query
 
-    alias Ecto.Query
-    alias Ecto.Query.SelectExpr
-    alias Ecto.Query.QueryExpr
-    alias Ecto.Query.JoinExpr
+    alias EctoOne.Query
+    alias EctoOne.Query.SelectExpr
+    alias EctoOne.Query.QueryExpr
+    alias EctoOne.Query.JoinExpr
 
     def all(query) do
       sources = create_names(query)
@@ -305,7 +305,7 @@ if Code.ensure_loaded?(Mariaex.Connection) do
     defp expr({:&, _, [idx]}, sources, query) do
       {table, name, model} = elem(sources, idx)
       unless model do
-        error!(query, "MySQL requires a model when using selector " <>
+        error!(query, "MySQL requires a model when using selecto_oner " <>
           "#{inspect name} but only the table #{inspect table} was given. " <>
           "Please specify a model or specify exactly which fields from " <>
           "#{inspect name} you desire")
@@ -388,19 +388,19 @@ if Code.ensure_loaded?(Mariaex.Connection) do
       Decimal.to_string(decimal, :normal)
     end
 
-    defp expr(%Ecto.Query.Tagged{value: binary, type: :binary}, _sources, _query)
+    defp expr(%EctoOne.Query.Tagged{value: binary, type: :binary}, _sources, _query)
         when is_binary(binary) do
       hex = Base.encode16(binary, case: :lower)
       "x'#{hex}'"
     end
 
-    defp expr(%Ecto.Query.Tagged{value: other, type: type}, sources, query)
+    defp expr(%EctoOne.Query.Tagged{value: other, type: type}, sources, query)
         when type in [:id, :integer, :float] do
       expr(other, sources, query)
     end
 
-    defp expr(%Ecto.Query.Tagged{value: other, type: type}, sources, query) do
-      "CAST(#{expr(other, sources, query)} AS " <> ecto_to_db(type, query) <> ")"
+    defp expr(%EctoOne.Query.Tagged{value: other, type: type}, sources, query) do
+      "CAST(#{expr(other, sources, query)} AS " <> ecto_one_to_db(type, query) <> ")"
     end
 
     defp expr(nil, _sources, _query),   do: "NULL"
@@ -459,9 +459,9 @@ if Code.ensure_loaded?(Mariaex.Connection) do
 
     ## DDL
 
-    alias Ecto.Migration.Table
-    alias Ecto.Migration.Index
-    alias Ecto.Migration.Reference
+    alias EctoOne.Migration.Table
+    alias EctoOne.Migration.Index
+    alias EctoOne.Migration.Reference
 
     def execute_ddl({command, %Table{} = table, columns}) when command in [:create, :create_if_not_exists] do
       engine  = engine_expr(table.engine)
@@ -609,7 +609,7 @@ if Code.ensure_loaded?(Mariaex.Connection) do
       size      = Keyword.get(opts, :size)
       precision = Keyword.get(opts, :precision)
       scale     = Keyword.get(opts, :scale)
-      type_name = ecto_to_db(type)
+      type_name = ecto_one_to_db(type)
 
       cond do
         size            -> "#{type_name}(#{size})"
@@ -685,23 +685,23 @@ if Code.ensure_loaded?(Mariaex.Connection) do
       |> :binary.replace("\\", "\\\\", [:global])
     end
 
-    defp ecto_to_db(type, query \\ nil)
-    defp ecto_to_db({:array, _}, query),
+    defp ecto_one_to_db(type, query \\ nil)
+    defp ecto_one_to_db({:array, _}, query),
       do: error!(query, "Array type is not supported by MySQL")
-    defp ecto_to_db(:id, _query),        do: "integer"
-    defp ecto_to_db(:binary_id, _query), do: "binary(16)"
-    defp ecto_to_db(:string, _query),    do: "varchar"
-    defp ecto_to_db(:float, _query),     do: "double"
-    defp ecto_to_db(:binary, _query),    do: "blob"
-    defp ecto_to_db(:uuid, _query),      do: "binary(16)" # MySQL does not support uuid
-    defp ecto_to_db(:map, _query),       do: "text"
-    defp ecto_to_db(other, _query),      do: Atom.to_string(other)
+    defp ecto_one_to_db(:id, _query),        do: "integer"
+    defp ecto_one_to_db(:binary_id, _query), do: "binary(16)"
+    defp ecto_one_to_db(:string, _query),    do: "varchar"
+    defp ecto_one_to_db(:float, _query),     do: "double"
+    defp ecto_one_to_db(:binary, _query),    do: "blob"
+    defp ecto_one_to_db(:uuid, _query),      do: "binary(16)" # MySQL does not support uuid
+    defp ecto_one_to_db(:map, _query),       do: "text"
+    defp ecto_one_to_db(other, _query),      do: Atom.to_string(other)
 
     defp error!(nil, message) do
       raise ArgumentError, message
     end
     defp error!(query, message) do
-      raise Ecto.QueryError, query: query, message: message
+      raise EctoOne.QueryError, query: query, message: message
     end
   end
 end

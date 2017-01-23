@@ -1,5 +1,5 @@
-defmodule Ecto.Integration.Migration do
-  use Ecto.Migration
+defmodule EctoOne.Integration.Migration do
+  use EctoOne.Migration
 
   def change do
     create table(:users) do

@@ -1,4 +1,4 @@
-defmodule Ecto.UUIDTest do
+defmodule EctoOne.UUIDTest do
   use ExUnit.Case, async: true
 
   @test_uuid "601d74e4-a8d3-4b6e-8365-eddb4c893327"
@@ -6,25 +6,25 @@ defmodule Ecto.UUIDTest do
                       0x83, 0x65, 0xED, 0xDB, 0x4C, 0x89, 0x33, 0x27>>
 
   test "cast" do
-    assert Ecto.UUID.cast(@test_uuid) == {:ok, @test_uuid}
-    assert Ecto.UUID.cast(@test_uuid_binary) == :error
-    assert Ecto.UUID.cast(nil) == :error
+    assert EctoOne.UUID.cast(@test_uuid) == {:ok, @test_uuid}
+    assert EctoOne.UUID.cast(@test_uuid_binary) == :error
+    assert EctoOne.UUID.cast(nil) == :error
   end
 
   test "load" do
-    assert Ecto.UUID.load(@test_uuid_binary) == {:ok, @test_uuid}
-    assert Ecto.UUID.load("") == :error
-    assert_raise RuntimeError, ~r"trying to load string UUID as Ecto.UUID:", fn ->
-      Ecto.UUID.load(@test_uuid)
+    assert EctoOne.UUID.load(@test_uuid_binary) == {:ok, @test_uuid}
+    assert EctoOne.UUID.load("") == :error
+    assert_raise RuntimeError, ~r"trying to load string UUID as EctoOne.UUID:", fn ->
+      EctoOne.UUID.load(@test_uuid)
     end
   end
 
   test "dump" do
-    assert Ecto.UUID.dump(@test_uuid) == {:ok, %Ecto.Query.Tagged{value: @test_uuid_binary, type: :uuid}}
-    assert Ecto.UUID.dump(@test_uuid_binary) == :error
+    assert EctoOne.UUID.dump(@test_uuid) == {:ok, %EctoOne.Query.Tagged{value: @test_uuid_binary, type: :uuid}}
+    assert EctoOne.UUID.dump(@test_uuid_binary) == :error
   end
 
   test "generate" do
-    assert << _::64, ?-, _::32, ?-, _::32, ?-, _::32, ?-, _::96 >> = Ecto.UUID.generate
+    assert << _::64, ?-, _::32, ?-, _::32, ?-, _::32, ?-, _::96 >> = EctoOne.UUID.generate
   end
 end

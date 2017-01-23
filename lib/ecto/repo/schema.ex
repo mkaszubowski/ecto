@@ -1,54 +1,54 @@
-defmodule Ecto.Repo.Schema do
+defmodule EctoOne.Repo.Schema do
   # The module invoked by user defined repos
   # for model related functionality.
   @moduledoc false
 
-  alias Ecto.Query.Planner
-  alias Ecto.Model.Callbacks
-  alias Ecto.Changeset
+  alias EctoOne.Query.Planner
+  alias EctoOne.Model.Callbacks
+  alias EctoOne.Changeset
 
   @doc """
-  Implementation for `Ecto.Repo.insert!/2`.
+  Implementation for `EctoOne.Repo.insert!/2`.
   """
   def insert!(repo, adapter, model_or_changeset, opts) do
     case insert(repo, adapter, model_or_changeset, opts) do
       {:ok, model} -> model
       {:error, changeset} ->
-        raise Ecto.InvalidChangesetError, action: :insert, changeset: changeset
+        raise EctoOne.InvalidChangesetError, action: :insert, changeset: changeset
     end
   end
 
   @doc """
-  Implementation for `Ecto.Repo.update!/2`.
+  Implementation for `EctoOne.Repo.update!/2`.
   """
   def update!(repo, adapter, model_or_changeset, opts) do
     case update(repo, adapter, model_or_changeset, opts) do
       {:ok, model} -> model
       {:error, changeset} ->
-        raise Ecto.InvalidChangesetError, action: :update, changeset: changeset
+        raise EctoOne.InvalidChangesetError, action: :update, changeset: changeset
     end
   end
 
   @doc """
-  Implementation for `Ecto.Repo.delete!/2`.
+  Implementation for `EctoOne.Repo.delete!/2`.
   """
   def delete!(repo, adapter, model_or_changeset, opts) do
     case delete(repo, adapter, model_or_changeset, opts) do
       {:ok, model} -> model
       {:error, changeset} ->
-        raise Ecto.InvalidChangesetError, action: :delete, changeset: changeset
+        raise EctoOne.InvalidChangesetError, action: :delete, changeset: changeset
     end
   end
 
   @doc """
-  Implementation for `Ecto.Repo.insert/2`.
+  Implementation for `EctoOne.Repo.insert/2`.
   """
   def insert(repo, adapter, %Changeset{} = changeset, opts) when is_list(opts) do
     do_insert(repo, adapter, changeset, opts)
   end
 
   def insert(repo, adapter, %{__struct__: _} = struct, opts) when is_list(opts) do
-    changeset = Ecto.Changeset.change(struct)
+    changeset = EctoOne.Changeset.change(struct)
     do_insert(repo, adapter, changeset, opts)
   end
 
@@ -71,7 +71,7 @@ defmodule Ecto.Repo.Schema do
       changeset = run_prepare(changeset, prepare)
       user_changeset = Callbacks.__apply__(model, :before_insert, changeset)
 
-      changeset = Ecto.Embedded.prepare(user_changeset, embeds, adapter, :insert)
+      changeset = EctoOne.Embedded.prepare(user_changeset, embeds, adapter, :insert)
       {assoc_changes, changeset} = pop_from_changes(changeset, assocs)
       {autogen, changes} = pop_autogenerate_id(changeset.changes, model)
       {changes, extra} = dump_changes(:insert, changes, model, fields, adapter)
@@ -96,7 +96,7 @@ defmodule Ecto.Repo.Schema do
   end
 
   @doc """
-  Implementation for `Ecto.Repo.update/2`.
+  Implementation for `EctoOne.Repo.update/2`.
   """
   def update(repo, adapter, %Changeset{} = changeset, opts) when is_list(opts) do
     do_update(repo, adapter, changeset, opts)
@@ -104,8 +104,8 @@ defmodule Ecto.Repo.Schema do
 
   def update(repo, adapter, %{__struct__: model} = struct, opts) when is_list(opts) do
     IO.puts :stderr, "warning: giving a struct to #{inspect repo}.update/2 is deprecated. " <>
-                     "Ecto is unable to properly track changes when a struct is given and " <>
-                     "an Ecto.Changeset must be given instead\n#{Exception.format_stacktrace}"
+                     "EctoOne is unable to properly track changes when a struct is given and " <>
+                     "an EctoOne.Changeset must be given instead\n#{Exception.format_stacktrace}"
 
     changes =
       struct
@@ -115,7 +115,7 @@ defmodule Ecto.Repo.Schema do
 
     changeset =
       struct
-      |> Ecto.Changeset.change()
+      |> EctoOne.Changeset.change()
       |> Map.put(:changes, changes)
 
     do_update(repo, adapter, changeset, opts)
@@ -140,7 +140,7 @@ defmodule Ecto.Repo.Schema do
         changeset = run_prepare(changeset, prepare)
         user_changeset = Callbacks.__apply__(model, :before_update, changeset)
 
-        changeset = Ecto.Embedded.prepare(user_changeset, embeds, adapter, :update)
+        changeset = EctoOne.Embedded.prepare(user_changeset, embeds, adapter, :update)
         {assoc_changes, changeset} = pop_from_changes(changeset, assocs)
         autogen = get_autogenerate_id(changeset.changes, model)
         {changes, extra} = dump_changes(:update, changeset.changes, model, fields, adapter)
@@ -172,7 +172,7 @@ defmodule Ecto.Repo.Schema do
   end
 
   @doc """
-  Implementation for `Ecto.Repo.insert_or_update/2`.
+  Implementation for `EctoOne.Repo.insert_or_update/2`.
   """
   def insert_or_update(repo, adapter, changeset, opts) do
     case get_state(changeset) do
@@ -184,7 +184,7 @@ defmodule Ecto.Repo.Schema do
   end
 
   @doc """
-  Implementation for `Ecto.Repo.insert_or_update!/2`.
+  Implementation for `EctoOne.Repo.insert_or_update!/2`.
   """
   def insert_or_update!(repo, adapter, changeset, opts) do
     case get_state(changeset) do
@@ -199,18 +199,18 @@ defmodule Ecto.Repo.Schema do
   defp get_state(%{__struct__: _model}) do
     raise ArgumentError, "giving a struct to Repo.insert_or_update/2 or " <>
                          "Repo.insert_or_update!/2 is not supported. " <>
-                         "Please use an Ecto.Changeset"
+                         "Please use an EctoOne.Changeset"
   end
 
   @doc """
-  Implementation for `Ecto.Repo.delete/2`.
+  Implementation for `EctoOne.Repo.delete/2`.
   """
   def delete(repo, adapter, %Changeset{} = changeset, opts) when is_list(opts) do
     do_delete(repo, adapter, changeset, opts)
   end
 
   def delete(repo, adapter, %{__struct__: _} = struct, opts) when is_list(opts) do
-    changeset = Ecto.Changeset.change(struct)
+    changeset = EctoOne.Changeset.change(struct)
     do_delete(repo, adapter, changeset, opts)
   end
 
@@ -234,7 +234,7 @@ defmodule Ecto.Repo.Schema do
       changeset = user_changeset
       embeds =
         changeset
-        |> Ecto.Embedded.prepare(embeds, adapter, :delete)
+        |> EctoOne.Embedded.prepare(embeds, adapter, :delete)
         |> Map.fetch!(:changes)
         |> Map.take(embeds)
 
@@ -275,10 +275,10 @@ defmodule Ecto.Repo.Schema do
   defp run_prepare(changeset, prepare) do
     Enum.reduce(Enum.reverse(prepare), changeset, fn fun, acc ->
       case fun.(acc) do
-        %Ecto.Changeset{} = acc -> acc
+        %EctoOne.Changeset{} = acc -> acc
         other ->
-          raise "expected function #{inspect fun} given to Ecto.Changeset.prepare_changes/2 " <>
-                "to return an Ecto.Changeset, got: `#{inspect other}`"
+          raise "expected function #{inspect fun} given to EctoOne.Changeset.prepare_changes/2 " <>
+                "to return an EctoOne.Changeset, got: `#{inspect other}`"
       end
     end)
   end
@@ -300,7 +300,7 @@ defmodule Ecto.Repo.Schema do
       {:invalid, _} = constraints ->
         constraints
       {:error, :stale} ->
-        raise Ecto.StaleModelError, model: changeset.model, action: action
+        raise EctoOne.StaleModelError, model: changeset.model, action: action
     end
   end
 
@@ -313,9 +313,9 @@ defmodule Ecto.Repo.Schema do
 
       case user_constraint do
         %{field: field, message: message} ->
-          Ecto.Changeset.add_error(acc, field, message)
+          EctoOne.Changeset.add_error(acc, field, message)
         nil ->
-          raise Ecto.ConstraintError, action: action, type: type,
+          raise EctoOne.ConstraintError, action: action, type: type,
                                       constraint: constraint, changeset: changeset
       end
     end
@@ -326,7 +326,7 @@ defmodule Ecto.Repo.Schema do
     # already filtered the results to be only about fields.
     model =
       changeset
-      |> Ecto.Changeset.apply_changes
+      |> EctoOne.Changeset.apply_changes
       |> load_each(values, types, adapter)
     model = put_in(model.__meta__.state, action_to_state(action))
     Map.put(changeset, :model, model)
@@ -355,7 +355,7 @@ defmodule Ecto.Repo.Schema do
     base =
       Enum.reduce embeds, Map.take(struct, fields), fn field, acc ->
         {:embed, embed} = Map.fetch!(types, field)
-        Map.put(acc, field, Ecto.Changeset.Relation.empty(embed))
+        Map.put(acc, field, EctoOne.Changeset.Relation.empty(embed))
       end
 
     update_in changeset.changes, &Map.merge(base, &1)
@@ -367,7 +367,7 @@ defmodule Ecto.Repo.Schema do
         {kind, relation} ->
           value = Map.get(struct, field)
           kind  = kind |> Atom.to_string
-          unless Ecto.Changeset.Relation.empty?(relation, value) do
+          unless EctoOne.Changeset.Relation.empty?(relation, value) do
             raise ArgumentError, "model #{inspect struct.__struct__} has value `#{inspect value}` " <>
               "set for #{kind} named `#{field}`. #{String.capitalize kind}s can only be " <>
               "manipulated via changesets, be it on insert, update or delete."
@@ -384,12 +384,12 @@ defmodule Ecto.Repo.Schema do
 
   defp process_embeds(changeset, embeds, adapter, repo, opts) do
     {:ok, changeset} =
-      Ecto.Changeset.Relation.on_repo_action(changeset, embeds, adapter, repo, opts)
+      EctoOne.Changeset.Relation.on_repo_action(changeset, embeds, adapter, repo, opts)
     changeset
   end
 
   defp process_assocs(changeset, assocs, adapter, repo, opts) do
-    Ecto.Changeset.Relation.on_repo_action(changeset, assocs, adapter, repo, opts)
+    EctoOne.Changeset.Relation.on_repo_action(changeset, assocs, adapter, repo, opts)
   end
 
   # TODO: In the future, once we support belongs_to associations,
@@ -401,12 +401,12 @@ defmodule Ecto.Repo.Schema do
       case struct.__schema__(:association, assoc_name) do
         # TODO: fetch_and_delete is deprecated. Removed by 2.0
         %{on_delete: :fetch_and_delete, field: field} ->
-          assocs = repo.all Ecto.assoc(model, field)
+          assocs = repo.all EctoOne.assoc(model, field)
           Enum.each assocs, &repo.delete!(&1)
         %{on_delete: :delete_all, field: field} ->
-          repo.delete_all Ecto.assoc(model, field)
+          repo.delete_all EctoOne.assoc(model, field)
         %{on_delete: :nilify_all, related_key: related_key, field: field} ->
-          query = Ecto.assoc(model, field)
+          query = EctoOne.assoc(model, field)
           repo.update_all query, set: [{related_key, nil}]
         _ ->
           :ok
@@ -461,9 +461,9 @@ defmodule Ecto.Repo.Schema do
   end
 
   defp add_pk_filter!(filters, struct) do
-    Enum.reduce Ecto.primary_key!(struct), filters, fn
+    Enum.reduce EctoOne.primary_key!(struct), filters, fn
       {_k, nil}, _acc ->
-        raise Ecto.NoPrimaryKeyValueError, struct: struct
+        raise EctoOne.NoPrimaryKeyValueError, struct: struct
       {k, v}, acc ->
         Map.put(acc, k, v)
     end

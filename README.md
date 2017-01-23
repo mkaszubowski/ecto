@@ -1,26 +1,26 @@
-# Ecto
+# EctoOne
 
-[![Build Status](https://travis-ci.org/elixir-lang/ecto.svg?branch=master)](https://travis-ci.org/elixir-lang/ecto)
-[![Inline docs](http://inch-ci.org/github/elixir-lang/ecto.svg?branch=master&style=flat)](http://inch-ci.org/github/elixir-lang/ecto)
+[![Build Status](https://travis-ci.org/elixir-lang/ecto_one.svg?branch=master)](https://travis-ci.org/elixir-lang/ecto_one)
+[![Inline docs](http://inch-ci.org/github/elixir-lang/ecto_one.svg?branch=master&style=flat)](http://inch-ci.org/github/elixir-lang/ecto_one)
 
-Ecto is a domain specific language for writing queries and interacting with databases in Elixir. Here is an example:
+EctoOne is a domain specific language for writing queries and interacting with databases in Elixir. Here is an example:
 
 ```elixir
 # In your config/config.exs file
 config :my_app, Sample.Repo,
-  adapter: Ecto.Adapters.Postgres,
-  database: "ecto_simple",
+  adapter: EctoOne.Adapters.Postgres,
+  database: "ecto_one_simple",
   username: "postgres",
   password: "postgres"
 
 # In your application code
 defmodule Sample.Repo do
-  use Ecto.Repo,
+  use EctoOne.Repo,
     otp_app: :my_app
 end
 
 defmodule Sample.Weather do
-  use Ecto.Schema
+  use EctoOne.Schema
 
   schema "weather" do
     field :city     # Defaults to type :string
@@ -31,7 +31,7 @@ defmodule Sample.Weather do
 end
 
 defmodule Sample.App do
-  import Ecto.Query
+  import EctoOne.Query
   alias Sample.Weather
   alias Sample.Repo
 
@@ -52,32 +52,32 @@ defmodule Sample.App do
 end
 ```
 
-See the [online documentation](http://hexdocs.pm/ecto) or [run the sample application](https://github.com/elixir-lang/ecto/tree/master/examples/simple) for more information.
+See the [online documentation](http://hexdocs.pm/ecto_one) or [run the sample application](https://github.com/elixir-lang/ecto_one/tree/master/examples/simple) for more information.
 
 ## Usage
 
-You need to add both Ecto and the database adapter as a dependency to your `mix.exs` file. The supported databases and their adapters are:
+You need to add both EctoOne and the database adapter as a dependency to your `mix.exs` file. The supported databases and their adapters are:
 
-Database                | Ecto Adapter           | Dependency
+Database                | EctoOne Adapter           | Dependency
 :---------------------- | :--------------------- | :-------------------
-PostgreSQL              | Ecto.Adapters.Postgres | [postgrex][postgrex]
-MySQL                   | Ecto.Adapters.MySQL    | [mariaex][mariaex]
-MSSQL                   | Tds.Ecto               | [tds_ecto][tds_ecto]
-SQLite3                 | Sqlite.Ecto            | [sqlite_ecto][sqlite_ecto]
-MongoDB                 | Mongo.Ecto             | [mongodb_ecto][mongodb_ecto]
+PostgreSQL              | EctoOne.Adapters.Postgres | [postgrex][postgrex]
+MySQL                   | EctoOne.Adapters.MySQL    | [mariaex][mariaex]
+MSSQL                   | Tds.EctoOne               | [tds_ecto_one][tds_ecto_one]
+SQLite3                 | Sqlite.EctoOne            | [sqlite_ecto_one][sqlite_ecto_one]
+MongoDB                 | Mongo.EctoOne             | [mongodb_ecto_one][mongodb_ecto_one]
 
 [postgrex]: http://github.com/ericmj/postgrex
 [mariaex]: http://github.com/xerions/mariaex
-[tds_ecto]: https://github.com/livehelpnow/tds_ecto
-[sqlite_ecto]: https://github.com/jazzyb/sqlite_ecto
-[mongodb_ecto]: https://github.com/michalmuskala/mongodb_ecto
+[tds_ecto_one]: https://github.com/livehelpnow/tds_ecto_one
+[sqlite_ecto_one]: https://github.com/jazzyb/sqlite_ecto_one
+[mongodb_ecto_one]: https://github.com/michalmuskala/mongodb_ecto_one
 
 For example, if you want to use PostgreSQL, add to your `mix.exs` file:
 
 ```elixir
 defp deps do
   [{:postgrex, ">= 0.0.0"},
-   {:ecto, "~> 1.0"}]
+   {:ecto_one, "~> 1.0"}]
 end
 ```
 
@@ -85,7 +85,7 @@ and update your applications list to include both projects:
 
 ```elixir
 def application do
-  [applications: [:postgrex, :ecto]]
+  [applications: [:postgrex, :ecto_one]]
 end
 ```
 
@@ -95,7 +95,7 @@ Finally, in the repository configuration, you will need to specify the `adapter:
 
 ```elixir
 config :my_app, Repo,
-  adapter: Ecto.Adapters.Postgres,
+  adapter: EctoOne.Adapters.Postgres,
   ...
 ```
 
@@ -103,9 +103,9 @@ We are currently looking for contributions to add support for other SQL database
 
 ## Important links
 
-  * [Documentation](http://hexdocs.pm/ecto)
-  * [Mailing list](https://groups.google.com/forum/#!forum/elixir-ecto)
-  * [Examples](https://github.com/elixir-lang/ecto/tree/master/examples)
+  * [Documentation](http://hexdocs.pm/ecto_one)
+  * [Mailing list](https://groups.google.com/forum/#!forum/elixir-ecto_one)
+  * [Examples](https://github.com/elixir-lang/ecto_one/tree/master/examples)
 
 ## Contributing
 
@@ -116,8 +116,8 @@ For overall guidelines, please see [CONTRIBUTING.md](CONTRIBUTING.md).
 Clone the repo and fetch its dependencies:
 
 ```
-$ git clone https://github.com/elixir-lang/ecto.git
-$ cd ecto
+$ git clone https://github.com/elixir-lang/ecto_one.git
+$ cd ecto_one
 $ mix deps.get
 $ mix test
 ```
@@ -142,4 +142,4 @@ $ MIX_ENV=docs mix docs
 
 Copyright (c) 2012, Plataformatec.
 
-Ecto source code is licensed under the [Apache 2 License](LICENSE.md).
+EctoOne source code is licensed under the [Apache 2 License](LICENSE.md).

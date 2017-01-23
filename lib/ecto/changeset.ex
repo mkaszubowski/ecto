@@ -1,17 +1,17 @@
-defmodule Ecto.Changeset do
+defmodule EctoOne.Changeset do
   @moduledoc ~S"""
   Changesets allow filtering, casting, validation and
   definition of constraints when manipulating models.
 
   There is an example of working with changesets in the
-  introductory documentation in the `Ecto` module. The
+  introductory documentation in the `EctoOne` module. The
   functions `change/2` and `cast/4` are the usual entry
   points for creating changesets, while the remaining
   functions are useful for manipulating them.
 
   ## Validations and constraints
 
-  Ecto changesets provide both validations and constraints
+  EctoOne changesets provide both validations and constraints
   which are ultimately turned into errors in case something
   goes wrong.
 
@@ -28,8 +28,8 @@ defmodule Ecto.Changeset do
   Let's see an example:
 
       defmodule User do
-        use Ecto.Schema
-        import Ecto.Changeset
+        use EctoOne.Schema
+        import EctoOne.Changeset
 
         schema "users" do
           field :name
@@ -70,7 +70,7 @@ defmodule Ecto.Changeset do
   happens. By moving constraints to the database, we also provide a safe,
   correct and data-race free means of checking the user input.
 
-  ## The Ecto.Changeset struct
+  ## The EctoOne.Changeset struct
 
   The fields are:
 
@@ -110,8 +110,8 @@ defmodule Ecto.Changeset do
     mark it deletion, as in the example below:
 
           defmodule Comment do
-            use Ecto.Schema
-            import Ecto.Changeset
+            use EctoOne.Schema
+            import EctoOne.Changeset
 
             schema "comments" do
               field :body, :string
@@ -135,7 +135,7 @@ defmodule Ecto.Changeset do
   """
 
   alias __MODULE__
-  alias Ecto.Changeset.Relation
+  alias EctoOne.Changeset.Relation
 
   # If a new field is added here, def merge must be adapted
   defstruct valid?: false, model: nil, params: nil, changes: %{}, repo: nil,
@@ -145,7 +145,7 @@ defmodule Ecto.Changeset do
   @type t :: %Changeset{valid?: boolean(),
                         repo: atom | nil,
                         opts: Keyword.t,
-                        model: Ecto.Schema.t | nil,
+                        model: EctoOne.Schema.t | nil,
                         params: %{String.t => term} | nil,
                         changes: %{atom => term},
                         required: [atom],
@@ -156,7 +156,7 @@ defmodule Ecto.Changeset do
                         validations: Keyword.t,
                         filters: %{atom => term},
                         action: action,
-                        types: nil | %{atom => Ecto.Type.t}}
+                        types: nil | %{atom => EctoOne.Type.t}}
 
   @type error :: {atom, error_message}
   @type error_message :: String.t | {String.t, Keyword.t}
@@ -200,7 +200,7 @@ defmodule Ecto.Changeset do
   ## Examples
 
       iex> changeset = change(%Post{})
-      %Ecto.Changeset{...}
+      %EctoOne.Changeset{...}
       iex> changeset.valid?
       true
       iex> changeset.changes
@@ -221,7 +221,7 @@ defmodule Ecto.Changeset do
       "body"
 
   """
-  @spec change(Ecto.Schema.t | t, %{atom => term} | Keyword.t) :: t | no_return
+  @spec change(EctoOne.Schema.t | t, %{atom => term} | Keyword.t) :: t | no_return
   def change(model_or_changeset, changes \\ %{})
 
   def change(%Changeset{types: nil}, _changes) do
@@ -339,7 +339,7 @@ defmodule Ecto.Changeset do
       end
 
   """
-  @spec cast(Ecto.Schema.t | t,
+  @spec cast(EctoOne.Schema.t | t,
              %{binary => term} | %{atom => term} | nil,
              [cast_field],
              [cast_field]) :: t | no_return
@@ -432,9 +432,9 @@ defmodule Ecto.Changeset do
   defp relation!(types, key, fun) do
     case Map.fetch(types, key) do
       {:ok, {:embed, embed}} ->
-        {:embed, %Ecto.Embedded{embed | on_cast: fun}}
+        {:embed, %EctoOne.Embedded{embed | on_cast: fun}}
       {:ok, {:assoc, assoc}} ->
-        {:assoc, %Ecto.Association.Has{assoc | on_cast: fun}}
+        {:assoc, %EctoOne.Association.Has{assoc | on_cast: fun}}
       {:ok, _} ->
         raise ArgumentError, "only embedded fields and associations can be " <>
           "given a cast function"
@@ -483,7 +483,7 @@ defmodule Ecto.Changeset do
   defp cast_field(param_key, type, params, current, _model, valid?) do
     case Map.fetch(params, param_key) do
       {:ok, value} ->
-        case Ecto.Type.cast(type, value) do
+        case EctoOne.Type.cast(type, value) do
           {:ok, ^current} -> {:missing, current}
           {:ok, value} -> {:ok, value, valid?}
           :error -> :invalid
@@ -1011,8 +1011,8 @@ defmodule Ecto.Changeset do
   @doc """
   Applies the changeset changes to the changeset model.
 
-  Note this operation is automatically performed on `Ecto.Repo.insert!/2` and
-  `Ecto.Repo.update!/2`, however this function is provided for
+  Note this operation is automatically performed on `EctoOne.Repo.insert!/2` and
+  `EctoOne.Repo.update!/2`, however this function is provided for
   debugging and testing purposes.
 
   ## Examples
@@ -1020,7 +1020,7 @@ defmodule Ecto.Changeset do
       apply_changes(changeset)
 
   """
-  @spec apply_changes(t) :: Ecto.Schema.t
+  @spec apply_changes(t) :: EctoOne.Schema.t
   def apply_changes(%Changeset{changes: changes, model: model}) when changes == %{} do
     model
   end
@@ -1433,7 +1433,7 @@ defmodule Ecto.Changeset do
   a field to the schema too:
 
       defmodule Post do
-        use Ecto.Schema
+        use EctoOne.Schema
 
         schema "posts" do
           field :title, :string
@@ -1442,8 +1442,8 @@ defmodule Ecto.Changeset do
 
         def changeset(:update, struct, params \\ :empty) do
           struct
-          |> Ecto.Changeset.cast(struct, params, ~w(:title))
-          |> Ecto.Changeset.optimistic_lock(:lock_version)
+          |> EctoOne.Changeset.cast(struct, params, ~w(:title))
+          |> EctoOne.Changeset.optimistic_lock(:lock_version)
         end
       end
 
@@ -1456,18 +1456,18 @@ defmodule Ecto.Changeset do
       iex> Repo.update!(valid_change)
       %Post{id: 1, title: "bar", lock_version: 2}
       iex> Repo.update!(stale_change)
-      ** (Ecto.StaleModelError) attempted to update a stale model:
+      ** (EctoOne.StaleModelError) attempted to update a stale model:
 
       %Post{id: 1, title: "baz", lock_version: 1}
 
   When a conflict happens (a record which has been previously fetched is
   being updated, but that same record has been modified since it was
-  fetched), an `Ecto.StaleModelError` exception is raised.
+  fetched), an `EctoOne.StaleModelError` exception is raised.
 
   Optimistic locking also works with delete operations. Just call the
   `optimistic_lock` function with the model before delete:
 
-      iex> changeset = Ecto.Changeset.optimistic_lock(post, :lock_version)
+      iex> changeset = EctoOne.Changeset.optimistic_lock(post, :lock_version)
       iex> Repo.delete(changeset)
 
   Finally, keep in `optimistic_lock/3` by default assumes the field
@@ -1475,10 +1475,10 @@ defmodule Ecto.Changeset do
   you need to pass the third argument customizing how the next value
   is generated:
 
-      iex> Ecto.Changeset.optimistic_lock(post, :lock_uuid, fn _ -> Ecto.UUID.generate end)
+      iex> EctoOne.Changeset.optimistic_lock(post, :lock_uuid, fn _ -> EctoOne.UUID.generate end)
 
   """
-  @spec optimistic_lock(Ecto.Schema.t | t, atom, (integer -> integer)) :: t | no_return
+  @spec optimistic_lock(EctoOne.Schema.t | t, atom, (integer -> integer)) :: t | no_return
   def optimistic_lock(data_or_changeset, field, incrementer \\ &(&1 + 1)) do
     changeset = change(data_or_changeset, %{})
     current = get_field(changeset, field)
@@ -1509,7 +1509,7 @@ defmodule Ecto.Changeset do
 
   The unique constraint works by relying on the database to check
   if the unique constraint has been violated or not and, if so,
-  Ecto converts it into a changeset error.
+  EctoOne converts it into a changeset error.
 
   In order to use the uniqueness constraint the first step is
   to define the unique index in a migration:
@@ -1517,7 +1517,7 @@ defmodule Ecto.Changeset do
       create unique_index(:users, [:email])
 
   Now that a constraint exists, when modifying users, we could
-  annotate the changeset with unique constraint so Ecto knows
+  annotate the changeset with unique constraint so EctoOne knows
   how to convert it into an error message:
 
       cast(user, params, ~w(email), ~w())
@@ -1601,11 +1601,11 @@ defmodule Ecto.Changeset do
         add :post_id, references(:posts)
       end
 
-  By default, Ecto will generate a foreign key constraint with
+  By default, EctoOne will generate a foreign key constraint with
   name "comments_post_id_fkey" (the name is configurable).
 
   Now that a constraint exists, when creating comments, we could
-  annotate the changeset with foreign key constraint so Ecto knows
+  annotate the changeset with foreign key constraint so EctoOne knows
   how to convert it into an error message:
 
       cast(comment, params, ~w(post_id), ~w())
@@ -1652,8 +1652,8 @@ defmodule Ecto.Changeset do
   comment to be added if the associated post does not exist:
 
         comment
-        |> Ecto.Changeset.cast(params, ~w(post_id))
-        |> Ecto.Changeset.assoc_constraint(:post)
+        |> EctoOne.Changeset.cast(params, ~w(post_id))
+        |> EctoOne.Changeset.assoc_constraint(:post)
         |> Repo.insert
 
   ## Options
@@ -1668,7 +1668,7 @@ defmodule Ecto.Changeset do
   def assoc_constraint(changeset, assoc, opts \\ []) do
     constraint = opts[:name] ||
       (case get_assoc(changeset, assoc) do
-        %Ecto.Association.BelongsTo{owner_key: owner_key} ->
+        %EctoOne.Association.BelongsTo{owner_key: owner_key} ->
           "#{get_source(changeset)}_#{owner_key}_fkey"
         other ->
           raise ArgumentError,
@@ -1700,8 +1700,8 @@ defmodule Ecto.Changeset do
   be deleted if they still have comments attached to it:
 
         post
-        |> Ecto.Changeset.change
-        |> Ecto.Changeset.no_assoc_constraint(:comments)
+        |> EctoOne.Changeset.change
+        |> EctoOne.Changeset.no_assoc_constraint(:comments)
         |> Repo.delete
 
   ## Options
@@ -1717,7 +1717,7 @@ defmodule Ecto.Changeset do
   def no_assoc_constraint(changeset, assoc, opts \\ []) do
     {constraint, message} =
       (case get_assoc(changeset, assoc) do
-        %Ecto.Association.Has{cardinality: cardinality,
+        %EctoOne.Association.Has{cardinality: cardinality,
                               related_key: related_key, related: related} ->
           {opts[:name] || "#{related.__schema__(:source)}_#{related_key}_fkey",
            opts[:message] || no_assoc_message(cardinality)}
@@ -1734,7 +1734,7 @@ defmodule Ecto.Changeset do
 
   The exclude constraint works by relying on the database to check
   if the exclude constraint has been violated or not and, if so,
-  Ecto converts it into a changeset error.
+  EctoOne converts it into a changeset error.
 
   ## Options
 

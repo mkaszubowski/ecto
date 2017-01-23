@@ -1,5 +1,5 @@
-defmodule Ecto.Integration.MySQL.Migration do
-  use Ecto.Migration
+defmodule EctoOne.Integration.MySQL.Migration do
+  use EctoOne.Migration
 
   def change do
     execute("""

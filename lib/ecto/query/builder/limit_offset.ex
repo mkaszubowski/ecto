@@ -1,7 +1,7 @@
-defmodule Ecto.Query.Builder.LimitOffset do
+defmodule EctoOne.Query.Builder.LimitOffset do
   @moduledoc false
 
-  alias Ecto.Query.Builder
+  alias EctoOne.Query.Builder
 
   @doc """
   Builds a quoted expression.
@@ -20,7 +20,7 @@ defmodule Ecto.Query.Builder.LimitOffset do
       Builder.error! "query variables are not allowed in #{type} expression"
     end
 
-    limoff = quote do: %Ecto.Query.QueryExpr{
+    limoff = quote do: %EctoOne.Query.QueryExpr{
                         expr: unquote(expr),
                         params: unquote(params),
                         file: unquote(env.file),
@@ -43,14 +43,14 @@ defmodule Ecto.Query.Builder.LimitOffset do
   @doc """
   The callback applied by `build/4` to build the query.
   """
-  @spec apply(Ecto.Queryable.t, :limit | :offset, term) :: Ecto.Query.t
+  @spec apply(EctoOne.Queryable.t, :limit | :offset, term) :: EctoOne.Query.t
   def apply(query, :limit, expr) do
-    query = Ecto.Queryable.to_query(query)
+    query = EctoOne.Queryable.to_query(query)
     %{query | limit: expr}
   end
 
   def apply(query, :offset, expr) do
-    query = Ecto.Queryable.to_query(query)
+    query = EctoOne.Queryable.to_query(query)
     %{query | offset: expr}
   end
 end

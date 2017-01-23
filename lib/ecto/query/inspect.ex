@@ -1,6 +1,6 @@
-defimpl Inspect, for: Ecto.Query do
+defimpl Inspect, for: EctoOne.Query do
   import Inspect.Algebra
-  alias Ecto.Query.JoinExpr
+  alias EctoOne.Query.JoinExpr
 
   @doc false
   def inspect(query, opts) do
@@ -11,7 +11,7 @@ defimpl Inspect, for: Ecto.Query do
         string
     end)
 
-    surround_many("#Ecto.Query<", list, ">", opts, fn str, _ -> str end)
+    surround_many("#EctoOne.Query<", list, ">", opts, fn str, _ -> str end)
   end
 
   @doc false
@@ -150,11 +150,11 @@ defimpl Inspect, for: Ecto.Query do
   end
 
   # Tagged values
-  defp expr_to_string(%Ecto.Query.Tagged{value: value, tag: nil}, _, _names, _params) do
+  defp expr_to_string(%EctoOne.Query.Tagged{value: value, tag: nil}, _, _names, _params) do
     inspect value
   end
 
-  defp expr_to_string(%Ecto.Query.Tagged{value: value, tag: tag}, _, names, params) do
+  defp expr_to_string(%EctoOne.Query.Tagged{value: value, tag: tag}, _, names, params) do
     {:type, [], [value, tag]} |> expr(names, params)
   end
 

@@ -1,10 +1,10 @@
-defmodule Ecto.Integration.MigrationTest do
+defmodule EctoOne.Integration.MigrationTest do
   use ExUnit.Case
 
-  alias Ecto.Integration.TestRepo
+  alias EctoOne.Integration.TestRepo
 
   defmodule CreateMigration do
-    use Ecto.Migration
+    use EctoOne.Migration
 
     @table table(:create_table_migration)
     @index index(:create_table_migration, [:value], unique: true)
@@ -23,7 +23,7 @@ defmodule Ecto.Integration.MigrationTest do
   end
 
   defmodule AddColumnMigration do
-    use Ecto.Migration
+    use EctoOne.Migration
 
     def up do
       create table(:add_col_migration) do
@@ -43,7 +43,7 @@ defmodule Ecto.Integration.MigrationTest do
   end
 
   defmodule AlterColumnMigration do
-    use Ecto.Migration
+    use EctoOne.Migration
 
     def up do
       create table(:alter_col_migration) do
@@ -71,7 +71,7 @@ defmodule Ecto.Integration.MigrationTest do
   end
 
   defmodule AlterForeignKeyMigration do
-    use Ecto.Migration
+    use EctoOne.Migration
 
     def up do
       create table(:alter_fk_users)
@@ -96,7 +96,7 @@ defmodule Ecto.Integration.MigrationTest do
   end
 
   defmodule DropColumnMigration do
-    use Ecto.Migration
+    use EctoOne.Migration
 
     def up do
       create table(:drop_col_migration) do
@@ -117,7 +117,7 @@ defmodule Ecto.Integration.MigrationTest do
   end
 
   defmodule RenameColumnMigration do
-    use Ecto.Migration
+    use EctoOne.Migration
 
     def up do
       create table(:rename_col_migration) do
@@ -135,7 +135,7 @@ defmodule Ecto.Integration.MigrationTest do
   end
 
   defmodule OnDeleteMigration do
-    use Ecto.Migration
+    use EctoOne.Migration
 
     def up do
       create table(:parent1)
@@ -158,7 +158,7 @@ defmodule Ecto.Integration.MigrationTest do
   end
 
   defmodule ReferencesRollbackMigration do
-    use Ecto.Migration
+    use EctoOne.Migration
 
     def change do
       create table(:parent) do
@@ -172,7 +172,7 @@ defmodule Ecto.Integration.MigrationTest do
   end
 
   defmodule RenameMigration do
-    use Ecto.Migration
+    use EctoOne.Migration
 
     @table_current table(:posts_migration)
     @table_new table(:new_posts_migration)
@@ -188,9 +188,9 @@ defmodule Ecto.Integration.MigrationTest do
   end
 
   defmodule PrefixMigration do
-    use Ecto.Migration
+    use EctoOne.Migration
 
-    @prefix "ecto_prefix_test"
+    @prefix "ecto_one_prefix_test"
 
     def up do
       execute TestRepo.create_prefix(@prefix)
@@ -208,7 +208,7 @@ defmodule Ecto.Integration.MigrationTest do
   end
 
   defmodule NoSQLMigration do
-    use Ecto.Migration
+    use EctoOne.Migration
 
     def up do
       create table(:collection, options: [capped: true])
@@ -217,14 +217,14 @@ defmodule Ecto.Integration.MigrationTest do
   end
 
   defmodule Parent do
-    use Ecto.Schema
+    use EctoOne.Schema
 
     schema "parent" do
     end
   end
 
   defmodule NoErrorTableMigration do
-    use Ecto.Migration
+    use EctoOne.Migration
 
     def change do
       create_if_not_exists table(:existing) do
@@ -243,7 +243,7 @@ defmodule Ecto.Integration.MigrationTest do
   end
 
   defmodule NoErrorIndexMigration do
-    use Ecto.Migration
+    use EctoOne.Migration
 
     def change do
       create_if_not_exists index(:posts, [:title])
@@ -254,15 +254,15 @@ defmodule Ecto.Integration.MigrationTest do
   end
 
   defmodule InferredDropIndexMigration do
-    use Ecto.Migration
+    use EctoOne.Migration
 
     def change do
       create index(:posts, [:title])
     end
   end
 
-  import Ecto.Query, only: [from: 2]
-  import Ecto.Migrator, only: [up: 4, down: 4]
+  import EctoOne.Query, only: [from: 2]
+  import EctoOne.Migrator, only: [up: 4, down: 4]
 
   test "create and drop table and indexes" do
     assert :ok == up(TestRepo, 20050906120000, CreateMigration, log: false)
@@ -277,11 +277,11 @@ defmodule Ecto.Integration.MigrationTest do
   test "supports references" do
     assert :ok == up(TestRepo, 20050906120000, OnDeleteMigration, log: false)
 
-    parent1 = TestRepo.insert! Ecto.put_meta(%Parent{}, source: "parent1")
-    parent2 = TestRepo.insert! Ecto.put_meta(%Parent{}, source: "parent2")
+    parent1 = TestRepo.insert! EctoOne.put_meta(%Parent{}, source: "parent1")
+    parent2 = TestRepo.insert! EctoOne.put_meta(%Parent{}, source: "parent2")
 
     writer = "INSERT INTO ref_migration (parent1, parent2) VALUES (#{parent1.id}, #{parent2.id})"
-    Ecto.Adapters.SQL.query! TestRepo, writer, []
+    EctoOne.Adapters.SQL.query! TestRepo, writer, []
 
     reader = from r in "ref_migration", select: {r.parent1, r.parent2}
     assert TestRepo.all(reader) == [{parent1.id, parent2.id}]
@@ -336,7 +336,7 @@ defmodule Ecto.Integration.MigrationTest do
            TestRepo.all from p in "alter_col_migration", select: p.from_no_default_to_default
 
     query = "INSERT INTO alter_col_migration (from_not_null_to_null) VALUES ('foo')"
-    assert catch_error(Ecto.Adapters.SQL.query!(TestRepo, query, []))
+    assert catch_error(EctoOne.Adapters.SQL.query!(TestRepo, query, []))
 
     :ok = down(TestRepo, 20080906120000, AlterColumnMigration, log: false)
   end

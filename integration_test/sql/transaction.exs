@@ -1,11 +1,11 @@
-defmodule Ecto.Integration.TransactionTest do
+defmodule EctoOne.Integration.TransactionTest do
   # We can keep this test async as long as it
   # is the only one access the transactions table
   use ExUnit.Case, async: true
 
-  import Ecto.Query
-  alias Ecto.Integration.PoolRepo
-  alias Ecto.Integration.TestRepo
+  import EctoOne.Query
+  alias EctoOne.Integration.PoolRepo
+  alias EctoOne.Integration.TestRepo
 
   defmodule UniqueError do
     defexception [:message]
@@ -17,7 +17,7 @@ defmodule Ecto.Integration.TransactionTest do
   end
 
   defmodule Trans do
-    use Ecto.Schema
+    use EctoOne.Schema
 
     schema "transactions" do
       field :text, :string
@@ -174,7 +174,7 @@ defmodule Ecto.Integration.TransactionTest do
     end
 
     # If it doesn't fail, the transaction was not closed properly.
-    catch_error(Ecto.Adapters.SQL.query!(PoolRepo, "savepoint foobar", []))
+    catch_error(EctoOne.Adapters.SQL.query!(PoolRepo, "savepoint foobar", []))
   end
 
   test "log raises after begin, drops the whole transaction" do

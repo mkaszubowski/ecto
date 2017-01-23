@@ -1,9 +1,9 @@
-defmodule Ecto.Migration.SchemaMigration do
+defmodule EctoOne.Migration.SchemaMigration do
   # Define a schema that works with the schema_migrations table
   @moduledoc false
-  use Ecto.Schema
+  use EctoOne.Schema
 
-  import Ecto.Query, only: [from: 2]
+  import EctoOne.Query, only: [from: 2]
 
   @primary_key false
   schema "schema_migrations" do
@@ -23,7 +23,7 @@ defmodule Ecto.Migration.SchemaMigration do
   end
 
   def up(repo, version, prefix) do
-    repo.insert! %__MODULE__{version: version} |> Ecto.put_meta(prefix: prefix), @opts
+    repo.insert! %__MODULE__{version: version} |> EctoOne.put_meta(prefix: prefix), @opts
   end
 
   def down(repo, version, prefix) do
@@ -31,7 +31,7 @@ defmodule Ecto.Migration.SchemaMigration do
   end
 
   defp create_migrations_table(adapter, repo, prefix) do
-    table = %Ecto.Migration.Table{name: :schema_migrations, prefix: prefix}
+    table = %EctoOne.Migration.Table{name: :schema_migrations, prefix: prefix}
 
     # DDL queries do not log, so we do not need to pass log: false here.
     adapter.execute_ddl(repo,

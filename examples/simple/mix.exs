@@ -9,11 +9,11 @@ defmodule Simple.Mixfile do
 
   def application do
     [mod: {Simple.App, []},
-     applications: [:postgrex, :ecto]]
+     applications: [:postgrex, :ecto_one]]
   end
 
   defp deps do
     [{:postgrex, ">= 0.0.0"},
-     {:ecto, path: "../.."}]
+     {:ecto_one, path: "../.."}]
   end
 end

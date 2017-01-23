@@ -1,13 +1,13 @@
-defmodule Ecto.Integration.LockTest do
+defmodule EctoOne.Integration.LockTest do
   # We can keep this test async as long as it
   # is the only one accessing the lock_test table.
   use ExUnit.Case, async: true
 
-  import Ecto.Query
-  alias Ecto.Integration.PoolRepo
+  import EctoOne.Query
+  alias EctoOne.Integration.PoolRepo
 
   defmodule LockCounter do
-    use Ecto.Schema
+    use EctoOne.Schema
 
     schema "lock_counters" do
       field :count, :integer
@@ -24,8 +24,8 @@ defmodule Ecto.Integration.LockTest do
     pid = self()
 
     lock_for_update =
-      Application.get_env(:ecto, :lock_for_update) ||
-      raise ":lock_for_update not set in :ecto application"
+      Application.get_env(:ecto_one, :lock_for_update) ||
+      raise ":lock_for_update not set in :ecto_one application"
 
     # Here we are manually inserting the lock in the query
     # to test multiple adapters. Never do this in actual
@@ -39,7 +39,7 @@ defmodule Ecto.Integration.LockTest do
 
         PoolRepo.transaction(fn ->
           [post] = PoolRepo.all(query) # this should block until the other trans. commit
-          post |> Ecto.Changeset.change(count: post.count + 1) |> PoolRepo.update!
+          post |> EctoOne.Changeset.change(count: post.count + 1) |> PoolRepo.update!
         end)
 
         send pid, :updated
@@ -48,7 +48,7 @@ defmodule Ecto.Integration.LockTest do
     PoolRepo.transaction(fn ->
       [post] = PoolRepo.all(query)       # select and lock the row
       send new_pid, :select_for_update   # signal second process to begin a transaction
-      post |> Ecto.Changeset.change(count: post.count + 1) |> PoolRepo.update!
+      post |> EctoOne.Changeset.change(count: post.count + 1) |> PoolRepo.update!
     end)
 
     assert_receive :updated, 5000

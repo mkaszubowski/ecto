@@ -1,15 +1,15 @@
-defmodule Ecto.Query do
+defmodule EctoOne.Query do
   @moduledoc ~S"""
   Provides the Query DSL.
 
   Queries are used to retrieve and manipulate data in a repository
-  (see `Ecto.Repo`). Although this module provides a complete API,
+  (see `EctoOne.Repo`). Although this module provides a complete API,
   supporting expressions like `where/3`, `select/3` and so forth,
   most of the time developers need to import only the `from/2`
   macro.
 
-      # Imports only from/2 of Ecto.Query
-      import Ecto.Query, only: [from: 2]
+      # Imports only from/2 of EctoOne.Query
+      import EctoOne.Query, only: [from: 2]
 
       # Create a query
       query = from w in Weather,
@@ -21,7 +21,7 @@ defmodule Ecto.Query do
 
   ## Composition
 
-  Ecto queries are composable. For example, the query above can
+  EctoOne queries are composable. For example, the query above can
   actually be defined in two parts:
 
       # Create a query
@@ -35,17 +35,17 @@ defmodule Ecto.Query do
   account in the query generation.
 
   Any value can be used on the right-side of `in` as long as it
-  implements the `Ecto.Queryable` protocol.
+  implements the `EctoOne.Queryable` protocol.
 
   ## Query expressions
 
-  Ecto allows a limited set of expressions inside queries. In the
+  EctoOne allows a limited set of expressions inside queries. In the
   query below, for example, we use `w.prcp` to access a field, the
   `>` comparison operator and the literal `0`:
 
       query = from w in Weather, where: w.prcp > 0
 
-  You can find the full list of operations in `Ecto.Query.API`.
+  You can find the full list of operations in `EctoOne.Query.API`.
   Besides the operations listed here, the following literals are
   supported in queries:
 
@@ -84,24 +84,24 @@ defmodule Ecto.Query do
 
   ## Casting
 
-  Ecto is able to cast interpolated values in queries:
+  EctoOne is able to cast interpolated values in queries:
 
       age = "1"
       Repo.all(from u in User, where: u.age > ^age)
 
   The example above works because `u.age` is tagged as an :integer
-  in the User model and therefore Ecto will attempt to cast the
+  in the User model and therefore EctoOne will attempt to cast the
   interpolated `^age` to integer. When a value cannot be cast,
-  `Ecto.CastError` is raised.
+  `EctoOne.CastError` is raised.
 
-  In some situations, Ecto is unable to infer the type for interpolated
+  In some situations, EctoOne is unable to infer the type for interpolated
   values (as a database would be unable) and you may need to explicitly
   tag it with the type/2 function:
 
       type(^"1", :integer)
-      type(^<<0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15>>, Ecto.UUID)
+      type(^<<0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15>>, EctoOne.UUID)
 
-  It is important to keep in mind that Ecto cannot cast nil values in
+  It is important to keep in mind that EctoOne cannot cast nil values in
   queries. Passing nil automatically causes the query to fail.
 
   ## Query Prefix
@@ -121,7 +121,7 @@ defmodule Ecto.Query do
   Set the prefix without the query syntax:
 
       results = Model
-      |> Ecto.Queryable.to_query
+      |> EctoOne.Queryable.to_query
       |> Map.put(:prefix, "foo")
       |> Repo.all
 
@@ -129,14 +129,14 @@ defmodule Ecto.Query do
   set the changeset.model as the updated model with prefix using put_meta/2:
 
       new_changeset = changeset
-      |> Map.put(:model, Ecto.put_meta(changeset.model, prefix: "foo"))
+      |> Map.put(:model, EctoOne.put_meta(changeset.model, prefix: "foo"))
       results = Repo.all(new_changeset)
 
   For deleting, if the model was retrieved by a prefix qualified query, the prefix
   will be preserved in it when deleting, and the prefix qualified record will be deleted.
 
       result = Model
-      |> Ecto.Queryable.to_query
+      |> EctoOne.Queryable.to_query
       |> Map.put(:prefix, "foo")
       |> Repo.get!(id)
 
@@ -147,7 +147,7 @@ defmodule Ecto.Query do
   In all examples so far we have used the **keywords query syntax** to
   create a query:
 
-      import Ecto.Query
+      import EctoOne.Query
       from w in Weather, where: w.prcp > 0, select: w.city
 
   Behind the scenes, the query above expands to the set of macros defined
@@ -186,23 +186,23 @@ defmodule Ecto.Query do
   defmodule Tagged do
     @moduledoc false
     # * value is the tagged value
-    # * tag is the directly tagged value, like Ecto.DateTime
+    # * tag is the directly tagged value, like EctoOne.DateTime
     # * type is the underlying tag type, like :datetime
     defstruct [:value, :tag, :type]
   end
 
-  alias Ecto.Query.Builder
-  alias Ecto.Query.Builder.From
-  alias Ecto.Query.Builder.Filter
-  alias Ecto.Query.Builder.Select
-  alias Ecto.Query.Builder.Distinct
-  alias Ecto.Query.Builder.OrderBy
-  alias Ecto.Query.Builder.LimitOffset
-  alias Ecto.Query.Builder.GroupBy
-  alias Ecto.Query.Builder.Preload
-  alias Ecto.Query.Builder.Join
-  alias Ecto.Query.Builder.Lock
-  alias Ecto.Query.Builder.Update
+  alias EctoOne.Query.Builder
+  alias EctoOne.Query.Builder.From
+  alias EctoOne.Query.Builder.Filter
+  alias EctoOne.Query.Builder.Select
+  alias EctoOne.Query.Builder.Distinct
+  alias EctoOne.Query.Builder.OrderBy
+  alias EctoOne.Query.Builder.LimitOffset
+  alias EctoOne.Query.Builder.GroupBy
+  alias EctoOne.Query.Builder.Preload
+  alias EctoOne.Query.Builder.Join
+  alias EctoOne.Query.Builder.Lock
+  alias EctoOne.Query.Builder.Update
 
   @doc """
   Resets a previously set field on a query.
@@ -211,23 +211,23 @@ defmodule Ecto.Query do
 
   ## Example
 
-      query |> Ecto.Query.exclude(:select)
+      query |> EctoOne.Query.exclude(:select)
 
   """
-  def exclude(%Ecto.Query{} = query, field), do: do_exclude(query, field)
-  def exclude(query, field), do: do_exclude(Ecto.Queryable.to_query(query), field)
+  def exclude(%EctoOne.Query{} = query, field), do: do_exclude(query, field)
+  def exclude(query, field), do: do_exclude(EctoOne.Queryable.to_query(query), field)
 
-  defp do_exclude(%Ecto.Query{} = query, :join), do: %{query | joins: []}
-  defp do_exclude(%Ecto.Query{} = query, :where), do: %{query | wheres: []}
-  defp do_exclude(%Ecto.Query{} = query, :order_by), do: %{query | order_bys: []}
-  defp do_exclude(%Ecto.Query{} = query, :group_by), do: %{query | group_bys: []}
-  defp do_exclude(%Ecto.Query{} = query, :having), do: %{query | havings: []}
-  defp do_exclude(%Ecto.Query{} = query, :distinct), do: %{query | distinct: nil}
-  defp do_exclude(%Ecto.Query{} = query, :select), do: %{query | select: nil}
-  defp do_exclude(%Ecto.Query{} = query, :limit), do: %{query | limit: nil}
-  defp do_exclude(%Ecto.Query{} = query, :offset), do: %{query | offset: nil}
-  defp do_exclude(%Ecto.Query{} = query, :lock), do: %{query | lock: nil}
-  defp do_exclude(%Ecto.Query{} = query, :preload), do: %{query | preloads: [], assocs: []}
+  defp do_exclude(%EctoOne.Query{} = query, :join), do: %{query | joins: []}
+  defp do_exclude(%EctoOne.Query{} = query, :where), do: %{query | wheres: []}
+  defp do_exclude(%EctoOne.Query{} = query, :order_by), do: %{query | order_bys: []}
+  defp do_exclude(%EctoOne.Query{} = query, :group_by), do: %{query | group_bys: []}
+  defp do_exclude(%EctoOne.Query{} = query, :having), do: %{query | havings: []}
+  defp do_exclude(%EctoOne.Query{} = query, :distinct), do: %{query | distinct: nil}
+  defp do_exclude(%EctoOne.Query{} = query, :select), do: %{query | select: nil}
+  defp do_exclude(%EctoOne.Query{} = query, :limit), do: %{query | limit: nil}
+  defp do_exclude(%EctoOne.Query{} = query, :offset), do: %{query | offset: nil}
+  defp do_exclude(%EctoOne.Query{} = query, :lock), do: %{query | lock: nil}
+  defp do_exclude(%EctoOne.Query{} = query, :preload), do: %{query | preloads: [], assocs: []}
 
   @doc """
   Creates a query.
@@ -296,12 +296,12 @@ defmodule Ecto.Query do
     quoted =
       if Enum.all?(binds, fn {_, value} -> is_integer(value) end) do
         quote do
-          Ecto.Query.unquote(type)(unquote(quoted), unquote(binds), unquote(expr))
+          EctoOne.Query.unquote(type)(unquote(quoted), unquote(binds), unquote(expr))
         end
       else
         quote do
           query = unquote(quoted)
-          Ecto.Query.unquote(type)(query, unquote(binds), unquote(expr))
+          EctoOne.Query.unquote(type)(query, unquote(binds), unquote(expr))
         end
       end
 
@@ -311,7 +311,7 @@ defmodule Ecto.Query do
   defp from([{type, expr}|t], env, count_bind, quoted, binds) when type in @no_binds do
     quoted =
       quote do
-        Ecto.Query.unquote(type)(unquote(quoted), unquote(expr))
+        EctoOne.Query.unquote(type)(unquote(quoted), unquote(expr))
       end
 
     from(t, env, count_bind, quoted, binds)
@@ -387,7 +387,7 @@ defmodule Ecto.Query do
   ## Joining with fragments
 
   When you need to join on a complex expression that cannot be
-  expressed via Ecto associations, Ecto supports fragments in joins:
+  expressed via EctoOne associations, EctoOne supports fragments in joins:
 
       Comment
       |> join(:inner, [c], p in fragment("SOME COMPLEX QUERY", c.id, ^some_param))
@@ -412,7 +412,7 @@ defmodule Ecto.Query do
   The sub-expressions in the query can be wrapped in lists, tuples or maps as
   shown in the examples. A full model can also be selected. Note that map keys
   can only be atoms, binaries, integers or floats otherwise an
-  `Ecto.Query.CompileError` exception is raised at compile-time.
+  `EctoOne.Query.CompileError` exception is raised at compile-time.
 
   ## Keywords examples
 
@@ -592,10 +592,10 @@ defmodule Ecto.Query do
 
   If `lock` is used more than once, the last one used takes precedence.
 
-  Ecto also supports [optimistic
+  EctoOne also supports [optimistic
   locking](http://en.wikipedia.org/wiki/Optimistic_concurrency_control) but not
   through queries. For more information on optimistic locking, have a look at
-  the `Ecto.Model.OptimisticLock` module.
+  the `EctoOne.Model.OptimisticLock` module.
 
   ## Keywords example
 
@@ -614,7 +614,7 @@ defmodule Ecto.Query do
   An update query expression.
 
   Updates are used to update the filtered entries. In order for
-  updates to be applied, `Ecto.Repo.update_all/3` must be invoked.
+  updates to be applied, `EctoOne.Repo.update_all/3` must be invoked.
 
   ## Keywords example
 
@@ -627,7 +627,7 @@ defmodule Ecto.Query do
 
   ## Operators
 
-  The update expression in Ecto supports the following operators:
+  The update expression in EctoOne supports the following operators:
 
     * `set` - sets the given field in the table to the given value
 
@@ -729,7 +729,7 @@ defmodule Ecto.Query do
                  preload: [comments: c]
 
   In the example above, instead of issuing a separate query to fetch
-  comments, Ecto will fetch posts and comments in a single query.
+  comments, EctoOne will fetch posts and comments in a single query.
 
   Nested associations can also be preloaded in both formats:
 

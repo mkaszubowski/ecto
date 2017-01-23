@@ -1,4 +1,4 @@
-defmodule Ecto.Adapters.SQL do
+defmodule EctoOne.Adapters.SQL do
   @moduledoc """
   Behaviour and implementation for SQL adapters.
 
@@ -6,21 +6,21 @@ defmodule Ecto.Adapters.SQL do
   pooled based implementation of SQL and also expose
   a query function to developers.
 
-  Developers that use `Ecto.Adapters.SQL` should implement
+  Developers that use `EctoOne.Adapters.SQL` should implement
   a connection module with specifics on how to connect
   to the database and also how to translate the queries
   to SQL.
 
-  See `Ecto.Adapters.Connection` for connection processes and
-  `Ecto.Adapters.SQL.Query` for the query semantics.
+  See `EctoOne.Adapters.Connection` for connection processes and
+  `EctoOne.Adapters.SQL.Query` for the query semantics.
   """
 
   @doc false
   defmacro __using__(adapter) do
     quote do
-      @behaviour Ecto.Adapter
-      @behaviour Ecto.Adapter.Migration
-      @behaviour Ecto.Adapter.Transaction
+      @behaviour EctoOne.Adapter
+      @behaviour EctoOne.Adapter.Migration
+      @behaviour EctoOne.Adapter.Transaction
 
       @conn __MODULE__.Connection
       @adapter unquote(adapter)
@@ -35,7 +35,7 @@ defmodule Ecto.Adapters.SQL do
       @doc false
       def start_link(repo, opts) do
         {:ok, _} = Application.ensure_all_started(@adapter)
-        Ecto.Adapters.SQL.start_link(@conn, @adapter, repo, opts)
+        EctoOne.Adapters.SQL.start_link(@conn, @adapter, repo, opts)
       end
 
       @doc false
@@ -53,9 +53,9 @@ defmodule Ecto.Adapters.SQL do
 
       ## Types
 
-      def embed_id(_), do: Ecto.UUID.generate
-      def load(type, value), do: Ecto.Adapters.SQL.load(type, value, &load/2)
-      def dump(type, value), do: Ecto.Adapters.SQL.dump(type, value, &dump/2)
+      def embed_id(_), do: EctoOne.UUID.generate
+      def load(type, value), do: EctoOne.Adapters.SQL.load(type, value, &load/2)
+      def dump(type, value), do: EctoOne.Adapters.SQL.dump(type, value, &dump/2)
 
       ## Query
 
@@ -66,7 +66,7 @@ defmodule Ecto.Adapters.SQL do
 
       @doc false
       def execute(repo, meta, prepared, params, preprocess, opts) do
-        Ecto.Adapters.SQL.execute(repo, meta, prepared, params, preprocess, opts)
+        EctoOne.Adapters.SQL.execute(repo, meta, prepared, params, preprocess, opts)
       end
 
       @doc false
@@ -77,7 +77,7 @@ defmodule Ecto.Adapters.SQL do
 
       # Nil binary_ids are generated in the adapter.
       def insert(repo, model_meta, params, {key, :binary_id, nil}, returning, opts) do
-        {req, resp} = Ecto.Adapters.SQL.bingenerate(key)
+        {req, resp} = EctoOne.Adapters.SQL.bingenerate(key)
         case insert(repo, model_meta, req ++ params, nil, returning, opts) do
           {:ok, values}         -> {:ok, resp ++ values}
           {:error, _} = err     -> err
@@ -88,7 +88,7 @@ defmodule Ecto.Adapters.SQL do
       def insert(repo, %{source: {prefix, source}}, params, _autogenerate, returning, opts) do
         {fields, values} = :lists.unzip(params)
         sql = @conn.insert(prefix, source, fields, returning)
-        Ecto.Adapters.SQL.model(repo, @conn, sql, values, returning, opts)
+        EctoOne.Adapters.SQL.model(repo, @conn, sql, values, returning, opts)
       end
 
       @doc false
@@ -96,26 +96,26 @@ defmodule Ecto.Adapters.SQL do
         {fields, values1} = :lists.unzip(fields)
         {filter, values2} = :lists.unzip(filter)
         sql = @conn.update(prefix, source, fields, filter, returning)
-        Ecto.Adapters.SQL.model(repo, @conn, sql, values1 ++ values2, returning, opts)
+        EctoOne.Adapters.SQL.model(repo, @conn, sql, values1 ++ values2, returning, opts)
       end
 
       @doc false
       def delete(repo, %{source: {prefix, source}}, filter, _autogenarate, opts) do
         {filter, values} = :lists.unzip(filter)
         sql = @conn.delete(prefix, source, filter, [])
-        Ecto.Adapters.SQL.model(repo, @conn, sql, values, [], opts)
+        EctoOne.Adapters.SQL.model(repo, @conn, sql, values, [], opts)
       end
 
       ## Transaction
 
       @doc false
       def transaction(repo, opts, fun) do
-        Ecto.Adapters.SQL.transaction(repo, opts, fun)
+        EctoOne.Adapters.SQL.transaction(repo, opts, fun)
       end
 
       @doc false
       def rollback(repo, value) do
-        Ecto.Adapters.SQL.rollback(repo, value)
+        EctoOne.Adapters.SQL.rollback(repo, value)
       end
 
       ## Migration
@@ -125,7 +125,7 @@ defmodule Ecto.Adapters.SQL do
         sqls = @conn.execute_ddl(definition)
 
         for sql <- List.wrap(sqls) do
-          Ecto.Adapters.SQL.query!(repo, sql, [], opts)
+          EctoOne.Adapters.SQL.query!(repo, sql, [], opts)
         end
 
         :ok
@@ -138,8 +138,8 @@ defmodule Ecto.Adapters.SQL do
     end
   end
 
-  alias Ecto.Pool
-  alias Ecto.Adapters.SQL.Sandbox
+  alias EctoOne.Pool
+  alias EctoOne.Adapters.SQL.Sandbox
 
   @doc """
   Converts the given query to SQL according to its kind and the
@@ -150,22 +150,22 @@ defmodule Ecto.Adapters.SQL do
   The examples below are meant for reference. Each adapter will
   return a different result:
 
-      Ecto.Adapters.SQL.to_sql(:all, repo, Post)
+      EctoOne.Adapters.SQL.to_sql(:all, repo, Post)
       {"SELECT p.id, p.title, p.inserted_at, p.created_at FROM posts as p", []}
 
-      Ecto.Adapters.SQL.to_sql(:update_all, repo,
+      EctoOne.Adapters.SQL.to_sql(:update_all, repo,
                               from(p in Post, update: [set: [title: ^"hello"]]))
       {"UPDATE posts AS p SET title = $1", ["hello"]}
 
   """
-  @spec to_sql(:all | :update_all | :delete_all, Ecto.Repo.t, Ecto.Queryable.t) ::
+  @spec to_sql(:all | :update_all | :delete_all, EctoOne.Repo.t, EctoOne.Queryable.t) ::
                {String.t, [term]}
   def to_sql(kind, repo, queryable) do
     adapter = repo.__adapter__
 
     {_meta, prepared, params} =
-      Ecto.Queryable.to_query(queryable)
-      |> Ecto.Query.Planner.query(kind, repo, adapter)
+      EctoOne.Queryable.to_query(queryable)
+      |> EctoOne.Query.Planner.query(kind, repo, adapter)
 
     {prepared, params}
   end
@@ -173,7 +173,7 @@ defmodule Ecto.Adapters.SQL do
   @doc """
   Same as `query/4` but raises on invalid queries.
   """
-  @spec query!(Ecto.Repo.t, String.t, [term], Keyword.t) ::
+  @spec query!(EctoOne.Repo.t, String.t, [term], Keyword.t) ::
                %{rows: nil | [tuple], num_rows: non_neg_integer} | no_return
   def query!(repo, sql, params, opts \\ []) do
     query!(repo, sql, params, nil, opts)
@@ -211,11 +211,11 @@ defmodule Ecto.Adapters.SQL do
 
   ## Examples
 
-      iex> Ecto.Adapters.SQL.query(MyRepo, "SELECT $1::integer + $2", [40, 2])
+      iex> EctoOne.Adapters.SQL.query(MyRepo, "SELECT $1::integer + $2", [40, 2])
       {:ok, %{rows: [{42}], num_rows: 1}}
 
   """
-  @spec query(Ecto.Repo.t, String.t, [term], Keyword.t) ::
+  @spec query(EctoOne.Repo.t, String.t, [term], Keyword.t) ::
               {:ok, %{rows: nil | [tuple], num_rows: non_neg_integer}} | {:error, Exception.t}
   def query(repo, sql, params, opts \\ []) do
     query(repo, sql, params, nil, opts)
@@ -260,7 +260,7 @@ defmodule Ecto.Adapters.SQL do
   end
   defp query(mod, conn, queue_time, sql, params, true, opts) do
     {query_time, result} = :timer.tc(mod, :query, [conn, sql, params, opts])
-    entry = %Ecto.LogEntry{query: sql, params: params, connection_pid: conn,
+    entry = %EctoOne.LogEntry{query: sql, params: params, connection_pid: conn,
                            query_time: query_time, queue_time: queue_time}
     {result, entry}
   end
@@ -298,16 +298,16 @@ defmodule Ecto.Adapters.SQL do
 
 
   **IMPORTANT:** Test transactions only work if the connection pool is
-  `Ecto.Adapters.SQL.Sandbox`
+  `EctoOne.Adapters.SQL.Sandbox`
 
   ## Example
 
   The first step is to configure your database to use the
-  `Ecto.Adapters.SQL.Sandbox` pool. You set those options in your
+  `EctoOne.Adapters.SQL.Sandbox` pool. You set those options in your
   `config/config.exs`:
 
       config :my_app, Repo,
-        pool: Ecto.Adapters.SQL.Sandbox
+        pool: EctoOne.Adapters.SQL.Sandbox
 
   Since you don't want those options in your production database, we
   typically recommend to create a `config/test.exs` and add the
@@ -320,7 +320,7 @@ defmodule Ecto.Adapters.SQL do
 
       # At the end of your test_helper.exs
       # From now, all tests happen inside a transaction
-      Ecto.Adapters.SQL.begin_test_transaction(TestRepo)
+      EctoOne.Adapters.SQL.begin_test_transaction(TestRepo)
 
       defmodule PostTest do
         # Tests that use the shared repository cannot be async
@@ -328,7 +328,7 @@ defmodule Ecto.Adapters.SQL do
 
         setup do
           # Go back to a clean slate at the beginning of every test
-          Ecto.Adapters.SQL.restart_test_transaction(TestRepo)
+          EctoOne.Adapters.SQL.restart_test_transaction(TestRepo)
           :ok
         end
 
@@ -346,11 +346,11 @@ defmodule Ecto.Adapters.SQL do
 
         setup_all do
           # Wrap this case in a transaction
-          Ecto.Adapters.SQL.begin_test_transaction(TestRepo)
+          EctoOne.Adapters.SQL.begin_test_transaction(TestRepo)
 
           # Roll it back once we are done
           on_exit fn ->
-            Ecto.Adapters.SQL.rollback_test_transaction(TestRepo)
+            EctoOne.Adapters.SQL.rollback_test_transaction(TestRepo)
           end
 
           :ok
@@ -358,7 +358,7 @@ defmodule Ecto.Adapters.SQL do
 
         setup do
           # Go back to a clean slate at the beginning of every test
-          Ecto.Adapters.SQL.restart_test_transaction(TestRepo)
+          EctoOne.Adapters.SQL.restart_test_transaction(TestRepo)
           :ok
         end
 
@@ -368,7 +368,7 @@ defmodule Ecto.Adapters.SQL do
       end
 
   """
-  @spec begin_test_transaction(Ecto.Repo.t, Keyword.t) :: :ok
+  @spec begin_test_transaction(EctoOne.Repo.t, Keyword.t) :: :ok
   def begin_test_transaction(repo, opts \\ []) do
     test_transaction(:begin, repo, opts)
   end
@@ -376,12 +376,12 @@ defmodule Ecto.Adapters.SQL do
   @doc """
   Restarts a test transaction, see `begin_test_transaction/2`.
   """
-  @spec restart_test_transaction(Ecto.Repo.t, Keyword.t) :: :ok
+  @spec restart_test_transaction(EctoOne.Repo.t, Keyword.t) :: :ok
   def restart_test_transaction(repo, opts \\ []) do
     test_transaction(:restart, repo, opts)
   end
 
-  @spec rollback_test_transaction(Ecto.Repo.t, Keyword.t) :: :ok
+  @spec rollback_test_transaction(EctoOne.Repo.t, Keyword.t) :: :ok
   def rollback_test_transaction(repo, opts \\ []) do
     test_transaction(:rollback, repo, opts)
   end
@@ -395,7 +395,7 @@ defmodule Ecto.Adapters.SQL do
       {pool_mod, _, _, _} ->
         raise """
         cannot #{fun} test transaction with pool #{inspect pool_mod}.
-        In order to use test transactions with Ecto SQL, you need to
+        In order to use test transactions with EctoOne SQL, you need to
         configure your repository to use #{inspect Sandbox}:
 
             pool: #{inspect Sandbox}
@@ -424,9 +424,9 @@ defmodule Ecto.Adapters.SQL do
 
           {#{inspect adapter}, ">= 0.0.0"}
 
-      And remember to recompile Ecto afterwards by cleaning the current build:
+      And remember to recompile EctoOne afterwards by cleaning the current build:
 
-          mix deps.clean ecto
+          mix deps.clean ecto_one
       """
     end
 
@@ -438,33 +438,33 @@ defmodule Ecto.Adapters.SQL do
 
   @doc false
   def load({:embed, _} = type, data, loader),
-    do: Ecto.Type.load(type, data, fn
+    do: EctoOne.Type.load(type, data, fn
           {:embed, _} = type, value -> loader.(type, value)
-          type, value -> Ecto.Type.cast(type, value)
+          type, value -> EctoOne.Type.cast(type, value)
         end)
   def load(:binary_id, data, loader),
-    do: Ecto.Type.load(Ecto.UUID, data, loader)
+    do: EctoOne.Type.load(EctoOne.UUID, data, loader)
   def load(type, data, loader),
-    do: Ecto.Type.load(type, data, loader)
+    do: EctoOne.Type.load(type, data, loader)
 
   @doc false
   def dump({:embed, _} = type, data, dumper),
-    do: Ecto.Type.dump(type, data, fn
+    do: EctoOne.Type.dump(type, data, fn
           {:embed, _} = type, value -> dumper.(type, value)
           _type, value -> {:ok, value}
         end)
   def dump(:binary_id, data, dumper),
-    do: Ecto.Type.dump(Ecto.UUID, data, dumper)
+    do: EctoOne.Type.dump(EctoOne.UUID, data, dumper)
   def dump(type, data, dumper),
-    do: Ecto.Type.dump(type, data, dumper)
+    do: EctoOne.Type.dump(type, data, dumper)
 
   @doc false
   def bingenerate(key) do
-    {:ok, value} = Ecto.UUID.dump(Ecto.UUID.generate)
+    {:ok, value} = EctoOne.UUID.dump(EctoOne.UUID.generate)
     {[{key, value}], [{key, unwrap(value)}]}
   end
 
-  defp unwrap(%Ecto.Query.Tagged{value: value}), do: value
+  defp unwrap(%EctoOne.Query.Tagged{value: value}), do: value
   defp unwrap(value), do: value
 
   ## Query
@@ -601,7 +601,7 @@ defmodule Ecto.Adapters.SQL do
   end
 
   defp begin_sql(mod, :raw),     do: mod.begin_transaction
-  defp begin_sql(mod, :sandbox), do: mod.savepoint "ecto_trans"
+  defp begin_sql(mod, :sandbox), do: mod.savepoint "ecto_one_trans"
 
   defp commit(repo, ref, mod, :raw, pool_timeout, opts, result) do
     case query(repo, mod.commit, [], nil, nil, opts) do
@@ -635,6 +635,6 @@ defmodule Ecto.Adapters.SQL do
 
   defp rollback_sql(mod, :raw), do: mod.rollback
   defp rollback_sql(mod, :sandbox) do
-    mod.rollback_to_savepoint "ecto_trans"
+    mod.rollback_to_savepoint "ecto_one_trans"
   end
 end

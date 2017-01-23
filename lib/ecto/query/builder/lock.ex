@@ -1,7 +1,7 @@
-defmodule Ecto.Query.Builder.Lock do
+defmodule EctoOne.Query.Builder.Lock do
   @moduledoc false
 
-  alias Ecto.Query.Builder
+  alias EctoOne.Query.Builder
 
   @doc """
   Escapes the lock code.
@@ -33,9 +33,9 @@ defmodule Ecto.Query.Builder.Lock do
   @doc """
   The callback applied by `build/4` to build the query.
   """
-  @spec apply(Ecto.Queryable.t, term) :: Ecto.Query.t
+  @spec apply(EctoOne.Queryable.t, term) :: EctoOne.Query.t
   def apply(query, value) do
-    query = Ecto.Queryable.to_query(query)
+    query = EctoOne.Queryable.to_query(query)
     %{query | lock: value}
   end
 end

@@ -1,6 +1,6 @@
 import Kernel, except: [to_string: 1]
 
-defmodule Ecto.DateTime.Utils do
+defmodule EctoOne.DateTime.Utils do
   @moduledoc false
 
   @doc "Pads with zero"
@@ -83,8 +83,8 @@ defmodule Ecto.DateTime.Utils do
   defp parse(rest, acc), do: {acc, rest}
 end
 
-defmodule Ecto.Date do
-  import Ecto.DateTime.Utils
+defmodule EctoOne.Date do
+  import EctoOne.DateTime.Utils
 
   @doc """
   Compare two dates.
@@ -92,17 +92,17 @@ defmodule Ecto.Date do
   Receives two dates and compares the `t1`
   against `t2` and returns `:lt`, `:eq` or `:gt`.
   """
-  defdelegate compare(t1, t2), to: Ecto.DateTime.Utils
+  defdelegate compare(t1, t2), to: EctoOne.DateTime.Utils
 
   @moduledoc """
-  An Ecto type for dates.
+  An EctoOne type for dates.
   """
 
-  @behaviour Ecto.Type
+  @behaviour EctoOne.Type
   defstruct [:year, :month, :day]
 
   @doc """
-  The Ecto primitive type.
+  The EctoOne primitive type.
   """
   def type, do: :date
 
@@ -121,7 +121,7 @@ defmodule Ecto.Date do
     * a map with `:year`, `:month` and `:day` keys
       with integer or binaries as values
     * a tuple with `{year, month, day}` as integers or binaries
-    * an `Ecto.Date` struct itself
+    * an `EctoOne.Date` struct itself
 
   """
   def cast(<<year::4-bytes, ?-, month::2-bytes, ?-, day::2-bytes>>),
@@ -129,7 +129,7 @@ defmodule Ecto.Date do
   def cast(<<year::4-bytes, ?-, month::2-bytes, ?-, day::2-bytes, sep,
              _hour::2-bytes, ?:, _min::2-bytes, ?:, _sec::2-bytes, _rest::binary>>) when sep in [?\s, ?T],
     do: from_parts(to_i(year), to_i(month), to_i(day))
-  def cast(%Ecto.Date{} = d),
+  def cast(%EctoOne.Date{} = d),
     do: {:ok, d}
   def cast(%{"year" => year, "month" => month, "day" => day}),
     do: from_parts(to_i(year), to_i(month), to_i(day))
@@ -151,79 +151,79 @@ defmodule Ecto.Date do
   end
 
   defp from_parts(year, month, day) when is_date(year, month, day) do
-    {:ok, %Ecto.Date{year: year, month: month, day: day}}
+    {:ok, %EctoOne.Date{year: year, month: month, day: day}}
   end
   defp from_parts(_, _, _), do: :error
 
   @doc """
-  Converts an `Ecto.Date` into a date triplet.
+  Converts an `EctoOne.Date` into a date triplet.
   """
-  def dump(%Ecto.Date{year: year, month: month, day: day}) do
+  def dump(%EctoOne.Date{year: year, month: month, day: day}) do
     {:ok, {year, month, day}}
   end
   def dump(_), do: :error
 
   @doc """
-  Converts a date triplet into an `Ecto.Date`.
+  Converts a date triplet into an `EctoOne.Date`.
   """
   def load({year, month, day}) do
-    {:ok, %Ecto.Date{year: year, month: month, day: day}}
+    {:ok, %EctoOne.Date{year: year, month: month, day: day}}
   end
   def load(_), do: :error
 
   @doc """
-  Converts `Ecto.Date` to a readable string representation.
+  Converts `EctoOne.Date` to a readable string representation.
   """
-  def to_string(%Ecto.Date{year: year, month: month, day: day}) do
+  def to_string(%EctoOne.Date{year: year, month: month, day: day}) do
     zero_pad(year, 4) <> "-" <> zero_pad(month, 2) <> "-" <> zero_pad(day, 2)
   end
 
   @doc """
-  Converts `Ecto.Date` to ISO8601 representation.
+  Converts `EctoOne.Date` to ISO8601 representation.
   """
   def to_iso8601(date) do
     to_string(date)
   end
 
   @doc """
-  Returns an `Ecto.Date` in local time.
+  Returns an `EctoOne.Date` in local time.
 
   WARNING: The local time is often not always increasing due
   to DST changes, which can lead to bugs. Please prefer the
   `utc/0` function instead.
   """
   def local do
-    IO.write :stderr, "warning: Ecto.Date.local/0 is deprecated as it is unsafe. Use utc/0 instead." <>
+    IO.write :stderr, "warning: EctoOne.Date.local/0 is deprecated as it is unsafe. Use utc/0 instead." <>
                       Exception.format_stacktrace
     {{year, month, day}, _time} = :erlang.localtime
-    %Ecto.Date{year: year, month: month, day: day}
+    %EctoOne.Date{year: year, month: month, day: day}
   end
 
   @doc """
-  Returns an `Ecto.Date` in UTC.
+  Returns an `EctoOne.Date` in UTC.
   """
   def utc do
     {{year, month, day}, _time} = :erlang.universaltime
-    %Ecto.Date{year: year, month: month, day: day}
+    %EctoOne.Date{year: year, month: month, day: day}
   end
 
   @doc """
-  Returns an Erlang date tuple from an `Ecto.Date`.
+  Returns an Erlang date tuple from an `EctoOne.Date`.
   """
-  def to_erl(%Ecto.Date{year: year, month: month, day: day}) do
+  def to_erl(%EctoOne.Date{year: year, month: month, day: day}) do
     {year, month, day}
   end
 
   @doc """
-  Returns an `Ecto.Date` from an Erlang date tuple.
+  Returns an `EctoOne.Date` from an Erlang date tuple.
   """
   def from_erl({year, month, day}) do
-    %Ecto.Date{year: year, month: month, day: day}
+    %EctoOne.Date{year: year, month: month, day: day}
   end
 end
 
-defmodule Ecto.Time do
-  import Ecto.DateTime.Utils
+defmodule EctoOne.Time do
+  import EctoOne.DateTime.Utils
 
   @doc """
   Compare two times.
@@ -231,17 +231,17 @@ defmodule Ecto.Time do
   Receives two times and compares the `t1`
   against `t2` and returns `:lt`, `:eq` or `:gt`.
   """
-  defdelegate compare(t1, t2), to: Ecto.DateTime.Utils
+  defdelegate compare(t1, t2), to: EctoOne.DateTime.Utils
 
   @moduledoc """
-  An Ecto type for time.
+  An EctoOne type for time.
   """
 
-  @behaviour Ecto.Type
+  @behaviour EctoOne.Type
   defstruct [:hour, :min, :sec, usec: 0]
 
   @doc """
-  The Ecto primitive type.
+  The EctoOne primitive type.
   """
   def type, do: :time
 
@@ -260,7 +260,7 @@ defmodule Ecto.Time do
       as optional keys and values are integers or binaries
     * a tuple with `{hour, min, sec}` as integers or binaries
     * a tuple with `{hour, min, sec, usec}` as integers or binaries
-    * an `Ecto.Time` struct itself
+    * an `EctoOne.Time` struct itself
 
   """
   def cast(<<hour::2-bytes, ?:, min::2-bytes, ?:, sec::2-bytes, rest::binary>>) do
@@ -270,7 +270,7 @@ defmodule Ecto.Time do
       :error
     end
   end
-  def cast(%Ecto.Time{} = t),
+  def cast(%EctoOne.Time{} = t),
     do: {:ok, t}
   def cast(%{"hour" => hour, "minute" => min} = map),
     do: from_parts(to_i(hour), to_i(min), to_i(Map.get(map, "second", 0)), to_i(Map.get(map, "microsecond", 0)))
@@ -298,24 +298,24 @@ defmodule Ecto.Time do
   end
 
   defp from_parts(hour, min, sec, usec) when is_time(hour, min, sec, usec),
-    do: {:ok, %Ecto.Time{hour: hour, min: min, sec: sec, usec: usec}}
+    do: {:ok, %EctoOne.Time{hour: hour, min: min, sec: sec, usec: usec}}
   defp from_parts(_, _, _, _),
     do: :error
 
   @doc """
-  Converts an `Ecto.Time` into a time tuple (in the form `{hour, min, sec,
+  Converts an `EctoOne.Time` into a time tuple (in the form `{hour, min, sec,
   usec}`).
   """
-  def dump(%Ecto.Time{hour: hour, min: min, sec: sec, usec: usec}) do
+  def dump(%EctoOne.Time{hour: hour, min: min, sec: sec, usec: usec}) do
     {:ok, {hour, min, sec, usec}}
   end
   def dump(_), do: :error
 
   @doc """
-  Converts a time tuple like the one returned by `dump/1` into an `Ecto.Time`.
+  Converts a time tuple like the one returned by `dump/1` into an `EctoOne.Time`.
   """
   def load({hour, min, sec, usec}) do
-    {:ok, %Ecto.Time{hour: hour, min: min, sec: sec, usec: usec}}
+    {:ok, %EctoOne.Time{hour: hour, min: min, sec: sec, usec: usec}}
   end
   def load({_, _, _} = time) do
     {:ok, from_erl(time)}
@@ -323,9 +323,9 @@ defmodule Ecto.Time do
   def load(_), do: :error
 
   @doc """
-  Converts `Ecto.Time` to a string representation.
+  Converts `EctoOne.Time` to a string representation.
   """
-  def to_string(%Ecto.Time{hour: hour, min: min, sec: sec, usec: usec}) do
+  def to_string(%EctoOne.Time{hour: hour, min: min, sec: sec, usec: usec}) do
     str = zero_pad(hour, 2) <> ":" <> zero_pad(min, 2) <> ":" <> zero_pad(sec, 2)
 
     if is_nil(usec) or usec == 0 do
@@ -336,29 +336,29 @@ defmodule Ecto.Time do
   end
 
   @doc """
-  Converts `Ecto.Time` to its ISO 8601 representation.
+  Converts `EctoOne.Time` to its ISO 8601 representation.
   """
   def to_iso8601(time) do
     to_string(time)
   end
 
   @doc """
-  Returns an `Ecto.Time` in local time.
+  Returns an `EctoOne.Time` in local time.
 
   WARNING: The local time is often not always increasing due
   to DST changes, which can lead to bugs. Please prefer the
   `utc/1` function instead.
   """
   def local do
-    IO.write :stderr, "warning: Ecto.Time.local/0 is deprecated as it is unsafe. Use utc/0 instead." <>
+    IO.write :stderr, "warning: EctoOne.Time.local/0 is deprecated as it is unsafe. Use utc/0 instead." <>
                       Exception.format_stacktrace
 
     {_, {hour, min, sec}} = :erlang.localtime
-    %Ecto.Time{hour: hour, min: min, sec: sec}
+    %EctoOne.Time{hour: hour, min: min, sec: sec}
   end
 
   @doc """
-  Returns an `Ecto.Time` in UTC.
+  Returns an `EctoOne.Time` in UTC.
 
   `precision` can be `:sec` or `:usec.`
   """
@@ -366,32 +366,32 @@ defmodule Ecto.Time do
 
   def utc(:sec) do
     {_, {hour, min, sec}} = :erlang.universaltime
-    %Ecto.Time{hour: hour, min: min, sec: sec}
+    %EctoOne.Time{hour: hour, min: min, sec: sec}
   end
 
   def utc(:usec) do
     now = {_, _, usec} = :os.timestamp
     {_date, {hour, min, sec}} = :calendar.now_to_universal_time(now)
-    %Ecto.Time{hour: hour, min: min, sec: sec, usec: usec}
+    %EctoOne.Time{hour: hour, min: min, sec: sec, usec: usec}
   end
 
   @doc """
-  Returns an Erlang time tuple from an `Ecto.Time`.
+  Returns an Erlang time tuple from an `EctoOne.Time`.
   """
-  def to_erl(%Ecto.Time{hour: hour, min: min, sec: sec}) do
+  def to_erl(%EctoOne.Time{hour: hour, min: min, sec: sec}) do
     {hour, min, sec}
   end
 
   @doc """
-  Returns an `Ecto.Time` from an Erlang time tuple.
+  Returns an `EctoOne.Time` from an Erlang time tuple.
   """
   def from_erl({hour, min, sec}) do
-    %Ecto.Time{hour: hour, min: min, sec: sec}
+    %EctoOne.Time{hour: hour, min: min, sec: sec}
   end
 end
 
-defmodule Ecto.DateTime do
-  import Ecto.DateTime.Utils
+defmodule EctoOne.DateTime do
+  import EctoOne.DateTime.Utils
 
   @doc """
   Compare two datetimes.
@@ -399,17 +399,17 @@ defmodule Ecto.DateTime do
   Receives two datetimes and compares the `t1`
   against `t2` and returns `:lt`, `:eq` or `:gt`.
   """
-  defdelegate compare(t1, t2), to: Ecto.DateTime.Utils
+  defdelegate compare(t1, t2), to: EctoOne.DateTime.Utils
 
   @moduledoc """
-  An Ecto type that includes a date and a time.
+  An EctoOne type that includes a date and a time.
   """
 
-  @behaviour Ecto.Type
+  @behaviour EctoOne.Type
   defstruct [:year, :month, :day, :hour, :min, :sec, usec: 0]
 
   @doc """
-  The Ecto primitive type.
+  The EctoOne primitive type.
   """
   def type, do: :datetime
 
@@ -428,7 +428,7 @@ defmodule Ecto.DateTime do
       with `:sec` and `:usec` as optional keys and values are integers or binaries
     * a tuple with `{{year, month, day}, {hour, min, sec}}` as integers or binaries
     * a tuple with `{{year, month, day}, {hour, min, sec, usec}}` as integers or binaries
-    * an `Ecto.DateTime` struct itself
+    * an `EctoOne.DateTime` struct itself
 
   """
   def cast(<<year::4-bytes, ?-, month::2-bytes, ?-, day::2-bytes, sep,
@@ -441,7 +441,7 @@ defmodule Ecto.DateTime do
     end
   end
 
-  def cast(%Ecto.DateTime{} = dt) do
+  def cast(%EctoOne.DateTime{} = dt) do
     {:ok, dt}
   end
 
@@ -495,20 +495,20 @@ defmodule Ecto.DateTime do
 
   defp from_parts(year, month, day, hour, min, sec, usec)
       when is_date(year, month, day) and is_time(hour, min, sec, usec) do
-    {:ok, %Ecto.DateTime{year: year, month: month, day: day, hour: hour, min: min, sec: sec, usec: usec}}
+    {:ok, %EctoOne.DateTime{year: year, month: month, day: day, hour: hour, min: min, sec: sec, usec: usec}}
   end
   defp from_parts(_, _, _, _, _, _, _), do: :error
 
   @doc """
-  Converts an `Ecto.DateTime` into a `{date, time}` tuple.
+  Converts an `EctoOne.DateTime` into a `{date, time}` tuple.
   """
-  def dump(%Ecto.DateTime{year: year, month: month, day: day, hour: hour, min: min, sec: sec, usec: usec}) do
+  def dump(%EctoOne.DateTime{year: year, month: month, day: day, hour: hour, min: min, sec: sec, usec: usec}) do
     {:ok, {{year, month, day}, {hour, min, sec, usec}}}
   end
   def dump(_), do: :error
 
   @doc """
-  Converts a `{date, time}` tuple into an `Ecto.DateTime`.
+  Converts a `{date, time}` tuple into an `EctoOne.DateTime`.
   """
   def load({{_, _, _}, {_, _, _, _}} = datetime) do
     {:ok, erl_load(datetime)}
@@ -519,41 +519,41 @@ defmodule Ecto.DateTime do
   def load(_), do: :error
 
   @doc """
-  Converts `Ecto.DateTime` into an `Ecto.Date`.
+  Converts `EctoOne.DateTime` into an `EctoOne.Date`.
   """
-  def to_date(%Ecto.DateTime{year: year, month: month, day: day}) do
-    %Ecto.Date{year: year, month: month, day: day}
+  def to_date(%EctoOne.DateTime{year: year, month: month, day: day}) do
+    %EctoOne.Date{year: year, month: month, day: day}
   end
 
   @doc """
-  Converts `Ecto.DateTime` into an `Ecto.Time`.
+  Converts `EctoOne.DateTime` into an `EctoOne.Time`.
   """
-  def to_time(%Ecto.DateTime{hour: hour, min: min, sec: sec, usec: usec}) do
-    %Ecto.Time{hour: hour, min: min, sec: sec, usec: usec}
+  def to_time(%EctoOne.DateTime{hour: hour, min: min, sec: sec, usec: usec}) do
+    %EctoOne.Time{hour: hour, min: min, sec: sec, usec: usec}
   end
 
   @doc """
-  Converts the given `Ecto.Date` into `Ecto.DateTime` with the time being
+  Converts the given `EctoOne.Date` into `EctoOne.DateTime` with the time being
   00:00:00.
   """
-  def from_date(%Ecto.Date{year: year, month: month, day: day}) do
-    %Ecto.DateTime{year: year, month: month, day: day,
+  def from_date(%EctoOne.Date{year: year, month: month, day: day}) do
+    %EctoOne.DateTime{year: year, month: month, day: day,
       hour: 0, min: 0, sec: 0, usec: 0}
   end
 
   @doc """
-  Converts the given `Ecto.Date` and `Ecto.Time` into `Ecto.DateTime`.
+  Converts the given `EctoOne.Date` and `EctoOne.Time` into `EctoOne.DateTime`.
   """
-  def from_date_and_time(%Ecto.Date{year: year, month: month, day: day},
-                         %Ecto.Time{hour: hour, min: min, sec: sec, usec: usec}) do
-    %Ecto.DateTime{year: year, month: month, day: day,
+  def from_date_and_time(%EctoOne.Date{year: year, month: month, day: day},
+                         %EctoOne.Time{hour: hour, min: min, sec: sec, usec: usec}) do
+    %EctoOne.DateTime{year: year, month: month, day: day,
                    hour: hour, min: min, sec: sec, usec: usec}
   end
 
   @doc """
-  Converts `Ecto.DateTime` to its string representation.
+  Converts `EctoOne.DateTime` to its string representation.
   """
-  def to_string(%Ecto.DateTime{year: year, month: month, day: day, hour: hour, min: min, sec: sec, usec: usec}) do
+  def to_string(%EctoOne.DateTime{year: year, month: month, day: day, hour: hour, min: min, sec: sec, usec: usec}) do
     str = zero_pad(year, 4) <> "-" <> zero_pad(month, 2) <> "-" <> zero_pad(day, 2) <> " " <>
           zero_pad(hour, 2) <> ":" <> zero_pad(min, 2) <> ":" <> zero_pad(sec, 2)
 
@@ -565,15 +565,15 @@ defmodule Ecto.DateTime do
   end
 
   @doc """
-  Converts `Ecto.DateTime` to its ISO 8601 UTC representation if the
-  `Ecto.DateTime` is UTC.
+  Converts `EctoOne.DateTime` to its ISO 8601 UTC representation if the
+  `EctoOne.DateTime` is UTC.
 
   WARNING: This will produce an incorrect result unless the datetime is UTC!
   Make sure that the datetime is UTC. `inserted_at` and `updated_at` fields
-  populated by the Ecto `timestamps` feature are UTC. But other `Ecto.DateTime`
+  populated by the EctoOne `timestamps` feature are UTC. But other `EctoOne.DateTime`
   fields are not always UTC.
   """
-  def to_iso8601(%Ecto.DateTime{year: year, month: month, day: day,
+  def to_iso8601(%EctoOne.DateTime{year: year, month: month, day: day,
                                 hour: hour, min: min, sec: sec, usec: usec}) do
     str = zero_pad(year, 4) <> "-" <> zero_pad(month, 2) <> "-" <> zero_pad(day, 2) <> "T" <>
           zero_pad(hour, 2) <> ":" <> zero_pad(min, 2) <> ":" <> zero_pad(sec, 2)
@@ -586,7 +586,7 @@ defmodule Ecto.DateTime do
   end
 
   @doc """
-  Returns an `Ecto.DateTime` in local time.
+  Returns an `EctoOne.DateTime` in local time.
 
   WARNING: Using the local time of the server will often lead to
   intermittent bugs.
@@ -595,13 +595,13 @@ defmodule Ecto.DateTime do
   use this function. Please use the `utc/1` function instead.
   """
   def local do
-    IO.write :stderr, "warning: Ecto.DateTime.local/0 is deprecated as it is unsafe. Use utc/0 instead." <>
+    IO.write :stderr, "warning: EctoOne.DateTime.local/0 is deprecated as it is unsafe. Use utc/0 instead." <>
                       Exception.format_stacktrace
     from_erl(:erlang.localtime)
   end
 
   @doc """
-  Returns an `Ecto.DateTime` in UTC.
+  Returns an `EctoOne.DateTime` in UTC.
 
   `precision` can be `:sec` or `:usec`.
   """
@@ -610,17 +610,17 @@ defmodule Ecto.DateTime do
   end
 
   @doc """
-  Returns an Erlang datetime tuple from an `Ecto.DateTime`.
+  Returns an Erlang datetime tuple from an `EctoOne.DateTime`.
   """
-  def to_erl(%Ecto.DateTime{year: year, month: month, day: day, hour: hour, min: min, sec: sec}) do
+  def to_erl(%EctoOne.DateTime{year: year, month: month, day: day, hour: hour, min: min, sec: sec}) do
     {{year, month, day}, {hour, min, sec}}
   end
 
   @doc """
-  Returns an `Ecto.DateTime` from an Erlang datetime tuple.
+  Returns an `EctoOne.DateTime` from an Erlang datetime tuple.
   """
   def from_erl({{year, month, day}, {hour, min, sec}}) do
-    %Ecto.DateTime{year: year, month: month, day: day,
+    %EctoOne.DateTime{year: year, month: month, day: day,
                    hour: hour, min: min, sec: sec}
   end
 
@@ -640,18 +640,18 @@ defmodule Ecto.DateTime do
   end
 
   defp erl_load({{year, month, day}, {hour, min, sec, usec}}) do
-    %Ecto.DateTime{year: year, month: month, day: day,
+    %EctoOne.DateTime{year: year, month: month, day: day,
                    hour: hour, min: min, sec: sec, usec: usec}
   end
 end
 
-defimpl String.Chars, for: [Ecto.DateTime, Ecto.Date, Ecto.Time] do
+defimpl String.Chars, for: [EctoOne.DateTime, EctoOne.Date, EctoOne.Time] do
   def to_string(dt) do
     @for.to_string(dt)
   end
 end
 
-defimpl Inspect, for: [Ecto.DateTime, Ecto.Date, Ecto.Time] do
+defimpl Inspect, for: [EctoOne.DateTime, EctoOne.Date, EctoOne.Time] do
   @inspected inspect(@for)
 
   def inspect(dt, _opts) do

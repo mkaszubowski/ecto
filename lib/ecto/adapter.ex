@@ -1,4 +1,4 @@
-defmodule Ecto.Adapter do
+defmodule EctoOne.Adapter do
   @moduledoc """
   This module specifies the adapter API that an adapter is required to
   implement.
@@ -8,7 +8,7 @@ defmodule Ecto.Adapter do
 
   @type t :: module
 
-  @typedoc "Ecto.Query fields that are orthogonal to the generated query"
+  @typedoc "EctoOne.Query fields that are orthogonal to the generated query"
   @type query_meta :: %{prefix: binary | nil, sources: tuple, assocs: term, preloads: term, select: term}
 
   @typedoc "Schema metadata fields"
@@ -22,7 +22,7 @@ defmodule Ecto.Adapter do
   @type preprocess :: (field :: Macro.t, value :: term, context :: term -> term)
   @type autogenerate_id :: {field :: atom, type :: :id | :binary_id, value :: term} | nil
 
-  @typep repo :: Ecto.Repo.t
+  @typep repo :: EctoOne.Repo.t
   @typep options :: Keyword.t
 
   @doc """
@@ -33,63 +33,63 @@ defmodule Ecto.Adapter do
   ## Types
 
   @doc """
-  Called for every known Ecto type when loading data from the adapter.
+  Called for every known EctoOne type when loading data from the adapter.
 
   This allows developers to properly translate values coming from
-  the adapters into Ecto ones. For example, if the database does not
+  the adapters into EctoOne ones. For example, if the database does not
   support booleans but instead returns 0 and 1 for them, you could
   add:
 
       def load(:boolean, 0), do: {:ok, false}
       def load(:boolean, 1), do: {:ok, true}
-      def load(type, value), do: Ecto.Type.load(type, value, &load/2)
+      def load(type, value), do: EctoOne.Type.load(type, value, &load/2)
 
-  Notice that `Ecto.Type.load/3` provides a default implementation
+  Notice that `EctoOne.Type.load/3` provides a default implementation
   which also expects the current `load/2` for handling recursive
   types like arrays and embeds.
 
   Finally, notice all adapters are required to implement a clause
   for :binary_id types, since they are adapter specific. If your
-  adapter does not provide binary ids, you may simply use Ecto.UUID:
+  adapter does not provide binary ids, you may simply use EctoOne.UUID:
 
-      def load(:binary_id, value), do: load(Ecto.UUID, value)
-      def load(type, value), do: Ecto.Type.load(type, value, &load/2)
+      def load(:binary_id, value), do: load(EctoOne.UUID, value)
+      def load(type, value), do: EctoOne.Type.load(type, value, &load/2)
 
   """
-  defcallback load(Ecto.Type.t, term) :: {:ok, term} | :error
+  defcallback load(EctoOne.Type.t, term) :: {:ok, term} | :error
 
   @doc """
-  Called for every known Ecto type when dumping data to the adapter.
+  Called for every known EctoOne type when dumping data to the adapter.
 
   This allows developers to properly translate values coming from
-  the Ecto into adapter ones. For example, if the database does not
+  the EctoOne into adapter ones. For example, if the database does not
   support booleans but instead returns 0 and 1 for them, you could
   add:
 
       def dump(:boolean, false), do: {:ok, 0}
       def dump(:boolean, true), do: {:ok, 1}
-      def dump(type, value), do: Ecto.Type.dump(type, value, &dump/2)
+      def dump(type, value), do: EctoOne.Type.dump(type, value, &dump/2)
 
-  Notice that `Ecto.Type.dump/3` provides a default implementation
+  Notice that `EctoOne.Type.dump/3` provides a default implementation
   which also expects the current `dump/2` for handling recursive
   types like arrays and embeds.
 
   Finally, notice all adapters are required to implement a clause
   for :binary_id types, since they are adapter specific. If your
-  adapter does not provide binary ids, you may simply use Ecto.UUID:
+  adapter does not provide binary ids, you may simply use EctoOne.UUID:
 
-      def dump(:binary_id, value), do: dump(Ecto.UUID, value)
-      def dump(type, value), do: Ecto.Type.dump(type, value, &dump/2)
+      def dump(:binary_id, value), do: dump(EctoOne.UUID, value)
+      def dump(type, value), do: EctoOne.Type.dump(type, value, &dump/2)
 
   """
-  defcallback dump(Ecto.Type.t, term) :: {:ok, term} | :error
+  defcallback dump(EctoOne.Type.t, term) :: {:ok, term} | :error
 
   @doc """
   Called every time an id is needed for an embedded model.
 
-  It receives the `Ecto.Embedded` struct.
+  It receives the `EctoOne.Embedded` struct.
   """
-  defcallback embed_id(Ecto.Embedded.t) :: String.t
+  defcallback embed_id(EctoOne.Embedded.t) :: String.t
 
   @doc """
   Starts any connection pooling or supervision and return `{:ok, pid}`.
@@ -99,7 +99,7 @@ defmodule Ecto.Adapter do
 
   ## Adapter start
 
-  Because some Ecto tasks like migration may run without starting
+  Because some EctoOne tasks like migration may run without starting
   the parent application, it is recommended that start_link in
   adapters make sure the adapter application is started by calling
   `Application.ensure_all_started/1`.
@@ -120,7 +120,7 @@ defmodule Ecto.Adapter do
 
   The returned result is given to `execute/6`.
   """
-  defcallback prepare(:all | :update_all | :delete_all, query :: Ecto.Query.t) ::
+  defcallback prepare(:all | :update_all | :delete_all, query :: EctoOne.Query.t) ::
               {:cache, prepared} | {:nocache, prepared}
 
   @doc """
@@ -131,11 +131,11 @@ defmodule Ecto.Adapter do
   `nil` if a particular operation does not support them.
 
   The `meta` field is a map containing some of the fields found
-  in the `Ecto.Query` struct.
+  in the `EctoOne.Query` struct.
 
   It receives a preprocess function that should be invoked for each
   selected field in the query result in order to convert them to the
-  expected Ecto type. The `preprocess` function will be nil if no
+  expected EctoOne type. The `preprocess` function will be nil if no
   result set is expected from the query.
   """
   defcallback execute(repo, query_meta :: map, prepared, params :: list(), preprocess | nil, options) ::

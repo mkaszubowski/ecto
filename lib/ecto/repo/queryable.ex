@@ -1,29 +1,29 @@
-defmodule Ecto.Repo.Queryable do
+defmodule EctoOne.Repo.Queryable do
   # The module invoked by user defined repos
   # for query related functionality.
   @moduledoc false
 
-  alias Ecto.Queryable
-  alias Ecto.Query.Planner
+  alias EctoOne.Queryable
+  alias EctoOne.Query.Planner
 
-  require Ecto.Query
+  require EctoOne.Query
 
   @doc """
-  Implementation for `Ecto.Repo.all/2`
+  Implementation for `EctoOne.Repo.all/2`
   """
   def all(repo, adapter, queryable, opts) when is_list(opts) do
     execute(:all, repo, adapter, queryable, opts) |> elem(1)
   end
 
   @doc """
-  Implementation for `Ecto.Repo.get/3`
+  Implementation for `EctoOne.Repo.get/3`
   """
   def get(repo, adapter, queryable, id, opts) do
     one(repo, adapter, query_for_get(repo, queryable, id), opts)
   end
 
   @doc """
-  Implementation for `Ecto.Repo.get!/3`
+  Implementation for `EctoOne.Repo.get!/3`
   """
   def get!(repo, adapter, queryable, id, opts) do
     one!(repo, adapter, query_for_get(repo, queryable, id), opts)
@@ -38,36 +38,36 @@ defmodule Ecto.Repo.Queryable do
   end
 
   @doc """
-  Implementation for `Ecto.Repo.one/2`
+  Implementation for `EctoOne.Repo.one/2`
   """
   def one(repo, adapter, queryable, opts) do
     case all(repo, adapter, queryable, opts) do
       [one] -> one
       []    -> nil
-      other -> raise Ecto.MultipleResultsError, queryable: queryable, count: length(other)
+      other -> raise EctoOne.MultipleResultsError, queryable: queryable, count: length(other)
     end
   end
 
   @doc """
-  Implementation for `Ecto.Repo.one!/2`
+  Implementation for `EctoOne.Repo.one!/2`
   """
   def one!(repo, adapter, queryable, opts) do
     case all(repo, adapter, queryable, opts) do
       [one] -> one
-      []    -> raise Ecto.NoResultsError, queryable: queryable
-      other -> raise Ecto.MultipleResultsError, queryable: queryable, count: length(other)
+      []    -> raise EctoOne.NoResultsError, queryable: queryable
+      other -> raise EctoOne.MultipleResultsError, queryable: queryable, count: length(other)
     end
   end
 
   @doc """
-  Runtime callback for `Ecto.Repo.update_all/3`
+  Runtime callback for `EctoOne.Repo.update_all/3`
   """
   def update_all(repo, adapter, queryable, [], opts) when is_list(opts) do
     update_all(repo, adapter, queryable, opts)
   end
 
   def update_all(repo, adapter, queryable, updates, opts) when is_list(opts) do
-    query = Ecto.Query.from q in queryable, update: ^updates
+    query = EctoOne.Query.from q in queryable, update: ^updates
     update_all(repo, adapter, query, opts)
   end
 
@@ -76,7 +76,7 @@ defmodule Ecto.Repo.Queryable do
   end
 
   @doc """
-  Implementation for `Ecto.Repo.delete_all/2`
+  Implementation for `EctoOne.Repo.delete_all/2`
   """
   def delete_all(repo, adapter, queryable, opts) when is_list(opts) do
     execute(:delete_all, repo, adapter, queryable, opts)
@@ -95,8 +95,8 @@ defmodule Ecto.Repo.Queryable do
       {count, rows} = adapter.execute(repo, meta, prepared, params, preprocess, opts)
       {count,
         rows
-        |> Ecto.Repo.Assoc.query(meta.assocs, meta.sources)
-        |> Ecto.Repo.Preloader.query(repo, meta.preloads, meta.assocs, postprocess(meta.select))}
+        |> EctoOne.Repo.Assoc.query(meta.assocs, meta.sources)
+        |> EctoOne.Repo.Preloader.query(repo, meta.preloads, meta.assocs, postprocess(meta.select))}
     else
       adapter.execute(repo, meta, prepared, params, nil, opts)
     end
@@ -108,17 +108,17 @@ defmodule Ecto.Repo.Queryable do
 
   defp preprocess({:&, _, [ix]}, value, prefix, context, sources, adapter) do
     {source, model} = elem(sources, ix)
-    Ecto.Schema.__load__(model, prefix, source, context, value, &adapter.load/2)
+    EctoOne.Schema.__load__(model, prefix, source, context, value, &adapter.load/2)
   end
 
   defp preprocess({{:., _, [{:&, _, [_]}, _]}, meta, []}, value, _prefix, _context, _sources, adapter) do
-    case Keyword.fetch(meta, :ecto_type) do
+    case Keyword.fetch(meta, :ecto_one_type) do
       {:ok, type} -> load!(type, value, adapter)
       :error      -> value
     end
   end
 
-  defp preprocess(%Ecto.Query.Tagged{tag: tag}, value, _prefix, _context, _sources, adapter) do
+  defp preprocess(%EctoOne.Query.Tagged{tag: tag}, value, _prefix, _context, _sources, adapter) do
     load!(tag, value, adapter)
   end
 
@@ -185,11 +185,11 @@ defmodule Ecto.Repo.Queryable do
     query = Queryable.to_query(queryable)
     model = assert_model!(query)
     primary_key = primary_key_field!(model)
-    Ecto.Query.from(x in query, where: field(x, ^primary_key) == ^id)
+    EctoOne.Query.from(x in query, where: field(x, ^primary_key) == ^id)
   end
 
   defp query_for_get_by(_repo, queryable, clauses) do
-    Ecto.Query.where(queryable, [], ^Enum.to_list(clauses))
+    EctoOne.Query.where(queryable, [], ^Enum.to_list(clauses))
   end
 
   defp assert_model!(query) do
@@ -197,7 +197,7 @@ defmodule Ecto.Repo.Queryable do
       {_source, model} when model != nil ->
         model
       _ ->
-        raise Ecto.QueryError,
+        raise EctoOne.QueryError,
           query: query,
           message: "expected a from expression with a model"
     end
@@ -206,7 +206,7 @@ defmodule Ecto.Repo.Queryable do
   defp primary_key_field!(model) when is_atom(model) do
     case model.__schema__(:primary_key) do
       [field] -> field
-      _ -> raise Ecto.NoPrimaryKeyFieldError, model: model
+      _ -> raise EctoOne.NoPrimaryKeyFieldError, model: model
     end
   end
 end

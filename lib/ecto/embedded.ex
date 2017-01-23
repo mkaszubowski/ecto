@@ -1,7 +1,7 @@
-defmodule Ecto.Embedded do
+defmodule EctoOne.Embedded do
   @moduledoc false
   alias __MODULE__
-  alias Ecto.Changeset
+  alias EctoOne.Changeset
 
   @type t :: %Embedded{cardinality: :one | :many,
                        strategy: :replace | atom,
@@ -9,7 +9,7 @@ defmodule Ecto.Embedded do
                        field: atom, owner: atom, related: atom,
                        on_cast: Changeset.Relation.on_cast}
 
-  @behaviour Ecto.Changeset.Relation
+  @behaviour EctoOne.Changeset.Relation
   @on_replace_opts [:raise, :mark_as_invalid, :delete]
   defstruct [:cardinality, :field, :owner, :related, :on_replace,
              strategy: :replace, on_cast: :changeset]
@@ -67,7 +67,7 @@ defmodule Ecto.Embedded do
   defp merge_delete_changes(changeset, embeds, types, :delete) do
     Enum.reduce(embeds, changeset, fn field, acc ->
       {:embed, embed} = Map.get(types, field)
-      Changeset.put_embed(acc, field, Ecto.Changeset.Relation.empty(embed))
+      Changeset.put_embed(acc, field, EctoOne.Changeset.Relation.empty(embed))
     end)
   end
 
@@ -102,7 +102,7 @@ defmodule Ecto.Embedded do
   defp prepare_each(%Changeset{model: %{__struct__: model}, action: action} = changeset,
                     %{related: model} = embed, adapter) do
     callback = callback_for(:before, action)
-    Ecto.Model.Callbacks.__apply__(model, callback, changeset)
+    EctoOne.Model.Callbacks.__apply__(model, callback, changeset)
     |> autogenerate_id(action, model, embed, adapter)
     |> autogenerate(action, model, adapter)
     |> prepare(model.__schema__(:embeds), adapter, action)
@@ -134,8 +134,8 @@ defmodule Ecto.Embedded do
   end
 
   defp autogenerate_id(changeset, action, _model, _embed, _adapter) when action in [:update, :delete] do
-    for {_, nil} <- Ecto.primary_key(changeset.model) do
-      raise Ecto.NoPrimaryKeyValueError, struct: changeset.model
+    for {_, nil} <- EctoOne.primary_key(changeset.model) do
+      raise EctoOne.NoPrimaryKeyValueError, struct: changeset.model
     end
     changeset
   end
@@ -195,14 +195,14 @@ defmodule Ecto.Embedded do
     callback = callback_for(:after, action)
     related  = Map.take(changes, model.__schema__(:embeds))
     {:ok, changeset} =
-      Ecto.Changeset.Relation.on_repo_action(changeset, related, adapter, repo, opts)
-    Ecto.Model.Callbacks.__apply__(model, callback, changeset)
+      EctoOne.Changeset.Relation.on_repo_action(changeset, related, adapter, repo, opts)
+    EctoOne.Model.Callbacks.__apply__(model, callback, changeset)
   end
 
   defp maybe_replace_one!(%{cardinality: :one, related: model}, :insert, current) when current != nil do
     changeset = Changeset.change(current)
-    changeset = Ecto.Model.Callbacks.__apply__(model, :before_delete, changeset)
-    Ecto.Model.Callbacks.__apply__(model, :after_delete, changeset)
+    changeset = EctoOne.Model.Callbacks.__apply__(model, :before_delete, changeset)
+    EctoOne.Model.Callbacks.__apply__(model, :after_delete, changeset)
     :ok
   end
   defp maybe_replace_one!(_embed, _action, _current), do: :ok

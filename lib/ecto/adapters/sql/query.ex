@@ -1,4 +1,4 @@
-defmodule Ecto.Adapters.SQL.Query do
+defmodule EctoOne.Adapters.SQL.Query do
   @moduledoc """
   Specifies the behaviour to be implemented by the
   connection for handling all SQL queries.
@@ -43,17 +43,17 @@ defmodule Ecto.Adapters.SQL.Query do
   @doc """
   Receives a query and must return a SELECT query.
   """
-  defcallback all(Ecto.Query.t) :: String.t
+  defcallback all(EctoOne.Query.t) :: String.t
 
   @doc """
   Receives a query and values to update and must return an UPDATE query.
   """
-  defcallback update_all(Ecto.Query.t) :: String.t
+  defcallback update_all(EctoOne.Query.t) :: String.t
 
   @doc """
   Receives a query and must return a DELETE query.
   """
-  defcallback delete_all(Ecto.Query.t) :: String.t
+  defcallback delete_all(EctoOne.Query.t) :: String.t
 
   @doc """
   Returns an INSERT for the given `fields` in `table` returning
@@ -80,7 +80,7 @@ defmodule Ecto.Adapters.SQL.Query do
   @doc """
   Receives a DDL command and returns a query that executes it.
   """
-  defcallback execute_ddl(Ecto.Adapter.Migration.command) :: String.t
+  defcallback execute_ddl(EctoOne.Adapter.Migration.command) :: String.t
 
   ## Transaction
 

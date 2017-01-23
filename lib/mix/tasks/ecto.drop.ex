@@ -1,6 +1,6 @@
-defmodule Mix.Tasks.Ecto.Drop do
+defmodule Mix.Tasks.EctoOne.Drop do
   use Mix.Task
-  import Mix.Ecto
+  import Mix.EctoOne
 
   @shortdoc "Drop the storage for the repo"
 
@@ -9,8 +9,8 @@ defmodule Mix.Tasks.Ecto.Drop do
 
   ## Examples
 
-      mix ecto.drop
-      mix ecto.drop -r Custom.Repo
+      mix ecto_one.drop
+      mix ecto_one.drop -r Custom.Repo
 
   ## Command line options
 
@@ -24,7 +24,7 @@ defmodule Mix.Tasks.Ecto.Drop do
     repos = parse_repo(args)
     ensure_repo(repos, args)
 
-    Enum.all?(repos, &ensure_implements(&1.__adapter__, Ecto.Adapter.Storage,
+    Enum.all?(repos, &ensure_implements(&1.__adapter__, EctoOne.Adapter.Storage,
                                         "to drop storage for #{inspect &1}"))
 
     {opts, _, _} = OptionParser.parse args, switches: [quiet: :boolean]
@@ -42,7 +42,7 @@ defmodule Mix.Tasks.Ecto.Drop do
   end
 
   defp drop_database(repo, opts) do
-    case Ecto.Storage.down(repo) do
+    case EctoOne.Storage.down(repo) do
       :ok ->
         unless opts[:quiet] do
           Mix.shell.info "The database for #{inspect repo} has been dropped."

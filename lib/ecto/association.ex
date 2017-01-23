@@ -1,6 +1,6 @@
-import Ecto.Query, only: [from: 2, join: 4, distinct: 3]
+import EctoOne.Query, only: [from: 2, join: 4, distinct: 3]
 
-defmodule Ecto.Association.NotLoaded do
+defmodule EctoOne.Association.NotLoaded do
   @moduledoc """
   Struct returned by one to one associations when they are not loaded.
 
@@ -16,12 +16,12 @@ defmodule Ecto.Association.NotLoaded do
   defimpl Inspect do
     def inspect(not_loaded, _opts) do
       msg = "association #{inspect not_loaded.__field__} is not loaded"
-      ~s(#Ecto.Association.NotLoaded<#{msg}>)
+      ~s(#EctoOne.Association.NotLoaded<#{msg}>)
     end
   end
 end
 
-defmodule Ecto.Association do
+defmodule EctoOne.Association do
   @moduledoc false
 
   @type t :: %{__struct__: atom, cardinality: :one | :many,
@@ -53,9 +53,9 @@ defmodule Ecto.Association do
   The struct to build from is given as argument in case default values
   should be set in the struct.
 
-  Invoked by `Ecto.build_assoc/3`.
+  Invoked by `EctoOne.build_assoc/3`.
   """
-  defcallback build(t, Ecto.Schema.t, %{atom => term} | [Keyword.t]) :: Ecto.Schema.t
+  defcallback build(t, EctoOne.Schema.t, %{atom => term} | [Keyword.t]) :: EctoOne.Schema.t
 
   @doc """
   Returns an association join query.
@@ -75,7 +75,7 @@ defmodule Ecto.Association do
   This callback is invoked when `join: assoc(p, :comments)` is used
   inside queries.
   """
-  defcallback joins_query(t) :: Ecto.Query.t
+  defcallback joins_query(t) :: EctoOne.Query.t
 
   @doc """
   Returns the association query.
@@ -84,9 +84,9 @@ defmodule Ecto.Association do
   a query that retrieves all associated entries with the given
   values for the owner key.
 
-  This callback is used by `Ecto.assoc/2`.
+  This callback is used by `EctoOne.assoc/2`.
   """
-  defcallback assoc_query(t, values :: [term]) :: Ecto.Query.t
+  defcallback assoc_query(t, values :: [term]) :: EctoOne.Query.t
 
   @doc """
   Returns the association query on top of the given query.
@@ -97,7 +97,7 @@ defmodule Ecto.Association do
 
   This callback is used by preloading.
   """
-  defcallback assoc_query(t, Ecto.Query.t, values :: [term]) :: Ecto.Query.t
+  defcallback assoc_query(t, EctoOne.Query.t, values :: [term]) :: EctoOne.Query.t
 
   @doc """
   Returns information used by the preloader.
@@ -118,13 +118,13 @@ defmodule Ecto.Association do
 
   ## Examples
 
-      iex> Ecto.Association.association_key(Hello.World, :id)
+      iex> EctoOne.Association.association_key(Hello.World, :id)
       :world_id
 
-      iex> Ecto.Association.association_key(Hello.HTTP, :id)
+      iex> EctoOne.Association.association_key(Hello.HTTP, :id)
       :http_id
 
-      iex> Ecto.Association.association_key(Hello.HTTPServer, :id)
+      iex> EctoOne.Association.association_key(Hello.HTTPServer, :id)
       :http_server_id
 
   """
@@ -179,13 +179,13 @@ defmodule Ecto.Association do
 
   ## Examples
 
-      iex> Ecto.Association.related_from_query({"custom_source", Model})
+      iex> EctoOne.Association.related_from_query({"custom_source", Model})
       Model
 
-      iex> Ecto.Association.related_from_query(Model)
+      iex> EctoOne.Association.related_from_query(Model)
       Model
 
-      iex> Ecto.Association.related_from_query("wrong")
+      iex> EctoOne.Association.related_from_query("wrong")
       ** (ArgumentError) association queryable must be a model or {source, model}, got: "wrong"
 
   """
@@ -205,7 +205,7 @@ defmodule Ecto.Association do
   def merge_source(model, query)
 
   def merge_source(struct, {source, _}) do
-    Ecto.put_meta(struct, source: source)
+    EctoOne.put_meta(struct, source: source)
   end
 
   def merge_source(struct, _query) do
@@ -213,7 +213,7 @@ defmodule Ecto.Association do
   end
 end
 
-defmodule Ecto.Association.Has do
+defmodule EctoOne.Association.Has do
   @moduledoc """
   The association struct for `has_one` and `has_many` associations.
 
@@ -232,7 +232,7 @@ defmodule Ecto.Association.Has do
     * `defaults` - Default fields used when building the association
   """
 
-  @behaviour Ecto.Association
+  @behaviour EctoOne.Association
   @on_delete_opts [:nothing, :fetch_and_delete, :nilify_all, :delete_all]
   @on_replace_opts [:raise, :mark_as_invalid, :delete, :nilify]
   defstruct [:cardinality, :field, :owner, :related, :owner_key, :related_key,
@@ -251,13 +251,13 @@ defmodule Ecto.Association.Has do
             "association #{inspect name} when model has no primary key"
       end
 
-    unless Module.get_attribute(module, :ecto_fields)[ref] do
+    unless Module.get_attribute(module, :ecto_one_fields)[ref] do
       raise ArgumentError, "model does not have the field #{inspect ref} used by " <>
         "association #{inspect name}, please set the :references option accordingly"
     end
 
     queryable = Keyword.fetch!(opts, :queryable)
-    related = Ecto.Association.related_from_query(queryable)
+    related = EctoOne.Association.related_from_query(queryable)
 
     if opts[:through] do
       raise ArgumentError, "invalid association #{inspect name}. When using the :through " <>
@@ -286,7 +286,7 @@ defmodule Ecto.Association.Has do
       owner: module,
       related: related,
       owner_key: ref,
-      related_key: opts[:foreign_key] || Ecto.Association.association_key(module, ref),
+      related_key: opts[:foreign_key] || EctoOne.Association.association_key(module, ref),
       queryable: queryable,
       on_delete: on_delete,
       on_replace: on_replace,
@@ -326,13 +326,13 @@ defmodule Ecto.Association.Has do
     {:assoc, refl, refl.related_key}
   end
 
-  @behaviour Ecto.Changeset.Relation
+  @behaviour EctoOne.Changeset.Relation
 
   @doc false
   def build(%{related: related, queryable: queryable, defaults: defaults}) do
     related
     |> struct(defaults)
-    |> Ecto.Association.merge_source(queryable)
+    |> EctoOne.Association.merge_source(queryable)
   end
 
   @doc false
@@ -366,7 +366,7 @@ defmodule Ecto.Association.Has do
   defp update_parent_key(changeset, :delete, _key, _value),
     do: changeset
   defp update_parent_key(changeset, _action, key, value),
-    do: Ecto.Changeset.put_change(changeset, key, value)
+    do: EctoOne.Changeset.put_change(changeset, key, value)
 
   defp parent_key(%{owner_key: owner_key, related_key: related_key}, owner) do
     {related_key, Map.get(owner, owner_key)}
@@ -379,19 +379,19 @@ defmodule Ecto.Association.Has do
   defp maybe_replace_one!(%{cardinality: :one, field: field} = assoc,
                           %{action: :insert}, parent, repo, opts) do
     case Map.get(parent, field) do
-      %Ecto.Association.NotLoaded{} ->
+      %EctoOne.Association.NotLoaded{} ->
         :ok
       nil ->
         :ok
       previous ->
         # the case when this could return :error, was handled before
-        {:ok, changeset} = Ecto.Changeset.Relation.on_replace(assoc, previous)
+        {:ok, changeset} = EctoOne.Changeset.Relation.on_replace(assoc, previous)
 
         case apply(repo, changeset.action, [changeset, opts]) do
           {:ok, _} ->
             :ok
           {:error, changeset} ->
-            raise Ecto.InvalidChangesetError,
+            raise EctoOne.InvalidChangesetError,
               action: changeset.action, changeset: changeset
         end
     end
@@ -400,7 +400,7 @@ defmodule Ecto.Association.Has do
   defp maybe_replace_one!(_, _, _, _, _), do: :ok
 end
 
-defmodule Ecto.Association.HasThrough do
+defmodule EctoOne.Association.HasThrough do
   @moduledoc """
   The association struct for `has_one` and `has_many` through associations.
 
@@ -413,9 +413,9 @@ defmodule Ecto.Association.HasThrough do
     * `through` - The through associations
   """
 
-  alias Ecto.Query.JoinExpr
+  alias EctoOne.Query.JoinExpr
 
-  @behaviour Ecto.Association
+  @behaviour EctoOne.Association
   defstruct [:cardinality, :field, :owner, :owner_key, :through]
 
   @doc false
@@ -425,7 +425,7 @@ defmodule Ecto.Association.HasThrough do
     refl =
       case through do
         [h,_|_] ->
-          Module.get_attribute(module, :ecto_assocs)[h]
+          Module.get_attribute(module, :ecto_one_assocs)[h]
         _ ->
           raise ArgumentError, ":through expects a list with at least two entries: " <>
             "the association in the current module and one step through, got: #{inspect through}"
@@ -471,11 +471,11 @@ defmodule Ecto.Association.HasThrough do
 
   @doc false
   def assoc_query(refl, values) do
-    assoc_query(refl, %Ecto.Query{from: {"join expression", nil}}, values)
+    assoc_query(refl, %EctoOne.Query{from: {"join expression", nil}}, values)
   end
 
   @doc false
-  def assoc_query(%{owner: owner, through: [h|t]}, %Ecto.Query{} = query, values) do
+  def assoc_query(%{owner: owner, through: [h|t]}, %EctoOne.Query{} = query, values) do
     refl = owner.__schema__(:association, h)
 
     # Find the position for upcoming joins
@@ -494,7 +494,7 @@ defmodule Ecto.Association.HasThrough do
     query =
       %{query | joins: query.joins ++ [join]}
       |> joins_query(t, position)
-      |> Ecto.Query.Planner.prepare_sources()
+      |> EctoOne.Query.Planner.prepare_sources()
 
     # Our source is going to be the last join after
     # traversing them all.
@@ -542,7 +542,7 @@ defmodule Ecto.Association.HasThrough do
   end
 end
 
-defmodule Ecto.Association.BelongsTo do
+defmodule EctoOne.Association.BelongsTo do
   @moduledoc """
   The association struct for a `belongs_to` association.
 
@@ -558,7 +558,7 @@ defmodule Ecto.Association.BelongsTo do
     * `defaults` - Default fields used when building the association
   """
 
-  @behaviour Ecto.Association
+  @behaviour EctoOne.Association
   defstruct [:cardinality, :field, :owner, :related, :owner_key, :related_key, :queryable, defaults: []]
 
   @doc false
@@ -584,7 +584,7 @@ defmodule Ecto.Association.BelongsTo do
 
     queryable = Keyword.fetch!(opts, :queryable)
 
-    related = Ecto.Association.related_from_query(queryable)
+    related = EctoOne.Association.related_from_query(queryable)
 
     unless is_atom(related) do
       raise ArgumentError, "association queryable must be a model, got: #{inspect related}"

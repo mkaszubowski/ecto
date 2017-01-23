@@ -1,13 +1,13 @@
-defmodule Ecto.Adapter.Migration  do
+defmodule EctoOne.Adapter.Migration  do
   @moduledoc """
   Specifies the adapter migrations API.
   """
 
   use Behaviour
 
-  alias Ecto.Migration.Table
-  alias Ecto.Migration.Index
-  alias Ecto.Migration.Reference
+  alias EctoOne.Migration.Table
+  alias EctoOne.Migration.Index
+  alias EctoOne.Migration.Reference
 
   @typedoc "All migration commands"
   @type command ::
@@ -24,8 +24,8 @@ defmodule Ecto.Adapter.Migration  do
 
   @typedoc "All commands allowed within the block passed to `table/2`"
   @type table_subcommand ::
-    {:add, field :: atom, type :: Ecto.Type.t | Reference.t, Keyword.t} |
-    {:modify, field :: atom, type :: Ecto.Type.t | Reference.t, Keyword.t} |
+    {:add, field :: atom, type :: EctoOne.Type.t | Reference.t, Keyword.t} |
+    {:modify, field :: atom, type :: EctoOne.Type.t | Reference.t, Keyword.t} |
     {:remove, field :: atom}
 
   @typedoc """
@@ -51,5 +51,5 @@ defmodule Ecto.Adapter.Migration  do
       to finish, `:infinity` will wait indefinitely (default: 5000);
     * `:log` - When false, does not log begin/commit/rollback queries
   """
-  defcallback execute_ddl(Ecto.Repo.t, command, Keyword.t) :: :ok | no_return
+  defcallback execute_ddl(EctoOne.Repo.t, command, Keyword.t) :: :ok | no_return
 end

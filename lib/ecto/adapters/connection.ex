@@ -1,4 +1,4 @@
-defmodule Ecto.Adapters.Connection do
+defmodule EctoOne.Adapters.Connection do
   @moduledoc """
   Behaviour for adapters that rely on connections.
 
@@ -6,7 +6,7 @@ defmodule Ecto.Adapters.Connection do
   a single callback in a module: `connect/1` defined in this module.
 
   The benefits of implementing this module is that the adapter can
-  then be used with all the different pools provided by Ecto.
+  then be used with all the different pools provided by EctoOne.
   """
 
   use Behaviour

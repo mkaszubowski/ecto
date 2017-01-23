@@ -1,17 +1,17 @@
-defmodule Ecto.ChangesetTest do
+defmodule EctoOne.ChangesetTest do
   use ExUnit.Case, async: true
-  import Ecto.Changeset
+  import EctoOne.Changeset
 
   defmodule Comment do
-    use Ecto.Schema
+    use EctoOne.Schema
 
     schema "comments" do
-      belongs_to :post, Ecto.ChangesetTest.Post
+      belongs_to :post, EctoOne.ChangesetTest.Post
     end
   end
 
   defmodule Post do
-    use Ecto.Schema
+    use EctoOne.Schema
 
     schema "posts" do
       field :title
@@ -20,9 +20,9 @@ defmodule Ecto.ChangesetTest do
       field :decimal, :decimal
       field :upvotes, :integer, default: 0
       field :topics, {:array, :string}
-      field :published_at, Ecto.DateTime
-      has_many :comments, Ecto.ChangesetTest.Comment
-      has_one :comment, Ecto.ChangesetTest.Comment
+      field :published_at, EctoOne.DateTime
+      has_many :comments, EctoOne.ChangesetTest.Comment
+      has_one :comment, EctoOne.ChangesetTest.Comment
     end
   end
 
@@ -228,7 +228,7 @@ defmodule Ecto.ChangesetTest do
   end
 
   test "cast/4: works on casting a datetime field" do
-    date = %Ecto.DateTime{year: 2015, month: 5, day: 1, hour: 10, min: 8, sec: 0}
+    date = %EctoOne.DateTime{year: 2015, month: 5, day: 1, hour: 10, min: 8, sec: 0}
     params = %{"published_at" => date}
     struct = %Post{}
 
@@ -321,18 +321,18 @@ defmodule Ecto.ChangesetTest do
   end
 
   test "merge/2: merges the :repo field when either one is nil" do
-    changeset = merge(%Ecto.Changeset{repo: :foo}, %Ecto.Changeset{repo: nil})
+    changeset = merge(%EctoOne.Changeset{repo: :foo}, %EctoOne.Changeset{repo: nil})
     assert changeset.repo == :foo
 
-    changeset = merge(%Ecto.Changeset{repo: nil}, %Ecto.Changeset{repo: :bar})
+    changeset = merge(%EctoOne.Changeset{repo: nil}, %EctoOne.Changeset{repo: :bar})
     assert changeset.repo == :bar
   end
 
   test "merge/2: merges the :action field when either one is nil" do
-    changeset = merge(%Ecto.Changeset{action: :insert}, %Ecto.Changeset{repo: nil})
+    changeset = merge(%EctoOne.Changeset{action: :insert}, %EctoOne.Changeset{repo: nil})
     assert changeset.action == :insert
 
-    changeset = merge(%Ecto.Changeset{action: nil}, %Ecto.Changeset{action: :update})
+    changeset = merge(%EctoOne.Changeset{action: nil}, %EctoOne.Changeset{action: :update})
     assert changeset.action == :update
   end
 
@@ -345,11 +345,11 @@ defmodule Ecto.ChangesetTest do
     end
 
     assert_raise ArgumentError, "different repos (`:foo` and `:bar`) when merging changesets", fn ->
-      merge(%Ecto.Changeset{repo: :foo}, %Ecto.Changeset{repo: :bar})
+      merge(%EctoOne.Changeset{repo: :foo}, %EctoOne.Changeset{repo: :bar})
     end
 
     assert_raise ArgumentError, "different actions (`:insert` and `:update`) when merging changesets", fn ->
-      merge(%Ecto.Changeset{action: :insert}, %Ecto.Changeset{action: :update})
+      merge(%EctoOne.Changeset{action: :insert}, %EctoOne.Changeset{action: :update})
     end
   end
 

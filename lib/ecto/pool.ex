@@ -1,4 +1,4 @@
-defmodule Ecto.Pool do
+defmodule EctoOne.Pool do
   @moduledoc """
   Behaviour for using a pool of connections.
   """
@@ -32,7 +32,7 @@ defmodule Ecto.Pool do
   Start a pool of connections.
 
   `module` is the connection module, which should define the
-  `Ecto.Adapters.Connection` callbacks, and `opts` are its (and the pool's)
+  `EctoOne.Adapters.Connection` callbacks, and `opts` are its (and the pool's)
   options.
 
   A pool should support the following options:
@@ -243,7 +243,7 @@ defmodule Ecto.Pool do
     try do
       fun.(:opened, ref, conn, time)
     catch
-      # If any error leaked, it should be a bug in Ecto.
+      # If any error leaked, it should be a bug in EctoOne.
       kind, reason ->
         stack = System.stacktrace()
         break(ref, timeout)
@@ -295,7 +295,7 @@ defmodule Ecto.Pool do
         %{tainted: false} -> {:ok, value}
       end
     catch
-      :throw, {:ecto_rollback, ^ref, value} ->
+      :throw, {:ecto_one_rollback, ^ref, value} ->
         {:error, value}
       kind, reason ->
         stack = System.stacktrace()
@@ -309,7 +309,7 @@ defmodule Ecto.Pool do
     try do
       {:ok, fun.()}
     catch
-      :throw, {:ecto_rollback, ^ref, value} ->
+      :throw, {:ecto_one_rollback, ^ref, value} ->
         tainted(ref, true)
         {:error, value}
     end
@@ -323,7 +323,7 @@ defmodule Ecto.Pool do
   def rollback(pool_mod, pool, value) do
     ref = {__MODULE__, pool_mod, pool}
     if Process.get(ref) do
-      throw {:ecto_rollback, ref, value}
+      throw {:ecto_one_rollback, ref, value}
     else
       raise "cannot call rollback outside of transaction"
     end

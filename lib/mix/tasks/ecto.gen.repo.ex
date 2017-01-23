@@ -1,7 +1,7 @@
-defmodule Mix.Tasks.Ecto.Gen.Repo do
+defmodule Mix.Tasks.EctoOne.Gen.Repo do
   use Mix.Task
 
-  import Mix.Ecto
+  import Mix.EctoOne
   import Mix.Generator
 
   @shortdoc "Generate a new repository"
@@ -9,12 +9,12 @@ defmodule Mix.Tasks.Ecto.Gen.Repo do
   @moduledoc """
   Generates a new repository.
 
-  The repository will be placed in the `lib` directory.
+  The repository will be placed in the `lib` directo_onery.
 
   ## Examples
 
-      mix ecto.gen.repo
-      mix ecto.gen.repo -r Custom.Repo
+      mix ecto_one.gen.repo
+      mix ecto_one.gen.repo -r Custom.Repo
 
   This generator will automatically open the config/config.exs
   after generation if you have `ECTO_EDITOR` set in your environment
@@ -28,11 +28,11 @@ defmodule Mix.Tasks.Ecto.Gen.Repo do
 
   @doc false
   def run(args) do
-    no_umbrella!("ecto.gen.repo")
+    no_umbrella!("ecto_one.gen.repo")
     [repo|other_repos] = parse_repo(args)
 
     if other_repos != [] do
-      Mix.raise "Only specify one repo at a time when generating with ecto.gen.repo"
+      Mix.raise "Only specify one repo at a time when generating with ecto_one.gen.repo"
     end
 
     config      = Mix.Project.config
@@ -67,7 +67,7 @@ defmodule Mix.Tasks.Ecto.Gen.Repo do
 
   embed_template :repo, """
   defmodule <%= inspect @mod %> do
-    use Ecto.Repo, otp_app: <%= inspect @app %>
+    use EctoOne.Repo, otp_app: <%= inspect @app %>
   end
   """
 
@@ -75,7 +75,7 @@ defmodule Mix.Tasks.Ecto.Gen.Repo do
   use Mix.Config
 
   config <%= inspect @app %>, <%= inspect @mod %>,
-    adapter: Ecto.Adapters.Postgres,
+    adapter: EctoOne.Adapters.Postgres,
     database: "<%= @app %>_<%= @base %>",
     username: "user",
     password: "pass",

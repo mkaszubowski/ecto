@@ -1,9 +1,9 @@
-defmodule Ecto.Changeset.Relation do
+defmodule EctoOne.Changeset.Relation do
   @moduledoc false
 
   use Behaviour
-  alias Ecto.Changeset
-  alias Ecto.Association.NotLoaded
+  alias EctoOne.Changeset
+  alias EctoOne.Association.NotLoaded
 
   @type on_cast :: atom
   @type on_replace :: :raise | :mark_as_invalid | :delete | :nilify
@@ -19,19 +19,19 @@ defmodule Ecto.Changeset.Relation do
   The action to be performed when the relation is modified given the changeset
   on the repo insert/update/delete.
   """
-  defcallback on_repo_action(t, Changeset.t, Ecto.Schema.t, Ecto.Adapter.t, Ecto.Repo.t,
+  defcallback on_repo_action(t, Changeset.t, EctoOne.Schema.t, EctoOne.Adapter.t, EctoOne.Repo.t,
                              repo_action :: :insert | :update | :delete, Keyword.t) ::
-              {:ok, Ecto.Schema.t} | {:error, Ecto.Changeset.t}
+              {:ok, EctoOne.Schema.t} | {:error, EctoOne.Changeset.t}
 
   @doc """
   Builds the related model.
   """
-  defcallback build(t) :: Ecto.Schema.t
+  defcallback build(t) :: EctoOne.Schema.t
 
   @doc """
   Returns empty container for relation.
 
-  Handles both the relation structs as well as Ecto.Association.NotLoaded.
+  Handles both the relation structs as well as EctoOne.Association.NotLoaded.
   """
   def empty(%{cardinality: cardinality}), do: do_empty(cardinality)
 
@@ -286,7 +286,7 @@ defmodule Ecto.Changeset.Relation do
     in this error message.
 
     It is possible to change this behaviour by setting `:on_replace` when
-    defining the relation. See `Ecto.Changeset`'s section on related models
+    defining the relation. See `EctoOne.Changeset`'s section on related models
     for more info.
     """
   end
@@ -412,7 +412,7 @@ defmodule Ecto.Changeset.Relation do
 
   defp do_get_pk(model_or_params, {key, type}) do
     original = do_get_pk(model_or_params, key)
-    case Ecto.Type.cast(type, original) do
+    case EctoOne.Type.cast(type, original) do
       {:ok, value} -> value
       :error       -> original
     end
@@ -421,7 +421,7 @@ defmodule Ecto.Changeset.Relation do
 
   defp primary_keys!(module) do
     case module.__schema__(:primary_key) do
-      []  -> raise Ecto.NoPrimaryKeyFieldError, model: module
+      []  -> raise EctoOne.NoPrimaryKeyFieldError, model: module
       pks -> pks
     end
   end

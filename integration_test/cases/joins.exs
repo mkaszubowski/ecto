@@ -1,13 +1,13 @@
-defmodule Ecto.Integration.JoinsTest do
-  use Ecto.Integration.Case
+defmodule EctoOne.Integration.JoinsTest do
+  use EctoOne.Integration.Case
 
-  alias Ecto.Integration.TestRepo
-  import Ecto.Query
+  alias EctoOne.Integration.TestRepo
+  import EctoOne.Query
 
-  alias Ecto.Integration.Post
-  alias Ecto.Integration.Comment
-  alias Ecto.Integration.Permalink
-  alias Ecto.Integration.User
+  alias EctoOne.Integration.Post
+  alias EctoOne.Integration.Comment
+  alias EctoOne.Integration.Permalink
+  alias EctoOne.Integration.User
 
   @tag :update_with_join
   test "update all with joins" do
@@ -112,7 +112,7 @@ defmodule Ecto.Integration.JoinsTest do
     %Comment{} = TestRepo.insert!(%Comment{post_id: pid1, author_id: uid2})
     %Comment{} = TestRepo.insert!(%Comment{post_id: pid2, author_id: uid2})
 
-    [u2, u1] = TestRepo.all Ecto.assoc([p1, p2], :comments_authors)
+    [u2, u1] = TestRepo.all EctoOne.assoc([p1, p2], :comments_authors)
                             |> order_by([a], a.name)
     assert u1.id == uid1
     assert u2.id == uid2
@@ -120,7 +120,7 @@ defmodule Ecto.Integration.JoinsTest do
 
   ## Preload assocs
 
-  test "has_many assoc selector" do
+  test "has_many assoc selecto_oner" do
     p1 = TestRepo.insert!(%Post{title: "1"})
     p2 = TestRepo.insert!(%Post{title: "1"})
 
@@ -134,7 +134,7 @@ defmodule Ecto.Integration.JoinsTest do
     assert [%Comment{id: ^cid3}] = post2.comments
   end
 
-  test "has_one assoc selector" do
+  test "has_one assoc selecto_oner" do
     p1 = TestRepo.insert!(%Post{title: "1"})
     p2 = TestRepo.insert!(%Post{title: "2"})
 
@@ -149,7 +149,7 @@ defmodule Ecto.Integration.JoinsTest do
     assert %Permalink{id: ^pid3} = post3.permalink
   end
 
-  test "belongs_to assoc selector" do
+  test "belongs_to assoc selecto_oner" do
     %Post{id: pid1} = TestRepo.insert!(%Post{title: "1"})
     %Post{id: pid2} = TestRepo.insert!(%Post{title: "2"})
 
@@ -165,7 +165,7 @@ defmodule Ecto.Integration.JoinsTest do
     assert %Post{id: ^pid2} = p3.post
   end
 
-  test "has_many through assoc selector" do
+  test "has_many through assoc selecto_oner" do
     %Post{id: pid1} = TestRepo.insert!(%Post{})
     %Post{id: pid2} = TestRepo.insert!(%Post{})
 
@@ -189,7 +189,7 @@ defmodule Ecto.Integration.JoinsTest do
     assert u2.id == uid2
   end
 
-  test "has_many through-through assoc selector" do
+  test "has_many through-through assoc selecto_oner" do
     %Post{id: pid1} = TestRepo.insert!(%Post{})
     %Post{id: pid2} = TestRepo.insert!(%Post{})
 

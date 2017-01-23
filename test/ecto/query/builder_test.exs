@@ -1,8 +1,8 @@
-defmodule Ecto.Query.BuilderTest do
+defmodule EctoOne.Query.BuilderTest do
   use ExUnit.Case, async: true
 
-  import Ecto.Query.Builder
-  doctest Ecto.Query.Builder
+  import EctoOne.Query.Builder
+  doctest EctoOne.Query.Builder
 
   defp escape(quoted, vars, env) do
     escape(quoted, :any, %{}, vars, env)
@@ -25,7 +25,7 @@ defmodule Ecto.Query.BuilderTest do
     assert {quote(do: ~s"123"), %{}} ==
            escape(quote do ~s"123" end, [], __ENV__)
 
-    assert {{:%, [], [Ecto.Query.Tagged, {:%{}, [], [value: {:<<>>, [], [0, 1, 2]}, type: :binary]}]}, %{}} ==
+    assert {{:%, [], [EctoOne.Query.Tagged, {:%{}, [], [value: {:<<>>, [], [0, 1, 2]}, type: :binary]}]}, %{}} ==
            escape(quote do <<0,1,2>> end, [], __ENV__)
 
     assert quote(do: &0.z) ==
@@ -47,51 +47,51 @@ defmodule Ecto.Query.BuilderTest do
     assert {Macro.escape(quote do fragment(title: [foo: ^0]) end), %{0 => {0, :any}}} ==
       escape(quote do fragment(title: [foo: ^0]) end, [], __ENV__)
 
-    assert_raise Ecto.Query.CompileError, ~r"expects the first argument to be .* got: `:invalid`", fn ->
+    assert_raise EctoOne.Query.CompileError, ~r"expects the first argument to be .* got: `:invalid`", fn ->
       escape(quote do fragment(:invalid) end, [], __ENV__)
     end
 
-    assert_raise Ecto.Query.CompileError, ~r"expects extra arguments in the same amount of question marks in string", fn ->
+    assert_raise EctoOne.Query.CompileError, ~r"expects extra arguments in the same amount of question marks in string", fn ->
       escape(quote do fragment("?") end, [], __ENV__)
     end
   end
 
   test "escape type checks" do
-    assert_raise Ecto.Query.CompileError, ~r"It returns a value of type :boolean but a value of type :integer is expected", fn ->
+    assert_raise EctoOne.Query.CompileError, ~r"It returns a value of type :boolean but a value of type :integer is expected", fn ->
       escape(quote(do: ^1 == ^2), :integer, %{}, [], __ENV__)
     end
 
-    assert_raise Ecto.Query.CompileError, ~r"It returns a value of type :boolean but a value of type :integer is expected", fn ->
+    assert_raise EctoOne.Query.CompileError, ~r"It returns a value of type :boolean but a value of type :integer is expected", fn ->
       escape(quote(do: 1 > 2), :integer, %{}, [], __ENV__)
     end
   end
 
   test "escape raise" do
-    assert_raise Ecto.Query.CompileError, ~r"variable `x` is not a valid query expression", fn ->
+    assert_raise EctoOne.Query.CompileError, ~r"variable `x` is not a valid query expression", fn ->
       escape(quote(do: x), [], __ENV__)
     end
 
-    assert_raise Ecto.Query.CompileError, ~r"is not a valid query expression. Only literal binaries and strings are allowed", fn ->
+    assert_raise EctoOne.Query.CompileError, ~r"is not a valid query expression. Only literal binaries and strings are allowed", fn ->
       escape(quote(do: "#{x}"), [], __ENV__)
     end
 
-    assert_raise Ecto.Query.CompileError, ~r"`:atom` is not a valid query expression", fn ->
+    assert_raise EctoOne.Query.CompileError, ~r"`:atom` is not a valid query expression", fn ->
       escape(quote(do: :atom), [], __ENV__)
     end
 
-    assert_raise Ecto.Query.CompileError, ~r"`unknown\(1, 2\)` is not a valid query expression", fn ->
+    assert_raise EctoOne.Query.CompileError, ~r"`unknown\(1, 2\)` is not a valid query expression", fn ->
       escape(quote(do: unknown(1, 2)), [], __ENV__)
     end
 
-    assert_raise Ecto.Query.CompileError, ~r"unbound variable", fn ->
+    assert_raise EctoOne.Query.CompileError, ~r"unbound variable", fn ->
       escape(quote(do: x.y), [], __ENV__)
     end
 
-    assert_raise Ecto.Query.CompileError, ~r"unbound variable", fn ->
+    assert_raise EctoOne.Query.CompileError, ~r"unbound variable", fn ->
       escape(quote(do: x.y == 1), [], __ENV__)
     end
 
-    assert_raise Ecto.Query.CompileError, ~r"expected literal atom or interpolated value", fn ->
+    assert_raise EctoOne.Query.CompileError, ~r"expected literal atom or interpolated value", fn ->
       escape(quote(do: field(x, 123)), [x: 0], __ENV__) |> elem(0) |> Code.eval_quoted([], __ENV__)
     end
   end

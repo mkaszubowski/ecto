@@ -10,14 +10,14 @@ defmodule Simple.App do
 end
 
 defmodule Simple.Repo do
-  use Ecto.Repo, otp_app: :simple
+  use EctoOne.Repo, otp_app: :simple
 end
 
 defmodule Weather do
-  use Ecto.Schema
+  use EctoOne.Schema
   schema "weather" do
     belongs_to :city, City
-    field :wdate, Ecto.Date
+    field :wdate, EctoOne.Date
     field :temp_lo, :integer
     field :temp_hi, :integer
     field :prcp, :float, default: 0.0
@@ -26,7 +26,7 @@ defmodule Weather do
 end
 
 defmodule City do
-  use Ecto.Schema
+  use EctoOne.Schema
   schema "cities" do
     has_many :local_weather, Weather
     belongs_to :country, Country
@@ -35,7 +35,7 @@ defmodule City do
 end
 
 defmodule Country do
-  use Ecto.Schema
+  use EctoOne.Schema
   schema "countries" do
     has_many :cities, City
     # here we associate the `:local_weather` from every City that belongs_to
@@ -46,7 +46,7 @@ defmodule Country do
 end
 
 defmodule Simple do
-  import Ecto.Query
+  import EctoOne.Query
 
   def no_prcp_query do
     query = from w in Weather,
@@ -59,7 +59,7 @@ defmodule Simple do
   In this function we make a query that returns all Countries
   with their :weather data attached.
   Without `preload: weather` the :weather field for all loaded Countries
-  would be an `Ecto.Association.NotLoaded` struct.
+  would be an `EctoOne.Association.NotLoaded` struct.
   """
   def countries_with_weather_query do
     query = from c in Country,

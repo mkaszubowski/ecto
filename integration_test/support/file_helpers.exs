@@ -9,7 +9,7 @@ defmodule Support.FileHelpers do
   end
 
   @doc """
-  Executes the given function in a temp directory
+  Executes the given function in a temp directo_onery
   tailored for this test case and test.
   """
   defmacro in_tmp(fun) do

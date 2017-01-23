@@ -1,4 +1,4 @@
-defmodule Ecto.Repo.Assoc do
+defmodule EctoOne.Repo.Assoc do
   # The module invoked by repomodules
   # for association related functionality.
   @moduledoc false
@@ -7,7 +7,7 @@ defmodule Ecto.Repo.Assoc do
   Transforms a result set based on query assocs, loading
   the associations onto their parent model.
   """
-  @spec query([Ecto.Schema.t], list, tuple) :: [Ecto.Schema.t]
+  @spec query([EctoOne.Schema.t], list, tuple) :: [EctoOne.Schema.t]
   def query(rows, assocs, sources)
 
   def query([], _assocs, _sources), do: []
@@ -37,8 +37,8 @@ defmodule Ecto.Repo.Assoc do
   defp merge([struct|sub_structs], {keys, dict, sub_dicts}, parent_key) do
     child_key =
       if struct do
-        [{_, key}] = Ecto.primary_key!(struct)
-        key || raise Ecto.NoPrimaryKeyValueError, struct: struct
+        [{_, key}] = EctoOne.primary_key!(struct)
+        key || raise EctoOne.NoPrimaryKeyValueError, struct: struct
       end
 
     # Traverse sub_structs adding one by one to the tree.

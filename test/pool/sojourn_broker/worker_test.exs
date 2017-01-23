@@ -1,8 +1,8 @@
-defmodule Ecto.Pools.SojournBroker.WorkerTest do
+defmodule EctoOne.Pools.SojournBroker.WorkerTest do
   use ExUnit.Case, async: true
 
-  alias Ecto.TestPool
-  alias Ecto.TestPool.Connection
+  alias EctoOne.TestPool
+  alias EctoOne.TestPool.Connection
 
   @timeout :infinity
 

@@ -1,13 +1,13 @@
-defmodule Ecto.Query.Builder.UpdateTest do
+defmodule EctoOne.Query.Builder.UpdateTest do
   use ExUnit.Case, async: true
 
-  import Ecto.Query
-  import Ecto.Query.Builder.Update
-  doctest Ecto.Query.Builder.Update
+  import EctoOne.Query
+  import EctoOne.Query.Builder.Update
+  doctest EctoOne.Query.Builder.Update
 
   test "escape" do
     assert escape(quote do [set: [foo: 1]] end, [x: 0], __ENV__) |> elem(0) ==
-           [set: [foo: {:%, [], [Ecto.Query.Tagged, {:%{}, [], [value: 1, type: {0, :foo}]}]}]]
+           [set: [foo: {:%, [], [EctoOne.Query.Tagged, {:%{}, [], [value: 1, type: {0, :foo}]}]}]]
 
     assert escape(quote do [set: [foo: x.bar]] end, [x: 0], __ENV__) |> elem(0) ==
            Macro.escape(quote do [set: [foo: &0.bar]] end)
@@ -62,23 +62,23 @@ defmodule Ecto.Query.Builder.UpdateTest do
   end
 
   test "keyword lists are expected" do
-    assert_raise Ecto.Query.CompileError,
+    assert_raise EctoOne.Query.CompileError,
                  ~r"malformed update `\[1\]` in query expression", fn ->
       escape(quote do [1] end, [], __ENV__)
     end
 
-    assert_raise Ecto.Query.CompileError,
+    assert_raise EctoOne.Query.CompileError,
                  ~r"malformed :set in update `\[1\]`, expected a keyword list", fn ->
       escape(quote do [set: [1]] end, [], __ENV__)
     end
   end
 
   test "update operations are validated" do
-    assert_raise Ecto.Query.CompileError, "unknown key `:unknown` in update", fn ->
+    assert_raise EctoOne.Query.CompileError, "unknown key `:unknown` in update", fn ->
       escape(quote do [unknown: [1]] end, [], __ENV__)
     end
 
-    assert_raise Ecto.Query.CompileError, "unknown key `:unknown` in update", fn ->
+    assert_raise EctoOne.Query.CompileError, "unknown key `:unknown` in update", fn ->
       update("foo", [_], ^[unknown: [1]])
     end
   end

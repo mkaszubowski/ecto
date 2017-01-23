@@ -1,14 +1,14 @@
-defmodule Ecto.Integration.PreloadTest do
-  use Ecto.Integration.Case
+defmodule EctoOne.Integration.PreloadTest do
+  use EctoOne.Integration.Case
 
-  alias Ecto.Integration.TestRepo
-  import Ecto.Query
+  alias EctoOne.Integration.TestRepo
+  import EctoOne.Query
 
-  alias Ecto.Integration.Post
-  alias Ecto.Integration.Comment
-  alias Ecto.Integration.Permalink
-  alias Ecto.Integration.User
-  alias Ecto.Integration.Custom
+  alias EctoOne.Integration.Post
+  alias EctoOne.Integration.Comment
+  alias EctoOne.Integration.Permalink
+  alias EctoOne.Integration.User
+  alias EctoOne.Integration.Custom
 
   test "preload empty" do
     assert TestRepo.preload([], :anything_goes) == []
@@ -25,7 +25,7 @@ defmodule Ecto.Integration.PreloadTest do
     %Comment{id: cid2} = TestRepo.insert!(%Comment{text: "2", post_id: p1.id})
     %Comment{id: cid4} = TestRepo.insert!(%Comment{text: "3", post_id: p2.id})
 
-    assert %Ecto.Association.NotLoaded{} = p1.comments
+    assert %EctoOne.Association.NotLoaded{} = p1.comments
 
     assert [p3, p1, p2] = TestRepo.preload([p3, p1, p2], :comments)
     assert [%Comment{id: ^cid1}, %Comment{id: ^cid2}] = p1.comments |> sort_by_id
@@ -42,8 +42,8 @@ defmodule Ecto.Integration.PreloadTest do
     %Permalink{}         = TestRepo.insert!(%Permalink{url: "2", post_id: nil})
     %Permalink{id: pid3} = TestRepo.insert!(%Permalink{url: "3", post_id: p3.id})
 
-    assert %Ecto.Association.NotLoaded{} = p1.permalink
-    assert %Ecto.Association.NotLoaded{} = p2.permalink
+    assert %EctoOne.Association.NotLoaded{} = p1.permalink
+    assert %EctoOne.Association.NotLoaded{} = p2.permalink
 
     assert [p3, p1, p2] = TestRepo.preload([p3, p1, p2], :permalink)
     assert %Permalink{id: ^pid1} = p1.permalink
@@ -60,7 +60,7 @@ defmodule Ecto.Integration.PreloadTest do
     pl2 = TestRepo.insert!(%Permalink{url: "2", post_id: nil})
     pl3 = TestRepo.insert!(%Permalink{url: "3", post_id: pid3})
 
-    assert %Ecto.Association.NotLoaded{} = pl1.post
+    assert %EctoOne.Association.NotLoaded{} = pl1.post
 
     assert [ple3, ple1, ple2] = TestRepo.preload([pl3, pl1, pl2],
                                                  post: from(p in Post, where: false))
@@ -85,7 +85,7 @@ defmodule Ecto.Integration.PreloadTest do
     %Comment{id: cid2} = TestRepo.insert!(%Comment{text: "2", post_id: p1.id})
     %Comment{id: cid4} = TestRepo.insert!(%Comment{text: "3", post_id: p2.id})
 
-    assert %Ecto.Association.NotLoaded{} = p1.comments
+    assert %EctoOne.Association.NotLoaded{} = p1.comments
 
     # With custom query
     assert [pe3, pe1, pe2] = TestRepo.preload([p3, p1, p2],
@@ -285,7 +285,7 @@ defmodule Ecto.Integration.PreloadTest do
   @tag :invalid_prefix
   test "preload custom prefix" do
     p = TestRepo.insert!(%Post{title: "1"})
-    p = Ecto.put_meta(p, prefix: "this_surely_does_not_exist")
+    p = EctoOne.put_meta(p, prefix: "this_surely_does_not_exist")
     # This preload should fail because it points to a prefix that does not exist
     assert catch_error(TestRepo.preload(p, [:comments]))
   end
@@ -366,7 +366,7 @@ defmodule Ecto.Integration.PreloadTest do
     %Comment{id: _}    = TestRepo.insert!(%Comment{text: "1", post_id: p1.id})
     %Comment{id: cid2} = TestRepo.insert!(%Comment{text: "2", post_id: p2.id})
 
-    assert %Ecto.Association.NotLoaded{} = p1.comments
+    assert %EctoOne.Association.NotLoaded{} = p1.comments
     p1 = %{p1 | comments: []}
 
     assert [p1, p2] = TestRepo.preload([p1, p2], :comments)

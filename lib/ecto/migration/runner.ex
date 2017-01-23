@@ -1,4 +1,4 @@
-defmodule Ecto.Migration.Runner do
+defmodule EctoOne.Migration.Runner do
   # A GenServer responsible for running migrations
   # in either `:forward` or `:backward` directions.
   @moduledoc false
@@ -6,8 +6,8 @@ defmodule Ecto.Migration.Runner do
   use GenServer
   require Logger
 
-  alias Ecto.Migration.Table
-  alias Ecto.Migration.Index
+  alias EctoOne.Migration.Table
+  alias EctoOne.Migration.Index
 
   @opts [timeout: :infinity, log: false]
 
@@ -18,8 +18,8 @@ defmodule Ecto.Migration.Runner do
     level = Keyword.get(opts, :log, :info)
     args  = [self, repo, direction, migrator_direction, level]
 
-    {:ok, runner} = Supervisor.start_child(Ecto.Migration.Supervisor, args)
-    Process.put(:ecto_migration, %{runner: runner, prefix: opts[:prefix]})
+    {:ok, runner} = Supervisor.start_child(EctoOne.Migration.Supervisor, args)
+    Process.put(:ecto_one_migration, %{runner: runner, prefix: opts[:prefix]})
 
     log(level, "== Running #{inspect module}.#{operation}/0 #{direction}")
     {time1, _} = :timer.tc(module, operation, [])
@@ -65,7 +65,7 @@ defmodule Ecto.Migration.Runner do
   Gets the prefix for this migration
   """
   def prefix do
-    case Process.get(:ecto_migration) do
+    case Process.get(:ecto_one_migration) do
       %{prefix: prefix} -> prefix
       _ -> raise "could not find migration runner process for #{inspect self}"
     end
@@ -93,7 +93,7 @@ defmodule Ecto.Migration.Runner do
   @doc """
   Queues command tuples or strings for execution.
 
-  Ecto.MigrationError will be raised when the server
+  EctoOne.MigrationError will be raised when the server
   is in `:backward` direction and `command` is irreversible.
   """
   def execute(command) do
@@ -136,7 +136,7 @@ defmodule Ecto.Migration.Runner do
       :ok ->
         :ok
       :error ->
-        raise Ecto.MigrationError, message: "cannot execute command outside of block"
+        raise EctoOne.MigrationError, message: "cannot execute command outside of block"
     end
   end
 
@@ -159,7 +159,7 @@ defmodule Ecto.Migration.Runner do
     if reversed = reverse(command) do
       log_and_execute_ddl(repo, level, reversed)
     else
-      raise Ecto.MigrationError, message:
+      raise EctoOne.MigrationError, message:
         "cannot reverse migration command: #{command command}. " <>
         "You will need to explicitly define up/1 and down/1 in your migration"
     end
@@ -191,7 +191,7 @@ defmodule Ecto.Migration.Runner do
   ## Helpers
 
   defp runner do
-    case Process.get(:ecto_migration) do
+    case Process.get(:ecto_one_migration) do
       %{runner: runner} -> runner
       _ -> raise "could not find migration runner process for #{inspect self}"
     end

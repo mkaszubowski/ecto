@@ -1,7 +1,7 @@
-defmodule Ecto.Query.Builder.From do
+defmodule EctoOne.Query.Builder.From do
   @moduledoc false
 
-  alias Ecto.Query.Builder
+  alias EctoOne.Query.Builder
 
   @doc """
   Handles from expressions.
@@ -30,7 +30,7 @@ defmodule Ecto.Query.Builder.From do
       {[], quote(do: other)}
 
       iex> escape(quote do: x() in other)
-      ** (Ecto.Query.CompileError) binding list should contain only variables, got: x()
+      ** (EctoOne.Query.CompileError) binding list should contain only variables, got: x()
 
   """
   @spec escape(Macro.t) :: {Keyword.t, Macro.t}
@@ -77,15 +77,15 @@ defmodule Ecto.Query.Builder.From do
   end
 
   defp query(source, model) do
-    {:%, [], [Ecto.Query, {:%{}, [], [from: {source, model}]}]}
+    {:%, [], [EctoOne.Query, {:%{}, [], [from: {source, model}]}]}
   end
 
   @doc """
   The callback applied by `build/2` to build the query.
   """
-  @spec apply(Ecto.Queryable.t, non_neg_integer) :: Ecto.Query.t
+  @spec apply(EctoOne.Queryable.t, non_neg_integer) :: EctoOne.Query.t
   def apply(query, binds) do
-    query = Ecto.Queryable.to_query(query)
+    query = EctoOne.Queryable.to_query(query)
     check_binds(query, binds)
     query
   end

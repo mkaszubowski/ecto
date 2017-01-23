@@ -1,21 +1,21 @@
-defmodule Ecto.MigrationTest do
-  # Although this test uses the Ecto.Migration.Runner which
+defmodule EctoOne.MigrationTest do
+  # Although this test uses the EctoOne.Migration.Runner which
   # is global state, we can run it async as long as this is
   # the only test case that uses the Runner in async mode.
   use ExUnit.Case, async: true
 
-  use Ecto.Migration
+  use EctoOne.Migration
 
-  alias Ecto.TestRepo
-  alias Ecto.Migration.Table
-  alias Ecto.Migration.Index
-  alias Ecto.Migration.Reference
-  alias Ecto.Migration.Runner
+  alias EctoOne.TestRepo
+  alias EctoOne.Migration.Table
+  alias EctoOne.Migration.Index
+  alias EctoOne.Migration.Reference
+  alias EctoOne.Migration.Runner
 
   setup meta do
     {:ok, runner} =
       Runner.start_link(self(), TestRepo, meta[:direction] || :forward, :up, false)
-    Process.put(:ecto_migration, %{runner: runner, prefix: meta[:prefix]})
+    Process.put(:ecto_one_migration, %{runner: runner, prefix: meta[:prefix]})
     {:ok, runner: runner}
   end
 
@@ -53,8 +53,8 @@ defmodule Ecto.MigrationTest do
 
   test "chokes on alias types" do
     assert_raise ArgumentError,
-                 ~r"Ecto.DateTime is not a valid database type", fn ->
-      add(:hello, Ecto.DateTime)
+                 ~r"EctoOne.DateTime is not a valid database type", fn ->
+      add(:hello, EctoOne.DateTime)
     end
   end
 
@@ -200,7 +200,7 @@ defmodule Ecto.MigrationTest do
 
   @tag prefix: :bar
   test "forward: raise error when prefixes don't match" do
-    assert_raise Ecto.MigrationError,
+    assert_raise EctoOne.MigrationError,
                  "the :prefix option `:foo` does match the migrator prefix `:bar`", fn ->
       create(table(:posts, prefix: :foo))
       flush
@@ -275,7 +275,7 @@ defmodule Ecto.MigrationTest do
   @moduletag direction: :backward
 
   test "backward: fails when executing SQL" do
-    assert_raise Ecto.MigrationError, ~r/cannot reverse migration command/, fn ->
+    assert_raise EctoOne.MigrationError, ~r/cannot reverse migration command/, fn ->
       execute "HELLO, IS IT ME YOU ARE LOOKING FOR?"
       flush
     end
@@ -308,7 +308,7 @@ defmodule Ecto.MigrationTest do
            {:alter, %Table{name: :posts},
               [{:remove, :summary}]}
 
-    assert_raise Ecto.MigrationError, ~r/cannot reverse migration command/, fn ->
+    assert_raise EctoOne.MigrationError, ~r/cannot reverse migration command/, fn ->
       alter table(:posts) do
         remove :summary
       end
@@ -324,7 +324,7 @@ defmodule Ecto.MigrationTest do
   end
 
   test "backward: drops a table" do
-    assert_raise Ecto.MigrationError, ~r/cannot reverse migration command/, fn ->
+    assert_raise EctoOne.MigrationError, ~r/cannot reverse migration command/, fn ->
       drop table(:posts)
       flush
     end

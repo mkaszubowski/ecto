@@ -1,23 +1,23 @@
 Code.require_file "../support/types.exs", __DIR__
 
-defmodule Ecto.Integration.TypeTest do
-  use Ecto.Integration.Case
+defmodule EctoOne.Integration.TypeTest do
+  use EctoOne.Integration.Case
 
-  alias Ecto.Integration.TestRepo
-  import Ecto.Query
+  alias EctoOne.Integration.TestRepo
+  import EctoOne.Query
 
-  alias Ecto.Integration.Post
-  alias Ecto.Integration.Tag
-  alias Ecto.Integration.Custom
-  alias Ecto.Integration.Order
-  alias Ecto.Integration.Item
+  alias EctoOne.Integration.Post
+  alias EctoOne.Integration.Tag
+  alias EctoOne.Integration.Custom
+  alias EctoOne.Integration.Order
+  alias EctoOne.Integration.Item
 
   test "primitive types" do
     integer  = 1
     float    = 0.1
     text     = <<0,1>>
     uuid     = "00010203-0405-0607-0809-0a0b0c0d0e0f"
-    datetime = %Ecto.DateTime{year: 2014, month: 1, day: 16,
+    datetime = %EctoOne.DateTime{year: 2014, month: 1, day: 16,
                               hour: 20, min: 26, sec: 51, usec: 0}
 
     TestRepo.insert!(%Post{text: text, public: true, visits: integer, uuid: uuid,
@@ -64,15 +64,15 @@ defmodule Ecto.Integration.TypeTest do
 
     # Datetime
     datetime = {{2014, 04, 17}, {14, 00, 00, 00}}
-    ecto_datetime = %Ecto.DateTime{year: 2014, month: 4, day: 17, hour: 14, min: 0, sec: 0, usec: 0}
-    assert [^ecto_datetime] = TestRepo.all(from Post, select: type(^datetime, Ecto.DateTime))
+    ecto_one_datetime = %EctoOne.DateTime{year: 2014, month: 4, day: 17, hour: 14, min: 0, sec: 0, usec: 0}
+    assert [^ecto_one_datetime] = TestRepo.all(from Post, select: type(^datetime, EctoOne.DateTime))
 
     # Custom wrappers
     assert [1] = TestRepo.all(from Post, select: type(^"1", Elixir.Custom.Permalink))
 
     # Custom types
-    datetime = %Ecto.DateTime{year: 2014, month: 1, day: 16, hour: 20, min: 26, sec: 51, usec: 0}
-    assert [^datetime] = TestRepo.all(from Post, select: type(^datetime, Ecto.DateTime))
+    datetime = %EctoOne.DateTime{year: 2014, month: 1, day: 16, hour: 20, min: 26, sec: 51, usec: 0}
+    assert [^datetime] = TestRepo.all(from Post, select: type(^datetime, EctoOne.DateTime))
   end
 
   test "binary id type" do
@@ -116,7 +116,7 @@ defmodule Ecto.Integration.TypeTest do
     assert TestRepo.all(from t in Tag, where: 1 in t.ints, select: t.ints) == [ints]
 
     # Update
-    tag = TestRepo.update!(Ecto.Changeset.change tag, ints: [3, 2, 1])
+    tag = TestRepo.update!(EctoOne.Changeset.change tag, ints: [3, 2, 1])
     assert TestRepo.get!(Tag, tag.id).ints == [3, 2, 1]
 
     # Update all
@@ -153,7 +153,7 @@ defmodule Ecto.Integration.TypeTest do
     post = TestRepo.insert!(%Post{meta: %{"world" => "hello"}})
     assert TestRepo.get!(Post, post.id).meta == %{"world" => "hello"}
 
-    post = TestRepo.update!(Ecto.Changeset.change post, meta: %{hello: "world"})
+    post = TestRepo.update!(EctoOne.Changeset.change post, meta: %{hello: "world"})
     assert TestRepo.get!(Post, post.id).meta == %{"hello" => "world"}
 
     query = from(p in Post, where: p.id == ^post.id)
@@ -163,11 +163,11 @@ defmodule Ecto.Integration.TypeTest do
 
   @tag :map_type
   test "embeds one" do
-    item = %Item{price: 123, valid_at: Ecto.Date.utc}
+    item = %Item{price: 123, valid_at: EctoOne.Date.utc}
     order =
       %Order{}
-      |> Ecto.Changeset.change
-      |> Ecto.Changeset.put_embed(:item, item)
+      |> EctoOne.Changeset.change
+      |> EctoOne.Changeset.put_embed(:item, item)
     order = TestRepo.insert!(order)
     dbitem = TestRepo.get!(Order, order.id).item
     assert item.price == dbitem.price
@@ -183,11 +183,11 @@ defmodule Ecto.Integration.TypeTest do
   @tag :map_type
   @tag :array_type
   test "embeds many" do
-    item = %Item{price: 123, valid_at: Ecto.Date.utc}
+    item = %Item{price: 123, valid_at: EctoOne.Date.utc}
     tag =
       %Tag{}
-      |> Ecto.Changeset.change
-      |> Ecto.Changeset.put_embed(:items, [item])
+      |> EctoOne.Changeset.change
+      |> EctoOne.Changeset.put_embed(:items, [item])
     tag = TestRepo.insert!(tag)
 
     [dbitem] = TestRepo.get!(Tag, tag.id).items

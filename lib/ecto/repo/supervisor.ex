@@ -1,4 +1,4 @@
-defmodule Ecto.Repo.Supervisor do
+defmodule EctoOne.Repo.Supervisor do
   @moduledoc false
 
   use Supervisor
@@ -47,7 +47,7 @@ defmodule Ecto.Repo.Supervisor do
   end
 
   defp pool(repo, config) do
-    pool         = Keyword.get(config, :pool, Ecto.Pools.Poolboy)
+    pool         = Keyword.get(config, :pool, EctoOne.Pools.Poolboy)
     name         = Keyword.get(config, :pool_name, default_pool_name(repo, config))
     pool_timeout = Keyword.get(config, :pool_timeout, 5_000)
     timeout      = Keyword.get(config, :timeout, 15_000)
@@ -59,11 +59,11 @@ defmodule Ecto.Repo.Supervisor do
   end
 
   @doc """
-  Parses an Ecto URL allowed in configuration.
+  Parses an EctoOne URL allowed in configuration.
 
   The format must be:
 
-      "ecto://username:password@hostname:port/database"
+      "ecto_one://username:password@hostname:port/database"
 
   or
 
@@ -80,11 +80,11 @@ defmodule Ecto.Repo.Supervisor do
     info = url |> URI.decode() |> URI.parse()
 
     if is_nil(info.host) do
-      raise Ecto.InvalidURLError, url: url, message: "host is not present"
+      raise EctoOne.InvalidURLError, url: url, message: "host is not present"
     end
 
     if is_nil(info.path) or not (info.path =~ ~r"^/([^/])+$") do
-      raise Ecto.InvalidURLError, url: url, message: "path should be a database name"
+      raise EctoOne.InvalidURLError, url: url, message: "path should be a database name"
     end
 
     destructure [username, password], info.userinfo && String.split(info.userinfo, ":")

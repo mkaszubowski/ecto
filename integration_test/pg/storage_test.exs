@@ -1,11 +1,11 @@
-defmodule Ecto.Integration.StorageTest do
+defmodule EctoOne.Integration.StorageTest do
   use ExUnit.Case, async: true
 
-  alias Ecto.Adapters.Postgres
+  alias EctoOne.Adapters.Postgres
 
   def correct_params do
-    Ecto.Repo.Supervisor.parse_url(
-      Application.get_env(:ecto, :pg_test_url) <> "/storage_mgt"
+    EctoOne.Repo.Supervisor.parse_url(
+      Application.get_env(:ecto_one, :pg_test_url) <> "/storage_mgt"
     )
   end
 

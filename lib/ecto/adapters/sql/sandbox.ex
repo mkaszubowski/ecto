@@ -1,4 +1,4 @@
-defmodule Ecto.Adapters.SQL.Sandbox do
+defmodule EctoOne.Adapters.SQL.Sandbox do
   @moduledoc """
   Start a pool with a single sandboxed SQL connection.
 
@@ -8,16 +8,16 @@ defmodule Ecto.Adapters.SQL.Sandbox do
 
   """
 
-  alias Ecto.Adapters.Connection
-  @behaviour Ecto.Pool
+  alias EctoOne.Adapters.Connection
+  @behaviour EctoOne.Pool
 
-  @typep log :: (%Ecto.LogEntry{} -> any())
+  @typep log :: (%EctoOne.LogEntry{} -> any())
 
   @doc """
   Starts a pool with a single sandboxed connections for the given SQL connection
   module and options.
 
-    * `conn_mod` - The connection module, see `Ecto.Adapters.Connection`
+    * `conn_mod` - The connection module, see `EctoOne.Adapters.Connection`
     * `opts` - The options for the pool and the connections
 
   """
@@ -288,14 +288,14 @@ defmodule Ecto.Adapters.SQL.Sandbox do
   defp begin(%{ref: nil, mode: :raw, module: module} = s, query!) do
     begin_sql = module.begin_transaction()
     query!.(s, begin_sql)
-    savepoint_sql = module.savepoint("ecto_sandbox")
+    savepoint_sql = module.savepoint("ecto_one_sandbox")
     query!.(s, savepoint_sql)
     {:ok, %{s | mode: :sandbox}}
   end
 
   defp restart(%{ref: nil, mode: :raw} = s, query!), do: begin(s, query!)
   defp restart(%{ref: nil, mode: :sandbox, module: module} = s, query!) do
-    sql = module.rollback_to_savepoint("ecto_sandbox")
+    sql = module.rollback_to_savepoint("ecto_one_sandbox")
     query!.(s, sql)
     {:ok, s}
   end
@@ -311,7 +311,7 @@ defmodule Ecto.Adapters.SQL.Sandbox do
     log? = Keyword.get(opts, :log, true)
     {query_time, res} = :timer.tc(module, :query, [conn, sql, [], opts])
     if log? do
-      entry = %Ecto.LogEntry{query: sql, params: [], result: res,
+      entry = %EctoOne.LogEntry{query: sql, params: [], result: res,
                             query_time: query_time, queue_time: nil}
       log.(entry)
     end

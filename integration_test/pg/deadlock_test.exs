@@ -1,11 +1,11 @@
-defmodule Ecto.Integration.DeadlockTest do
+defmodule EctoOne.Integration.DeadlockTest do
   # We can keep this test async as long as it
   # is the only one accessing advisory locks
   use ExUnit.Case, async: true
   require Logger
 
   @timeout 500
-  alias Ecto.Integration.PoolRepo
+  alias EctoOne.Integration.PoolRepo
 
   test "deadlocks reset worker" do
     tx1 = self()
@@ -63,7 +63,7 @@ defmodule Ecto.Integration.DeadlockTest do
 
   defp assert_tx_aborted do
     try do
-      Ecto.Adapters.SQL.query!(PoolRepo, "SELECT 1", []);
+      EctoOne.Adapters.SQL.query!(PoolRepo, "SELECT 1", []);
     rescue
       err in [Postgrex.Error] ->
         # current transaction is aborted, commands ignored until end of transaction block
@@ -75,6 +75,6 @@ defmodule Ecto.Integration.DeadlockTest do
 
   defp pg_advisory_xact_lock(key) do
     %{rows: [[:void]]} =
-      Ecto.Adapters.SQL.query!(PoolRepo, "SELECT pg_advisory_xact_lock($1);", [key])
+      EctoOne.Adapters.SQL.query!(PoolRepo, "SELECT pg_advisory_xact_lock($1);", [key])
   end
 end

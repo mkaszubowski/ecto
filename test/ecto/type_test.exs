@@ -1,8 +1,8 @@
-defmodule Ecto.TypeTest do
+defmodule EctoOne.TypeTest do
   use ExUnit.Case, async: true
 
   defmodule Custom do
-    @behaviour Ecto.Type
+    @behaviour EctoOne.Type
     def type,      do: :custom
     def load(_),   do: {:ok, :load}
     def dump(_),   do: {:ok, :dump}
@@ -10,7 +10,7 @@ defmodule Ecto.TypeTest do
   end
 
   defmodule CustomAny do
-    @behaviour Ecto.Type
+    @behaviour EctoOne.Type
     def type,      do: :any
     def load(_),   do: {:ok, :load}
     def dump(_),   do: {:ok, :dump}
@@ -18,7 +18,7 @@ defmodule Ecto.TypeTest do
   end
 
   defmodule Model do
-    use Ecto.Schema
+    use EctoOne.Schema
 
     @primary_key {:id, :binary_id, autogenerate: true}
     schema "" do
@@ -27,13 +27,13 @@ defmodule Ecto.TypeTest do
     end
 
     def changeset(params, model) do
-      Ecto.Changeset.cast(model, params, ~w(a))
+      EctoOne.Changeset.cast(model, params, ~w(a))
     end
   end
 
   import Kernel, except: [match?: 2], warn: false
-  import Ecto.Type
-  doctest Ecto.Type
+  import EctoOne.Type
+  doctest EctoOne.Type
 
   test "data type protocol" do
     defmodule Name do
@@ -44,7 +44,7 @@ defmodule Ecto.TypeTest do
     assert cast(:string, name) == :error
     assert cast(:integer, name) == :error
 
-    defimpl Ecto.DataType, for: Name do
+    defimpl EctoOne.DataType, for: Name do
       def cast(%Name{first: first, last: last}, :string) do
         {:ok, first <> " " <> last}
       end
@@ -63,7 +63,7 @@ defmodule Ecto.TypeTest do
     assert cast(Custom, "foo") == {:ok, :cast}
 
     assert load(Custom, nil) == {:ok, nil}
-    assert dump(Custom, nil) == {:ok, %Ecto.Query.Tagged{type: :custom, value: nil}}
+    assert dump(Custom, nil) == {:ok, %EctoOne.Query.Tagged{type: :custom, value: nil}}
     assert cast(Custom, nil) == {:ok, nil}
 
     assert match?(Custom, :any)
@@ -86,11 +86,11 @@ defmodule Ecto.TypeTest do
     assert cast({:array, Custom}, ["foo"]) == {:ok, [:cast]}
 
     assert load({:array, Custom}, [nil]) == {:ok, [nil]}
-    assert dump({:array, Custom}, [nil]) == {:ok, %Ecto.Query.Tagged{type: {:array, :custom}, value: [nil]}}
+    assert dump({:array, Custom}, [nil]) == {:ok, %EctoOne.Query.Tagged{type: {:array, :custom}, value: [nil]}}
     assert cast({:array, Custom}, [nil]) == {:ok, [nil]}
 
     assert load({:array, Custom}, nil) == {:ok, nil}
-    assert dump({:array, Custom}, nil) == {:ok, %Ecto.Query.Tagged{type: {:array, :custom}, value: nil}}
+    assert dump({:array, Custom}, nil) == {:ok, %EctoOne.Query.Tagged{type: {:array, :custom}, value: nil}}
     assert cast({:array, Custom}, nil) == {:ok, nil}
 
     assert load({:array, Custom}, 1) == :error
@@ -106,20 +106,20 @@ defmodule Ecto.TypeTest do
 
   @uuid_string "bfe0888c-5c59-4bb3-adfd-71f0b85d3db7"
   @uuid_binary <<191, 224, 136, 140, 92, 89, 75, 179, 173, 253, 113, 240, 184, 93, 61, 183>>
-  @uuid_tagged %Ecto.Query.Tagged{value: @uuid_binary, type: :uuid}
+  @uuid_tagged %EctoOne.Query.Tagged{value: @uuid_binary, type: :uuid}
 
   test "embeds_one" do
-    embed = %Ecto.Embedded{field: :embed, cardinality: :one,
+    embed = %EctoOne.Embedded{field: :embed, cardinality: :one,
                            owner: __MODULE__, related: Model, on_cast: :changeset}
     type  = {:embed, embed}
 
-    assert {:ok, %Model{a: 1}} = load(type, %{"a" => 1}, &Ecto.TestAdapter.load/2)
-    assert {:ok, nil} == load(type, nil, &Ecto.TestAdapter.load/2)
+    assert {:ok, %Model{a: 1}} = load(type, %{"a" => 1}, &EctoOne.TestAdapter.load/2)
+    assert {:ok, nil} == load(type, nil, &EctoOne.TestAdapter.load/2)
     assert :error == load(type, 1)
 
-    changeset = Ecto.Changeset.change(%Model{id: @uuid_string}, a: 1)
+    changeset = EctoOne.Changeset.change(%Model{id: @uuid_string}, a: 1)
     assert {:ok, %{a: 1, id: @uuid_tagged}} ==
-           dump(type, changeset, &Ecto.TestAdapter.dump/2)
+           dump(type, changeset, &EctoOne.TestAdapter.dump/2)
 
     assert :error == cast(type, %{"a" => 1})
 
@@ -127,21 +127,21 @@ defmodule Ecto.TypeTest do
   end
 
   test "embeds_many" do
-    embed = %Ecto.Embedded{field: :embed, cardinality: :many,
+    embed = %EctoOne.Embedded{field: :embed, cardinality: :many,
                            owner: __MODULE__, related: Model, on_cast: :changeset}
     type  = {:embed, embed}
 
-    assert {:ok, [%Model{a: 1}]} = load(type, [%{"a" => 1}], &Ecto.TestAdapter.load/2)
-    assert {:ok, []} == load(type, nil, &Ecto.TestAdapter.load/2)
-    assert :error == load(type, 1, &Ecto.TestAdapter.load/2)
+    assert {:ok, [%Model{a: 1}]} = load(type, [%{"a" => 1}], &EctoOne.TestAdapter.load/2)
+    assert {:ok, []} == load(type, nil, &EctoOne.TestAdapter.load/2)
+    assert :error == load(type, 1, &EctoOne.TestAdapter.load/2)
 
-    changeset = Ecto.Changeset.change(%Model{id: @uuid_string}, a: 1)
+    changeset = EctoOne.Changeset.change(%Model{id: @uuid_string}, a: 1)
     assert {:ok, [%{a: 1, id: @uuid_tagged}]} ==
-           dump(type, [changeset], &Ecto.TestAdapter.dump/2)
+           dump(type, [changeset], &EctoOne.TestAdapter.dump/2)
 
     deleted = %{changeset | action: :delete}
     assert {:ok, [%{a: 1, id: @uuid_tagged}]} ==
-           dump(type, [changeset, deleted], &Ecto.TestAdapter.dump/2)
+           dump(type, [changeset, deleted], &EctoOne.TestAdapter.dump/2)
 
     assert :error == cast(type, [%{"a" => 1}])
 

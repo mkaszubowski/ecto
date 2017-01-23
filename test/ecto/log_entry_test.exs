@@ -1,8 +1,8 @@
-defmodule Ecto.LogEntryTest do
+defmodule EctoOne.LogEntryTest do
   use ExUnit.Case, async: true
 
-  alias  Ecto.LogEntry
-  import Ecto.LogEntry
+  alias  EctoOne.LogEntry
+  import EctoOne.LogEntry
 
   test "can be resolved" do
     entry = %LogEntry{query: fn %LogEntry{} -> "done" end}
@@ -26,7 +26,7 @@ defmodule Ecto.LogEntryTest do
     entry = %{entry | params: [9, 10, 11]}
     assert to_binary(entry) == "done [9, 10, 11] OK"
 
-    entry = %{entry | params: [%Ecto.Query.Tagged{value: 1}, 2, 3]}
+    entry = %{entry | params: [%EctoOne.Query.Tagged{value: 1}, 2, 3]}
     assert to_binary(entry) == "done [1, 2, 3] OK"
 
     entry = %{entry | params: [1, 2, 3], query_time: 0}

@@ -1,18 +1,18 @@
 Code.require_file "../support/types.exs", __DIR__
 
-defmodule Ecto.Integration.RepoTest do
-  use Ecto.Integration.Case
+defmodule EctoOne.Integration.RepoTest do
+  use EctoOne.Integration.Case
 
-  alias Ecto.Integration.TestRepo
-  import Ecto.Query
+  alias EctoOne.Integration.TestRepo
+  import EctoOne.Query
 
-  alias Ecto.Integration.Post
-  alias Ecto.Integration.User
-  alias Ecto.Integration.PostUsecTimestamps
-  alias Ecto.Integration.Comment
-  alias Ecto.Integration.Permalink
-  alias Ecto.Integration.Custom
-  alias Ecto.Integration.Barebone
+  alias EctoOne.Integration.Post
+  alias EctoOne.Integration.User
+  alias EctoOne.Integration.PostUsecTimestamps
+  alias EctoOne.Integration.Comment
+  alias EctoOne.Integration.Permalink
+  alias EctoOne.Integration.Custom
+  alias EctoOne.Integration.Barebone
 
   test "returns already started for started repos" do
     assert {:error, {:already_started, _}} = TestRepo.start_link
@@ -65,7 +65,7 @@ defmodule Ecto.Integration.RepoTest do
 
   test "insert and update with changeset" do
     # On insert we merge the fields and changes
-    changeset = Ecto.Changeset.cast(%Post{text: "x", title: "wrong"},
+    changeset = EctoOne.Changeset.cast(%Post{text: "x", title: "wrong"},
                                     %{"title" => "hello", "temp" => "unknown"}, ~w(title temp), ~w())
 
     post = TestRepo.insert!(changeset)
@@ -73,7 +73,7 @@ defmodule Ecto.Integration.RepoTest do
     assert %Post{text: "x", title: "hello", temp: "temp"} = TestRepo.get!(Post, post.id)
 
     # On update we merge only fields, direct model changes are discarded
-    changeset = Ecto.Changeset.cast(%{post | text: "y"},
+    changeset = EctoOne.Changeset.cast(%{post | text: "y"},
                                     %{"title" => "world", "temp" => "unknown"}, ~w(title temp), ~w())
 
     assert %Post{text: "y", title: "world", temp: "unknown"} = TestRepo.update!(changeset)
@@ -82,12 +82,12 @@ defmodule Ecto.Integration.RepoTest do
 
   test "insert and update with empty changeset" do
     # On insert we merge the fields and changes
-    changeset = Ecto.Changeset.cast(%Permalink{}, %{}, ~w(), ~w())
+    changeset = EctoOne.Changeset.cast(%Permalink{}, %{}, ~w(), ~w())
     assert %Permalink{} = permalink = TestRepo.insert!(changeset)
 
     # Assert we can update the same value twice,
     # without changes, without triggering stale errors.
-    changeset = Ecto.Changeset.cast(permalink, %{}, ~w(), ~w())
+    changeset = EctoOne.Changeset.cast(permalink, %{}, ~w(), ~w())
     assert TestRepo.update!(changeset) == permalink
     assert TestRepo.update!(changeset) == permalink
   end
@@ -100,7 +100,7 @@ defmodule Ecto.Integration.RepoTest do
   @tag :read_after_writes
   test "insert and update with changeset read after writes" do
     defmodule RAW do
-      use Ecto.Schema
+      use EctoOne.Schema
 
       schema "posts" do
         field :counter, :integer, read_after_writes: true
@@ -108,7 +108,7 @@ defmodule Ecto.Integration.RepoTest do
       end
     end
 
-    changeset = Ecto.Changeset.cast(struct(RAW, %{}), %{}, ~w(), ~w())
+    changeset = EctoOne.Changeset.cast(struct(RAW, %{}), %{}, ~w(), ~w())
 
     # There is no dirty tracking on insert, even with changesets,
     # so database defaults never actually kick in.
@@ -119,7 +119,7 @@ defmodule Ecto.Integration.RepoTest do
 
     # Now, a combination of dirty tracking with read_after_writes,
     # allow us to see the actual counter value.
-    changeset = Ecto.Changeset.cast(raw, %{"visits" => "0"}, ~w(visits), ~w())
+    changeset = EctoOne.Changeset.cast(raw, %{"visits" => "0"}, ~w(visits), ~w())
     assert %{id: ^cid, counter: 11, visits: 0} = TestRepo.update!(changeset)
   end
 
@@ -132,7 +132,7 @@ defmodule Ecto.Integration.RepoTest do
   @tag :id_type
   test "insert autogenerates for custom id type" do
     defmodule ID do
-      use Ecto.Schema
+      use EctoOne.Schema
 
       @primary_key {:id, Elixir.Custom.Permalink, autogenerate: true}
       schema "posts" do
@@ -153,10 +153,10 @@ defmodule Ecto.Integration.RepoTest do
   @tag :id_type
   @tag :assigns_id_type
   test "insert and update with user-assigned primary key in changeset" do
-    changeset = Ecto.Changeset.cast(%Post{id: 11}, %{"id" => "13"}, ~w(id), ~w())
+    changeset = EctoOne.Changeset.cast(%Post{id: 11}, %{"id" => "13"}, ~w(id), ~w())
     assert %Post{id: 13} = post = TestRepo.insert!(changeset)
 
-    changeset = Ecto.Changeset.cast(post, %{"id" => "15"}, ~w(id), ~w())
+    changeset = EctoOne.Changeset.cast(post, %{"id" => "15"}, ~w(id), ~w())
     assert %Post{id: 15} = TestRepo.update!(changeset)
   end
 
@@ -175,7 +175,7 @@ defmodule Ecto.Integration.RepoTest do
   end
 
   test "optimistic locking in update/delete operations" do
-    import Ecto.Changeset, only: [cast: 4, optimistic_lock: 2]
+    import EctoOne.Changeset, only: [cast: 4, optimistic_lock: 2]
     base_post = TestRepo.insert!(%Comment{})
 
     cs_ok =
@@ -185,17 +185,17 @@ defmodule Ecto.Integration.RepoTest do
     TestRepo.update!(cs_ok)
 
     cs_stale = optimistic_lock(base_post, :lock_version)
-    assert_raise Ecto.StaleModelError, fn -> TestRepo.update!(cs_stale) end
-    assert_raise Ecto.StaleModelError, fn -> TestRepo.delete!(cs_stale) end
+    assert_raise EctoOne.StaleModelError, fn -> TestRepo.update!(cs_stale) end
+    assert_raise EctoOne.StaleModelError, fn -> TestRepo.delete!(cs_stale) end
   end
 
   @tag :unique_constraint
   test "unique constraint" do
-    changeset = Ecto.Changeset.change(%Post{}, uuid: Ecto.UUID.generate())
+    changeset = EctoOne.Changeset.change(%Post{}, uuid: EctoOne.UUID.generate())
     {:ok, _}  = TestRepo.insert(changeset)
 
     exception =
-      assert_raise Ecto.ConstraintError, ~r/constraint error when attempting to insert model/, fn ->
+      assert_raise EctoOne.ConstraintError, ~r/constraint error when attempting to insert model/, fn ->
         changeset
         |> TestRepo.insert()
       end
@@ -205,9 +205,9 @@ defmodule Ecto.Integration.RepoTest do
 
     message = ~r/constraint error when attempting to insert model/
     exception =
-      assert_raise Ecto.ConstraintError, message, fn ->
+      assert_raise EctoOne.ConstraintError, message, fn ->
         changeset
-        |> Ecto.Changeset.unique_constraint(:uuid, name: :posts_email_changeset)
+        |> EctoOne.Changeset.unique_constraint(:uuid, name: :posts_email_changeset)
         |> TestRepo.insert()
       end
 
@@ -215,7 +215,7 @@ defmodule Ecto.Integration.RepoTest do
 
     {:error, changeset} =
       changeset
-      |> Ecto.Changeset.unique_constraint(:uuid)
+      |> EctoOne.Changeset.unique_constraint(:uuid)
       |> TestRepo.insert()
     assert changeset.errors == [uuid: "has already been taken"]
     assert changeset.model.__meta__.state == :built
@@ -224,12 +224,12 @@ defmodule Ecto.Integration.RepoTest do
   @tag :id_type
   @tag :unique_constraint
   test "unique constraint with binary_id" do
-    changeset = Ecto.Changeset.change(%Custom{}, uuid: Ecto.UUID.generate())
+    changeset = EctoOne.Changeset.change(%Custom{}, uuid: EctoOne.UUID.generate())
     {:ok, _}  = TestRepo.insert(changeset)
 
     {:error, changeset} =
       changeset
-      |> Ecto.Changeset.unique_constraint(:uuid)
+      |> EctoOne.Changeset.unique_constraint(:uuid)
       |> TestRepo.insert()
     assert changeset.errors == [uuid: "has already been taken"]
     assert changeset.model.__meta__.state == :built
@@ -237,10 +237,10 @@ defmodule Ecto.Integration.RepoTest do
 
   @tag :foreign_key_constraint
   test "foreign key constraint" do
-    changeset = Ecto.Changeset.change(%Comment{post_id: 0})
+    changeset = EctoOne.Changeset.change(%Comment{post_id: 0})
 
     exception =
-      assert_raise Ecto.ConstraintError, ~r/constraint error when attempting to insert model/, fn ->
+      assert_raise EctoOne.ConstraintError, ~r/constraint error when attempting to insert model/, fn ->
         changeset
         |> TestRepo.insert()
       end
@@ -250,9 +250,9 @@ defmodule Ecto.Integration.RepoTest do
 
     message = ~r/constraint error when attempting to insert model/
     exception =
-      assert_raise Ecto.ConstraintError, message, fn ->
+      assert_raise EctoOne.ConstraintError, message, fn ->
         changeset
-        |> Ecto.Changeset.foreign_key_constraint(:post_id, name: :comments_post_id_other)
+        |> EctoOne.Changeset.foreign_key_constraint(:post_id, name: :comments_post_id_other)
         |> TestRepo.insert()
       end
 
@@ -260,17 +260,17 @@ defmodule Ecto.Integration.RepoTest do
 
     {:error, changeset} =
       changeset
-      |> Ecto.Changeset.foreign_key_constraint(:post_id)
+      |> EctoOne.Changeset.foreign_key_constraint(:post_id)
       |> TestRepo.insert()
     assert changeset.errors == [post_id: "does not exist"]
   end
 
  @tag :foreign_key_constraint
   test "assoc constraint" do
-    changeset = Ecto.Changeset.change(%Comment{post_id: 0})
+    changeset = EctoOne.Changeset.change(%Comment{post_id: 0})
 
     exception =
-      assert_raise Ecto.ConstraintError, ~r/constraint error when attempting to insert model/, fn ->
+      assert_raise EctoOne.ConstraintError, ~r/constraint error when attempting to insert model/, fn ->
         changeset
         |> TestRepo.insert()
       end
@@ -280,9 +280,9 @@ defmodule Ecto.Integration.RepoTest do
 
     message = ~r/constraint error when attempting to insert model/
     exception =
-      assert_raise Ecto.ConstraintError, message, fn ->
+      assert_raise EctoOne.ConstraintError, message, fn ->
         changeset
-        |> Ecto.Changeset.assoc_constraint(:post, name: :comments_post_id_other)
+        |> EctoOne.Changeset.assoc_constraint(:post, name: :comments_post_id_other)
         |> TestRepo.insert()
       end
 
@@ -290,7 +290,7 @@ defmodule Ecto.Integration.RepoTest do
 
     {:error, changeset} =
       changeset
-      |> Ecto.Changeset.assoc_constraint(:post)
+      |> EctoOne.Changeset.assoc_constraint(:post)
       |> TestRepo.insert()
     assert changeset.errors == [post: "does not exist"]
   end
@@ -301,7 +301,7 @@ defmodule Ecto.Integration.RepoTest do
     TestRepo.insert!(%Permalink{user_id: user.id})
 
     exception =
-      assert_raise Ecto.ConstraintError, ~r/constraint error when attempting to delete model/, fn ->
+      assert_raise EctoOne.ConstraintError, ~r/constraint error when attempting to delete model/, fn ->
         TestRepo.delete!(user)
       end
 
@@ -316,10 +316,10 @@ defmodule Ecto.Integration.RepoTest do
 
     message = ~r/constraint error when attempting to delete model/
     exception =
-      assert_raise Ecto.ConstraintError, message, fn ->
+      assert_raise EctoOne.ConstraintError, message, fn ->
         user
-        |> Ecto.Changeset.change
-        |> Ecto.Changeset.no_assoc_constraint(:permalinks, name: :permalinks_user_id_pther)
+        |> EctoOne.Changeset.change
+        |> EctoOne.Changeset.no_assoc_constraint(:permalinks, name: :permalinks_user_id_pther)
         |> TestRepo.delete()
       end
 
@@ -333,8 +333,8 @@ defmodule Ecto.Integration.RepoTest do
 
     {:error, changeset} =
       user
-      |> Ecto.Changeset.change
-      |> Ecto.Changeset.no_assoc_constraint(:permalinks)
+      |> EctoOne.Changeset.change
+      |> EctoOne.Changeset.no_assoc_constraint(:permalinks)
       |> TestRepo.delete()
     assert changeset.errors == [permalinks: "are still associated to this entry"]
   end
@@ -352,13 +352,13 @@ defmodule Ecto.Integration.RepoTest do
     TestRepo.delete!(post1)
 
     assert nil   == TestRepo.get(Post, post1.id)
-    assert_raise Ecto.NoResultsError, fn ->
+    assert_raise EctoOne.NoResultsError, fn ->
       TestRepo.get!(Post, post1.id)
     end
   end
 
   test "get(!) with custom source" do
-    custom = Ecto.put_meta(%Custom{}, source: "posts")
+    custom = EctoOne.put_meta(%Custom{}, source: "posts")
     custom = TestRepo.insert!(custom)
     bid    = custom.bid
     assert %Custom{bid: ^bid, __meta__: %{source: {nil, "posts"}}} =
@@ -383,7 +383,7 @@ defmodule Ecto.Integration.RepoTest do
 
     assert post1 == TestRepo.get_by!(Post, %{id: post1.id})
 
-    assert_raise Ecto.NoResultsError, fn ->
+    assert_raise EctoOne.NoResultsError, fn ->
       TestRepo.get_by!(Post, id: post2.id, text: "hey")
     end
   end
@@ -399,7 +399,7 @@ defmodule Ecto.Integration.RepoTest do
     assert post1 == TestRepo.one!(from p in Post, where: p.id == ^post1.id)
     assert post2 == TestRepo.one!(from p in Post, where: p.id == ^to_string post2.id) # With casting
 
-    assert_raise Ecto.NoResultsError, fn ->
+    assert_raise EctoOne.NoResultsError, fn ->
       TestRepo.one!(from p in Post, where: is_nil(p.id))
     end
   end
@@ -408,11 +408,11 @@ defmodule Ecto.Integration.RepoTest do
     assert %Post{} = TestRepo.insert!(%Post{title: "hai"})
     assert %Post{} = TestRepo.insert!(%Post{title: "hai"})
 
-    assert_raise Ecto.MultipleResultsError, fn ->
+    assert_raise EctoOne.MultipleResultsError, fn ->
       TestRepo.one(from p in Post, where: p.title == "hai")
     end
 
-    assert_raise Ecto.MultipleResultsError, fn ->
+    assert_raise EctoOne.MultipleResultsError, fn ->
       TestRepo.one!(from p in Post, where: p.title == "hai")
     end
   end
@@ -490,7 +490,7 @@ defmodule Ecto.Integration.RepoTest do
 
   test "update all with casting and dumping" do
     text = "hai"
-    date = Ecto.DateTime.utc
+    date = EctoOne.DateTime.utc
     assert %Post{id: id1} = TestRepo.insert!(%Post{})
 
     assert {1, nil} = TestRepo.update_all(Post, set: [text: text, inserted_at: date])
@@ -543,11 +543,11 @@ defmodule Ecto.Integration.RepoTest do
     %Comment{id: cid2} = TestRepo.insert!(%Comment{text: "2", post_id: p1.id})
     %Comment{id: cid3} = TestRepo.insert!(%Comment{text: "3", post_id: p2.id})
 
-    [c1, c2] = TestRepo.all Ecto.assoc(p1, :comments)
+    [c1, c2] = TestRepo.all EctoOne.assoc(p1, :comments)
     assert c1.id == cid1
     assert c2.id == cid2
 
-    [c1, c2, c3] = TestRepo.all Ecto.assoc([p1, p2], :comments)
+    [c1, c2, c3] = TestRepo.all EctoOne.assoc([p1, p2], :comments)
     assert c1.id == cid1
     assert c2.id == cid2
     assert c3.id == cid3
@@ -561,7 +561,7 @@ defmodule Ecto.Integration.RepoTest do
     %Permalink{}         = TestRepo.insert!(%Permalink{url: "2"})
     %Permalink{id: lid3} = TestRepo.insert!(%Permalink{url: "3", post_id: p2.id})
 
-    [l1, l3] = TestRepo.all Ecto.assoc([p1, p2], :permalink)
+    [l1, l3] = TestRepo.all EctoOne.assoc([p1, p2], :permalink)
     assert l1.id == lid1
     assert l3.id == lid3
   end
@@ -574,7 +574,7 @@ defmodule Ecto.Integration.RepoTest do
     l2 = TestRepo.insert!(%Permalink{url: "2"})
     l3 = TestRepo.insert!(%Permalink{url: "3", post_id: pid2})
 
-    assert [p1, p2] = TestRepo.all Ecto.assoc([l1, l2, l3], :post)
+    assert [p1, p2] = TestRepo.all EctoOne.assoc([l1, l2, l3], :post)
     assert p1.id == pid1
     assert p2.id == pid2
   end
@@ -582,8 +582,8 @@ defmodule Ecto.Integration.RepoTest do
   test "has_one nested assoc" do
     changeset =
       %Post{title: "1"}
-      |> Ecto.Changeset.change
-      |> Ecto.Changeset.put_assoc(:permalink, %Permalink{url: "1"})
+      |> EctoOne.Changeset.change
+      |> EctoOne.Changeset.put_assoc(:permalink, %Permalink{url: "1"})
     p1 = TestRepo.insert!(changeset)
     assert p1.permalink.id
     assert p1.permalink.post_id == p1.id
@@ -593,8 +593,8 @@ defmodule Ecto.Integration.RepoTest do
 
     changeset =
       p1
-      |> Ecto.Changeset.change
-      |> Ecto.Changeset.put_assoc(:permalink, %Permalink{url: "2"})
+      |> EctoOne.Changeset.change
+      |> EctoOne.Changeset.put_assoc(:permalink, %Permalink{url: "2"})
     p1 = TestRepo.update!(changeset)
     assert p1.permalink.id
     assert p1.permalink.post_id == p1.id
@@ -604,8 +604,8 @@ defmodule Ecto.Integration.RepoTest do
 
     changeset =
       p1
-      |> Ecto.Changeset.change
-      |> Ecto.Changeset.put_assoc(:permalink, nil)
+      |> EctoOne.Changeset.change
+      |> EctoOne.Changeset.put_assoc(:permalink, nil)
     p1 = TestRepo.update!(changeset)
     refute p1.permalink
     p1 = TestRepo.get!(from(p in Post, preload: [:permalink]), p1.id)
@@ -620,8 +620,8 @@ defmodule Ecto.Integration.RepoTest do
 
     changeset =
       %Post{title: "1"}
-      |> Ecto.Changeset.change
-      |> Ecto.Changeset.put_assoc(:comments, [c1])
+      |> EctoOne.Changeset.change
+      |> EctoOne.Changeset.put_assoc(:comments, [c1])
     p1 = TestRepo.insert!(changeset)
     [c1] = p1.comments
     assert c1.id
@@ -632,8 +632,8 @@ defmodule Ecto.Integration.RepoTest do
 
     changeset =
       p1
-      |> Ecto.Changeset.change
-      |> Ecto.Changeset.put_assoc(:comments, [c1, c2])
+      |> EctoOne.Changeset.change
+      |> EctoOne.Changeset.put_assoc(:comments, [c1, c2])
     p1 = TestRepo.update!(changeset)
     [_c1, c2] = p1.comments |> Enum.sort_by(&(&1.id))
     assert c2.id
@@ -645,8 +645,8 @@ defmodule Ecto.Integration.RepoTest do
 
     changeset =
       p1
-      |> Ecto.Changeset.change
-      |> Ecto.Changeset.put_assoc(:comments, [])
+      |> EctoOne.Changeset.change
+      |> EctoOne.Changeset.put_assoc(:comments, [])
     p1 = TestRepo.update!(changeset)
     assert p1.comments == []
     p1 = TestRepo.get!(from(p in Post, preload: [:comments]), p1.id)
@@ -662,7 +662,7 @@ defmodule Ecto.Integration.RepoTest do
     TestRepo.insert!(%Post{title: "world", author_id: author.id})
 
     # Asserts that `unique_constraint` for `uuid` exists
-    assert_raise Ecto.ConstraintError, fn ->
+    assert_raise EctoOne.ConstraintError, fn ->
       TestRepo.insert!(%Post{title: "another", author_id: author.id, uuid: p1.uuid})
     end
 
@@ -674,19 +674,19 @@ defmodule Ecto.Integration.RepoTest do
     # This will only work if we delete before performing inserts
     changeset =
       author
-      |> Ecto.Changeset.cast(%{"posts" => posts_params}, ~w())
-      |> Ecto.Changeset.cast_assoc(:posts)
+      |> EctoOne.Changeset.cast(%{"posts" => posts_params}, ~w())
+      |> EctoOne.Changeset.cast_assoc(:posts)
     author = TestRepo.update! changeset
     assert Enum.map(author.posts, &(&1.title)) == ["fresh", "fresh"]
   end
 
   @tag :transaction
   test "rollbacks failed nested assocs" do
-    permalink_changeset = %{Ecto.Changeset.change(%Permalink{url: "1"}) | valid?: false}
+    permalink_changeset = %{EctoOne.Changeset.change(%Permalink{url: "1"}) | valid?: false}
     changeset =
       %Post{title: "1"}
-      |> Ecto.Changeset.change
-      |> Ecto.Changeset.put_assoc(:permalink, permalink_changeset)
+      |> EctoOne.Changeset.change
+      |> EctoOne.Changeset.put_assoc(:permalink, permalink_changeset)
     assert {:error, changeset} = TestRepo.insert(changeset)
     assert changeset.model.__struct__ == Post
     refute changeset.valid?

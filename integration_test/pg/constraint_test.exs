@@ -1,11 +1,11 @@
-defmodule Ecto.Integration.ConstraintTest do
+defmodule EctoOne.Integration.ConstraintTest do
   use ExUnit.Case, async: true
 
-  alias Ecto.Integration.TestRepo
-  import Ecto.Migrator, only: [up: 4, down: 4]
+  alias EctoOne.Integration.TestRepo
+  import EctoOne.Migrator, only: [up: 4, down: 4]
 
   defmodule ExcludeConstraintMigration do
-    use Ecto.Migration
+    use EctoOne.Migration
 
     @table table(:exclude_constraint_migration)
 
@@ -23,7 +23,7 @@ defmodule Ecto.Integration.ConstraintTest do
   end
 
   defmodule ExcludeConstraintModel do
-    use Ecto.Integration.Schema
+    use EctoOne.Integration.Schema
 
     schema "exclude_constraint_migration" do
       field :from, :integer
@@ -34,11 +34,11 @@ defmodule Ecto.Integration.ConstraintTest do
   test "exclude constraint exception" do
     assert :ok == up(TestRepo, 20050906120000, ExcludeConstraintMigration, log: false)
 
-    changeset = Ecto.Changeset.change(%ExcludeConstraintModel{}, from: 0, to: 1)
+    changeset = EctoOne.Changeset.change(%ExcludeConstraintModel{}, from: 0, to: 1)
     {:ok, _} = TestRepo.insert(changeset)
 
     exception =
-      assert_raise Ecto.ConstraintError, ~r/constraint error when attempting to insert model/, fn ->
+      assert_raise EctoOne.ConstraintError, ~r/constraint error when attempting to insert model/, fn ->
         changeset
         |> TestRepo.insert()
       end
@@ -48,9 +48,9 @@ defmodule Ecto.Integration.ConstraintTest do
 
     message = ~r/constraint error when attempting to insert model/
     exception =
-      assert_raise Ecto.ConstraintError, message, fn ->
+      assert_raise EctoOne.ConstraintError, message, fn ->
         changeset
-        |> Ecto.Changeset.exclude_constraint(:from)
+        |> EctoOne.Changeset.exclude_constraint(:from)
         |> TestRepo.insert()
       end
 
@@ -58,7 +58,7 @@ defmodule Ecto.Integration.ConstraintTest do
 
     {:error, changeset} =
       changeset
-      |> Ecto.Changeset.exclude_constraint(:from, name: :overlapping_ranges)
+      |> EctoOne.Changeset.exclude_constraint(:from, name: :overlapping_ranges)
       |> TestRepo.insert()
 
     assert changeset.errors == [from: "violates an exclusion constraint"]

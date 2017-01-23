@@ -1,4 +1,4 @@
-defmodule Ecto.Adapters.MySQL do
+defmodule EctoOne.Adapters.MySQL do
   @moduledoc """
   Adapter module for MySQL.
 
@@ -17,8 +17,8 @@ defmodule Ecto.Adapters.MySQL do
   Those options should be set in the config file and require
   recompilation in order to make an effect.
 
-    * `:adapter` - The adapter name, in this case, `Ecto.Adapters.MySQL`
-    * `:pool` - The connection pool module, defaults to `Ecto.Pools.Poolboy`
+    * `:adapter` - The adapter name, in this case, `EctoOne.Adapters.MySQL`
+    * `:pool` - The connection pool module, defaults to `EctoOne.Pools.Poolboy`
     * `:pool_timeout` - The default timeout to use on pool calls, defaults to `5000`
     * `:timeout` - The default timeout to use on queries, defaults to `15000`
     * `:log_level` - The level to use when logging queries (default: `:debug`)
@@ -41,28 +41,28 @@ defmodule Ecto.Adapters.MySQL do
 
   ## Limitations
 
-  There are some limitations when using Ecto with MySQL that one
+  There are some limitations when using EctoOne with MySQL that one
   needs to be aware of.
 
   ### Engine
 
-  Since Ecto uses transactions, MySQL users running old versions
+  Since EctoOne uses transactions, MySQL users running old versions
   (5.1 and before) must ensure their tables use the InnoDB engine
   as the default (MyISAM) does not support transactions.
 
-  Tables created by Ecto are guaranteed to use InnoDB, regardless
+  Tables created by EctoOne are guaranteed to use InnoDB, regardless
   of the MySQL version.
 
   ### UUIDs
 
-  MySQL does not support UUID types. Ecto emulates them by using
+  MySQL does not support UUID types. EctoOne emulates them by using
   `binary(16)`.
 
   ### Read after writes
 
   Because MySQL does not support RETURNING clauses in INSERT and
   UPDATE, it does not support the `:read_after_writes` option of
-  `Ecto.Schema.field/3`.
+  `EctoOne.Schema.field/3`.
 
   ### DDL Transaction
 
@@ -81,11 +81,11 @@ defmodule Ecto.Adapters.MySQL do
   version.
   """
 
-  # Inherit all behaviour from Ecto.Adapters.SQL
-  use Ecto.Adapters.SQL, :mariaex
+  # Inherit all behaviour from EctoOne.Adapters.SQL
+  use EctoOne.Adapters.SQL, :mariaex
 
   # And provide a custom storage implementation
-  @behaviour Ecto.Adapter.Storage
+  @behaviour EctoOne.Adapter.Storage
 
   ## Custom MySQL types
 
@@ -99,7 +99,7 @@ defmodule Ecto.Adapters.MySQL do
   def load(:boolean, 1), do: {:ok, true}
   def load(type, value), do: super(type, value)
 
-  defp json_library, do: Application.get_env(:ecto, :json_library)
+  defp json_library, do: Application.get_env(:ecto_one, :json_library)
 
   ## Storage API
 
@@ -140,7 +140,7 @@ defmodule Ecto.Adapters.MySQL do
   defp run_with_mysql(database, sql_command) do
     unless System.find_executable("mysql") do
       raise "could not find executable `mysql` in path, " <>
-            "please guarantee it is available before running ecto commands"
+            "please guarantee it is available before running ecto_one commands"
     end
 
     env =
@@ -174,7 +174,7 @@ defmodule Ecto.Adapters.MySQL do
   def insert(repo, %{source: {prefix, source}}, params, {pk, :id, nil}, [], opts) do
     {fields, values} = :lists.unzip(params)
     sql = @conn.insert(prefix, source, fields, [])
-    case Ecto.Adapters.SQL.query(repo, sql, values, opts) do
+    case EctoOne.Adapters.SQL.query(repo, sql, values, opts) do
       {:ok, %{num_rows: 1, last_insert_id: last_insert_id}} ->
         {:ok, [{pk, last_insert_id}]}
       {:error, err} ->

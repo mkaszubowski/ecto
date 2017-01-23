@@ -1,20 +1,20 @@
-defmodule Ecto.Query.Builder do
+defmodule EctoOne.Query.Builder do
   @moduledoc false
 
   @distinct ~w(count)a
 
-  alias Ecto.Query
+  alias EctoOne.Query
 
   @typedoc """
   Quoted types store primitive types and types in the format
   {source, quoted}. The latter are handled directly in the planner,
-  never forwarded to Ecto.Type.
+  never forwarded to EctoOne.Type.
 
-  The Ecto.Type module concerns itself only with runtime types,
+  The EctoOne.Type module concerns itself only with runtime types,
   which include all primitive types and custom user types. Also
   note custom user types do not show up during compilation time.
   """
-  @type quoted_type :: Ecto.Type.primitive | {non_neg_integer, atom | Macro.t}
+  @type quoted_type :: EctoOne.Type.primitive | {non_neg_integer, atom | Macro.t}
 
   @doc """
   Smart escapes a query expression and extracts interpolated values in
@@ -67,7 +67,7 @@ defmodule Ecto.Query.Builder do
 
   def escape({:fragment, _, [{:^, _, [var]} = _expr]}, _type, params, _vars, _env) do
     expr = quote do
-      Ecto.Query.Builder.runtime_validate!(unquote(var))
+      EctoOne.Query.Builder.runtime_validate!(unquote(var))
     end
     {{:{}, [], [:fragment, [], [expr]]}, params}
   end
@@ -298,7 +298,7 @@ defmodule Ecto.Query.Builder do
   end
 
   defp assert_type!(expr, type, actual) do
-    if Ecto.Type.match?(type, actual) do
+    if EctoOne.Type.match?(type, actual) do
       :ok
     else
       error! "expression `#{Macro.to_string(expr)}` does not type check. " <>
@@ -329,13 +329,13 @@ defmodule Ecto.Query.Builder do
     do: do_literal(value, expected, quoted_type(value, vars))
 
   defp do_literal(value, :any, current) when current in @always_tagged,
-    do: {:%, [], [Ecto.Query.Tagged, {:%{}, [], [value: value, type: current]}]}
+    do: {:%, [], [EctoOne.Query.Tagged, {:%{}, [], [value: value, type: current]}]}
   defp do_literal(value, :any, _current),
     do: value
   defp do_literal(value, expected, expected),
     do: value
   defp do_literal(value, expected, _current),
-    do: {:%, [], [Ecto.Query.Tagged, {:%{}, [], [value: value, type: expected]}]}
+    do: {:%, [], [EctoOne.Query.Tagged, {:%{}, [], [value: value, type: expected]}]}
 
   @doc """
   Escape the params entries map.
@@ -360,7 +360,7 @@ defmodule Ecto.Query.Builder do
   Escapes a list of bindings as a list of atoms.
 
   Only variables or `{:atom, value}` tuples are allowed in the `bindings` list,
-  otherwise an `Ecto.Query.CompileError` is raised.
+  otherwise an `EctoOne.Query.CompileError` is raised.
 
   ## Examples
 
@@ -371,10 +371,10 @@ defmodule Ecto.Query.Builder do
       [x: 0, z: 2]
 
       iex> escape_binding(quote do: [x, y, x])
-      ** (Ecto.Query.CompileError) variable `x` is bound twice
+      ** (EctoOne.Query.CompileError) variable `x` is bound twice
 
       iex> escape_binding(quote do: [a, b, :foo])
-      ** (Ecto.Query.CompileError) binding list should contain only variables, got: :foo
+      ** (EctoOne.Query.CompileError) binding list should contain only variables, got: :foo
 
   """
   @spec escape_binding(list) :: Keyword.t
@@ -408,7 +408,7 @@ defmodule Ecto.Query.Builder do
         `#{Macro.to_string(expr)}` is not a valid query expression.
 
         * If you intended to call a database function, please check the documentation
-          for Ecto.Query to see the supported database expressions
+          for EctoOne.Query to see the supported database expressions
 
         * If you intended to call an Elixir function or introduce a value,
           you need to explicitly interpolate it with ^
@@ -430,7 +430,7 @@ defmodule Ecto.Query.Builder do
   delegate the check to runtime for interpolation.
   """
   def quoted_field!({:^, _, [expr]}),
-    do: quote(do: Ecto.Query.Builder.field!(unquote(expr)))
+    do: quote(do: EctoOne.Query.Builder.field!(unquote(expr)))
   def quoted_field!(atom) when is_atom(atom),
     do: atom
   def quoted_field!(other),
@@ -449,7 +449,7 @@ defmodule Ecto.Query.Builder do
   delegate the check to runtime for interpolation.
   """
   def quoted_interval!({:^, _, [expr]}),
-    do: quote(do: Ecto.Query.Builder.interval!(unquote(expr)))
+    do: quote(do: EctoOne.Query.Builder.interval!(unquote(expr)))
   def quoted_interval!(other),
     do: interval!(other)
 
@@ -531,12 +531,12 @@ defmodule Ecto.Query.Builder do
 
     t = Enum.drop_while t, fn
       {mod, _, _, _} ->
-        String.starts_with?(Atom.to_string(mod), ["Elixir.Ecto.Query.", "Elixir.Enum"])
+        String.starts_with?(Atom.to_string(mod), ["Elixir.EctoOne.Query.", "Elixir.Enum"])
       _ ->
         false
     end
 
-    reraise Ecto.Query.CompileError, [message: message], t
+    reraise EctoOne.Query.CompileError, [message: message], t
   end
 
   @doc """
@@ -544,14 +544,14 @@ defmodule Ecto.Query.Builder do
 
   ## Examples
 
-      iex> count_binds(%Ecto.Query{joins: [1,2,3]})
+      iex> count_binds(%EctoOne.Query{joins: [1,2,3]})
       3
 
-      iex> count_binds(%Ecto.Query{from: 0, joins: [1,2]})
+      iex> count_binds(%EctoOne.Query{from: 0, joins: [1,2]})
       3
 
   """
-  @spec count_binds(Ecto.Query.t) :: non_neg_integer
+  @spec count_binds(EctoOne.Query.t) :: non_neg_integer
   def count_binds(%Query{from: from, joins: joins}) do
     count = if from, do: 1, else: 0
     count + length(joins)
@@ -561,7 +561,7 @@ defmodule Ecto.Query.Builder do
   Applies a query at compilation time or at runtime.
 
   This function is responsible for checking if a given query is an
-  `Ecto.Query` struct at compile time. If it is not it will act
+  `EctoOne.Query` struct at compile time. If it is not it will act
   accordingly.
 
   If a query is available, it invokes the `apply` function in the
@@ -576,11 +576,11 @@ defmodule Ecto.Query.Builder do
 
   For example, take into account the `Builder.Select`:
 
-      select = %Ecto.Query.QueryExpr{expr: expr, file: env.file, line: env.line}
+      select = %EctoOne.Query.QueryExpr{expr: expr, file: env.file, line: env.line}
       Builder.apply_query(query, __MODULE__, [select], env)
 
   `expr` is already an escaped expression and we must not escape
-  it again. However, it is wrapped in an Ecto.Query.QueryExpr,
+  it again. However, it is wrapped in an EctoOne.Query.QueryExpr,
   which must be escaped! Furthermore, the `apply/2` function
   in `Builder.Select` very likely will inject the QueryExpr inside
   Query, which again, is a mixture of escaped and unescaped expressions.
@@ -609,7 +609,7 @@ defmodule Ecto.Query.Builder do
     end
   end
 
-  # Unescapes an `Ecto.Query` struct.
+  # Unescapes an `EctoOne.Query` struct.
   defp unescape_query({:%, _, [Query, {:%{}, _, list}]}) do
     struct(Query, list)
   end
@@ -626,7 +626,7 @@ defmodule Ecto.Query.Builder do
     other
   end
 
-  # Escapes an `Ecto.Query` and associated structs.
+  # Escapes an `EctoOne.Query` and associated structs.
   defp escape_query(%Query{} = query),
     do: {:%{}, [], Map.to_list(query)}
   defp escape_query(other),

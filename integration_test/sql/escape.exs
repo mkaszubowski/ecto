@@ -1,9 +1,9 @@
-defmodule Ecto.Integration.EscapeTest do
-  use Ecto.Integration.Case
+defmodule EctoOne.Integration.EscapeTest do
+  use EctoOne.Integration.Case
 
-  alias Ecto.Integration.TestRepo
-  import Ecto.Query
-  alias Ecto.Integration.Post
+  alias EctoOne.Integration.TestRepo
+  import EctoOne.Query
+  alias EctoOne.Integration.Post
 
   test "Repo.all escape" do
     TestRepo.insert!(%Post{title: "hello"})
@@ -21,7 +21,7 @@ defmodule Ecto.Integration.EscapeTest do
 
   test "Repo.update! escape" do
     p = TestRepo.insert!(%Post{title: "hello"})
-    TestRepo.update!(Ecto.Changeset.change p, title: "'")
+    TestRepo.update!(EctoOne.Changeset.change p, title: "'")
 
     query = from(p in Post, select: p.title)
     assert ["'"] == TestRepo.all(query)

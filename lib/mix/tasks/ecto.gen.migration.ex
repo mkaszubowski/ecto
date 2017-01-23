@@ -1,6 +1,6 @@
-defmodule Mix.Tasks.Ecto.Gen.Migration do
+defmodule Mix.Tasks.EctoOne.Gen.Migration do
   use Mix.Task
-  import Mix.Ecto
+  import Mix.EctoOne
   import Mix.Generator
   import Mix.Utils, only: [camelize: 1, underscore: 1]
 
@@ -11,11 +11,11 @@ defmodule Mix.Tasks.Ecto.Gen.Migration do
 
   ## Examples
 
-      mix ecto.gen.migration add_posts_table
-      mix ecto.gen.migration add_posts_table -r Custom.Repo
+      mix ecto_one.gen.migration add_posts_table
+      mix ecto_one.gen.migration add_posts_table -r Custom.Repo
 
   By default, the migration will be generated to the
-  "priv/YOUR_REPO/migrations" directory of the current application
+  "priv/YOUR_REPO/migrations" directo_onery of the current application
   but it can be configured by specify the `:priv` key under
   the repository configuration.
 
@@ -31,7 +31,7 @@ defmodule Mix.Tasks.Ecto.Gen.Migration do
 
   @doc false
   def run(args) do
-    no_umbrella!("ecto.gen.migration")
+    no_umbrella!("ecto_one.gen.migration")
     repos = parse_repo(args)
 
     Enum.each repos, fn repo ->
@@ -44,10 +44,10 @@ defmodule Mix.Tasks.Ecto.Gen.Migration do
           create_file file, migration_template(mod: Module.concat([repo, Migrations, camelize(name)]))
 
           if open?(file) && Mix.shell.yes?("Do you want to run this migration?") do
-            Mix.Task.run "ecto.migrate", [repo]
+            Mix.Task.run "ecto_one.migrate", [repo]
           end
         {_, _, _} ->
-          Mix.raise "expected ecto.gen.migration to receive the migration file name, " <>
+          Mix.raise "expected ecto_one.gen.migration to receive the migration file name, " <>
                     "got: #{inspect Enum.join(args, " ")}"
       end
     end
@@ -63,7 +63,7 @@ defmodule Mix.Tasks.Ecto.Gen.Migration do
 
   embed_template :migration, """
   defmodule <%= inspect @mod %> do
-    use Ecto.Migration
+    use EctoOne.Migration
 
     def change do
     end

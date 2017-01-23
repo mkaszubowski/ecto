@@ -1,20 +1,20 @@
-defmodule Mix.EctoTest do
+defmodule Mix.EctoOneTest do
   use ExUnit.Case, async: true
-  import Mix.Ecto
+  import Mix.EctoOne
 
   test "parse repo" do
     assert parse_repo(["-r", "Repo"]) == [Repo]
     assert parse_repo(["--repo", Repo]) == [Repo]
-    assert parse_repo([]) == [Ecto.Repo]
+    assert parse_repo([]) == [EctoOne.Repo]
 
     assert parse_repo(["-r", "Repo", "-r", "Repo2"]) == [Repo, Repo2]
     assert parse_repo(["-r", "Repo", "--quiet"]) == [Repo]
     assert parse_repo(["-r", "Repo", "-r", "Repo2", "--quiet"]), [Repo, Repo2]
 
-    Application.put_env(:ecto, :app_namespace, Foo)
+    Application.put_env(:ecto_one, :app_namespace, Foo)
     assert parse_repo([]) == [Foo.Repo]
   after
-    Application.delete_env(:ecto, :app_namespace)
+    Application.delete_env(:ecto_one, :app_namespace)
   end
 
   defmodule Repo do
@@ -27,7 +27,7 @@ defmodule Mix.EctoTest do
     end
 
     def config do
-      [priv: Process.get(:priv), otp_app: :ecto]
+      [priv: Process.get(:priv), otp_app: :ecto_one]
     end
   end
 
@@ -40,7 +40,7 @@ defmodule Mix.EctoTest do
     end
 
     def config do
-      [priv: Process.get(:priv), otp_app: :ecto]
+      [priv: Process.get(:priv), otp_app: :ecto_one]
     end
   end
 
@@ -63,8 +63,8 @@ defmodule Mix.EctoTest do
 
   test "migrations path" do
     Process.put(:priv, nil)
-    assert migrations_path(Repo) == Application.app_dir(:ecto, "priv/repo/migrations")
+    assert migrations_path(Repo) == Application.app_dir(:ecto_one, "priv/repo/migrations")
     Process.put(:priv, "hello")
-    assert migrations_path(Repo) == Application.app_dir(:ecto, "hello/migrations")
+    assert migrations_path(Repo) == Application.app_dir(:ecto_one, "hello/migrations")
   end
 end

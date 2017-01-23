@@ -1,10 +1,10 @@
-defmodule Ecto.Repo.EmbeddedTest do
+defmodule EctoOne.Repo.EmbeddedTest do
   use ExUnit.Case, async: true
 
-  alias Ecto.TestRepo, as: TestRepo
+  alias EctoOne.TestRepo, as: TestRepo
 
   defmodule SubEmbed do
-    use Ecto.Schema
+    use EctoOne.Schema
 
     @primary_key {:id, :binary_id, autogenerate: true}
     schema "" do
@@ -13,7 +13,7 @@ defmodule Ecto.Repo.EmbeddedTest do
   end
 
   defmodule MyEmbed do
-    use Ecto.Schema
+    use EctoOne.Schema
 
     @primary_key {:id, :binary_id, autogenerate: true}
     schema "" do
@@ -24,7 +24,7 @@ defmodule Ecto.Repo.EmbeddedTest do
   end
 
   defmodule MyModel do
-    use Ecto.Schema
+    use EctoOne.Schema
 
     schema "my_model" do
       embeds_one :embed, MyEmbed, on_replace: :delete
@@ -35,7 +35,7 @@ defmodule Ecto.Repo.EmbeddedTest do
   @uuid "30313233-3435-3637-3839-616263646566"
 
   test "cannot change embeds on update_all" do
-    changeset = Ecto.Changeset.change(%MyEmbed{})
+    changeset = EctoOne.Changeset.change(%MyEmbed{})
     assert catch_error(TestRepo.update_all MyModel, set: [embed: %MyEmbed{}])
     assert catch_error(TestRepo.update_all MyModel, set: [embed: changeset])
   end
@@ -53,8 +53,8 @@ defmodule Ecto.Repo.EmbeddedTest do
 
     changeset = 
       %MyModel{}
-      |> Ecto.Changeset.change
-      |> Ecto.Changeset.put_embed(:embed, embed)
+      |> EctoOne.Changeset.change
+      |> EctoOne.Changeset.put_embed(:embed, embed)
     model = TestRepo.insert!(changeset)
     embed = model.embed
     assert embed.id
@@ -63,8 +63,8 @@ defmodule Ecto.Repo.EmbeddedTest do
 
     changeset =
       %MyModel{}
-      |> Ecto.Changeset.change
-      |> Ecto.Changeset.put_embed(:embeds, [embed])
+      |> EctoOne.Changeset.change
+      |> EctoOne.Changeset.put_embed(:embeds, [embed])
     model = TestRepo.insert!(changeset)
     [embed] = model.embeds
     assert embed.id
@@ -85,8 +85,8 @@ defmodule Ecto.Repo.EmbeddedTest do
   test "raises on action mismatch on insert" do
     changeset =
       %MyModel{}
-      |> Ecto.Changeset.change()
-      |> Ecto.Changeset.put_embed(:embed, %MyEmbed{x: "xyz"})
+      |> EctoOne.Changeset.change()
+      |> EctoOne.Changeset.put_embed(:embed, %MyEmbed{x: "xyz"})
     changeset = put_in(changeset.changes.embed.action, :update)
     assert_raise ArgumentError, ~r"got action :update in changeset for embedded .* while inserting", fn ->
       TestRepo.insert!(changeset)
@@ -96,9 +96,9 @@ defmodule Ecto.Repo.EmbeddedTest do
   test "returns untouched changeset on constraint mismatch on insert" do
     changeset =
       put_in(%MyModel{}.__meta__.context, {:invalid, [unique: "my_model_foo_index"]})
-      |> Ecto.Changeset.change()
-      |> Ecto.Changeset.put_embed(:embed, %MyEmbed{x: "xyz"})
-      |> Ecto.Changeset.unique_constraint(:foo)
+      |> EctoOne.Changeset.change()
+      |> EctoOne.Changeset.put_embed(:embed, %MyEmbed{x: "xyz"})
+      |> EctoOne.Changeset.unique_constraint(:foo)
     assert {:error, changeset} = TestRepo.insert(changeset)
     assert_received {:rollback, ^changeset}
     assert changeset.model.__meta__.state == :built
@@ -111,12 +111,12 @@ defmodule Ecto.Repo.EmbeddedTest do
   test "handles nested embeds on insert" do
     embed =
       %MyEmbed{x: "xyz"}
-      |> Ecto.Changeset.change()
-      |> Ecto.Changeset.put_embed(:sub_embed, %SubEmbed{y: "xyz"})
+      |> EctoOne.Changeset.change()
+      |> EctoOne.Changeset.put_embed(:sub_embed, %SubEmbed{y: "xyz"})
     changeset =
       %MyModel{}
-      |> Ecto.Changeset.change()
-      |> Ecto.Changeset.put_embed(:embed, embed)
+      |> EctoOne.Changeset.change()
+      |> EctoOne.Changeset.put_embed(:embed, embed)
     model = TestRepo.insert!(changeset)
     assert model.embed.sub_embed.id
   end
@@ -127,11 +127,11 @@ defmodule Ecto.Repo.EmbeddedTest do
     embed = %MyEmbed{x: "xyz"}
 
     # If embed is not in changeset, embeds are left out
-    changeset = Ecto.Changeset.change(%MyModel{id: 1, embed: embed}, x: "abc")
+    changeset = EctoOne.Changeset.change(%MyModel{id: 1, embed: embed}, x: "abc")
     model = TestRepo.update!(changeset)
     assert model.embed == embed
 
-    changeset = Ecto.Changeset.change(%MyModel{id: 1, embeds: [embed]}, x: "abc")
+    changeset = EctoOne.Changeset.change(%MyModel{id: 1, embeds: [embed]}, x: "abc")
     model = TestRepo.update!(changeset)
     assert model.embeds == [embed]
   end
@@ -141,8 +141,8 @@ defmodule Ecto.Repo.EmbeddedTest do
 
     changeset =
       %MyModel{id: 1}
-      |> Ecto.Changeset.change
-      |> Ecto.Changeset.put_embed(:embed, embed)
+      |> EctoOne.Changeset.change
+      |> EctoOne.Changeset.put_embed(:embed, embed)
     model = TestRepo.update!(changeset)
     embed = model.embed
     assert embed.id
@@ -151,8 +151,8 @@ defmodule Ecto.Repo.EmbeddedTest do
 
     changeset =
       %MyModel{id: 1}
-      |> Ecto.Changeset.change
-      |> Ecto.Changeset.put_embed(:embeds, [embed])
+      |> EctoOne.Changeset.change
+      |> EctoOne.Changeset.put_embed(:embeds, [embed])
     model = TestRepo.update!(changeset)
     [embed] = model.embeds
     assert embed.id
@@ -167,8 +167,8 @@ defmodule Ecto.Repo.EmbeddedTest do
     new_embed = %MyEmbed{x: "abc"}
     changeset =
       %MyModel{id: 1, embed: embed}
-      |> Ecto.Changeset.change
-      |> Ecto.Changeset.put_embed(:embed, new_embed)
+      |> EctoOne.Changeset.change
+      |> EctoOne.Changeset.put_embed(:embed, new_embed)
     model = TestRepo.update!(changeset)
     embed = model.embed
     assert embed.id != @uuid
@@ -179,8 +179,8 @@ defmodule Ecto.Repo.EmbeddedTest do
     # Replacing embed with nil
     changeset =
       %MyModel{id: 1, embed: embed}
-      |> Ecto.Changeset.change
-      |> Ecto.Changeset.put_embed(:embed, nil)
+      |> EctoOne.Changeset.change
+      |> EctoOne.Changeset.put_embed(:embed, nil)
     model = TestRepo.update!(changeset)
     refute model.embed
   end
@@ -189,24 +189,24 @@ defmodule Ecto.Repo.EmbeddedTest do
     embed = %MyEmbed{x: "xyz"}
 
     # Raises if there's no id
-    embed_changeset = Ecto.Changeset.change(embed, x: "abc")
+    embed_changeset = EctoOne.Changeset.change(embed, x: "abc")
     changeset =
       %MyModel{id: 1, embed: embed}
-      |> Ecto.Changeset.change
-      |> Ecto.Changeset.put_embed(:embed, embed_changeset)
-    assert_raise Ecto.NoPrimaryKeyValueError, fn ->
+      |> EctoOne.Changeset.change
+      |> EctoOne.Changeset.put_embed(:embed, embed_changeset)
+    assert_raise EctoOne.NoPrimaryKeyValueError, fn ->
       TestRepo.update!(changeset)
     end
   end
 
   test "changing embeds on update" do
     sample = %MyEmbed{x: "xyz", id: @uuid}
-    sample_changeset = Ecto.Changeset.change(sample, x: "abc")
+    sample_changeset = EctoOne.Changeset.change(sample, x: "abc")
 
     changeset =
       %MyModel{id: 1, embed: sample}
-      |> Ecto.Changeset.change
-      |> Ecto.Changeset.put_embed(:embed, sample_changeset)
+      |> EctoOne.Changeset.change
+      |> EctoOne.Changeset.put_embed(:embed, sample_changeset)
     model = TestRepo.update!(changeset)
     embed = model.embed
     assert embed.id == @uuid
@@ -216,8 +216,8 @@ defmodule Ecto.Repo.EmbeddedTest do
 
     changeset =
       %MyModel{id: 1, embeds: [sample]}
-      |> Ecto.Changeset.change
-      |> Ecto.Changeset.put_embed(:embeds, [sample_changeset])
+      |> EctoOne.Changeset.change
+      |> EctoOne.Changeset.put_embed(:embeds, [sample_changeset])
     model = TestRepo.update!(changeset)
     [embed] = model.embeds
     assert embed.id == @uuid
@@ -228,20 +228,20 @@ defmodule Ecto.Repo.EmbeddedTest do
 
   test "empty changeset on update" do
     embed = %MyEmbed{x: "xyz", id: @uuid}
-    no_changes = Ecto.Changeset.change(embed)
+    no_changes = EctoOne.Changeset.change(embed)
 
     changeset =
       %MyModel{id: 1, embed: embed}
-      |> Ecto.Changeset.change(x: "abc")
-      |> Ecto.Changeset.put_embed(:embed, no_changes)
+      |> EctoOne.Changeset.change(x: "abc")
+      |> EctoOne.Changeset.put_embed(:embed, no_changes)
     model = TestRepo.update!(changeset)
     refute model.embed.updated_at
 
-    changes = Ecto.Changeset.change(embed, x: "abc")
+    changes = EctoOne.Changeset.change(embed, x: "abc")
     changeset =
       %MyModel{id: 1, embeds: [embed]}
-      |> Ecto.Changeset.change
-      |> Ecto.Changeset.put_embed(:embeds, [no_changes, changes])
+      |> EctoOne.Changeset.change
+      |> EctoOne.Changeset.put_embed(:embeds, [no_changes, changes])
     model = TestRepo.update!(changeset)
     refute hd(model.embeds).updated_at
   end
@@ -251,9 +251,9 @@ defmodule Ecto.Repo.EmbeddedTest do
 
     changeset =
       %MyModel{id: 1, embed: embed}
-      |> Ecto.Changeset.change
-      |> Ecto.Changeset.put_embed(:embed, nil)
-    assert_raise Ecto.NoPrimaryKeyValueError, fn ->
+      |> EctoOne.Changeset.change
+      |> EctoOne.Changeset.put_embed(:embed, nil)
+    assert_raise EctoOne.NoPrimaryKeyValueError, fn ->
       TestRepo.update!(changeset)
     end
   end
@@ -263,15 +263,15 @@ defmodule Ecto.Repo.EmbeddedTest do
 
     changeset =
       %MyModel{id: 1, embed: embed}
-      |> Ecto.Changeset.change
-      |> Ecto.Changeset.put_embed(:embed, nil)
+      |> EctoOne.Changeset.change
+      |> EctoOne.Changeset.put_embed(:embed, nil)
     model = TestRepo.update!(changeset)
     assert model.embed == nil
 
     changeset =
       %MyModel{id: 1, embeds: [embed]}
-      |> Ecto.Changeset.change
-      |> Ecto.Changeset.put_embed(:embeds, [])
+      |> EctoOne.Changeset.change
+      |> EctoOne.Changeset.put_embed(:embeds, [])
     model = TestRepo.update!(changeset)
     assert model.embeds == []
   end
@@ -282,9 +282,9 @@ defmodule Ecto.Repo.EmbeddedTest do
     my_model = %MyModel{id: 1, embed: nil}
     changeset =
       put_in(my_model.__meta__.context, {:invalid, [unique: "my_model_foo_index"]})
-      |> Ecto.Changeset.change(x: "foo")
-      |> Ecto.Changeset.put_embed(:embed, embed)
-      |> Ecto.Changeset.unique_constraint(:foo)
+      |> EctoOne.Changeset.change(x: "foo")
+      |> EctoOne.Changeset.put_embed(:embed, embed)
+      |> EctoOne.Changeset.unique_constraint(:foo)
     assert {:error, changeset} = TestRepo.update(changeset)
     assert_received {:rollback, ^changeset}
     refute changeset.model.embed
@@ -297,12 +297,12 @@ defmodule Ecto.Repo.EmbeddedTest do
     embed = %MyEmbed{id: @uuid, x: "xyz"}
     embed_changeset =
       embed
-      |> Ecto.Changeset.change
-      |> Ecto.Changeset.put_embed(:sub_embed, %SubEmbed{y: "xyz"})
+      |> EctoOne.Changeset.change
+      |> EctoOne.Changeset.put_embed(:sub_embed, %SubEmbed{y: "xyz"})
     changeset =
       %MyModel{id: 1, embed: embed}
-      |> Ecto.Changeset.change
-      |> Ecto.Changeset.put_embed(:embed, embed_changeset)
+      |> EctoOne.Changeset.change
+      |> EctoOne.Changeset.put_embed(:embed, embed_changeset)
     model = TestRepo.update!(changeset)
     assert model.embed.sub_embed.id
   end

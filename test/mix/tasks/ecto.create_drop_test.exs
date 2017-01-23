@@ -1,13 +1,13 @@
-defmodule Mix.Tasks.Ecto.CreateDropTest do
+defmodule Mix.Tasks.EctoOne.CreateDropTest do
   use ExUnit.Case, async: true
 
-  alias Mix.Tasks.Ecto.Create
-  alias Mix.Tasks.Ecto.Drop
+  alias Mix.Tasks.EctoOne.Create
+  alias Mix.Tasks.EctoOne.Drop
 
   # Mocked adapters
 
   defmodule Adapter do
-    @behaviour Ecto.Adapter.Storage
+    @behaviour EctoOne.Adapter.Storage
     defmacro __before_compile__(_), do: :ok
     def storage_up(_), do: Process.get(:storage_up) || raise "no storage_up"
     def storage_down(_), do: Process.get(:storage_down) || raise "no storage_down"
@@ -20,17 +20,17 @@ defmodule Mix.Tasks.Ecto.CreateDropTest do
   # Mocked repos
 
   defmodule Repo do
-    use Ecto.Repo, otp_app: :ecto, adapter: Adapter
+    use EctoOne.Repo, otp_app: :ecto_one, adapter: Adapter
   end
 
   defmodule NoStorageRepo do
-    use Ecto.Repo, otp_app: :ecto, adapter: NoStorageAdapter
+    use EctoOne.Repo, otp_app: :ecto_one, adapter: NoStorageAdapter
   end
 
   setup do
     opts = [disable_safety_warnings: true]
-    Application.put_env(:ecto, __MODULE__.Repo, opts)
-    Application.put_env(:ecto, __MODULE__.NoStorageRepo, opts)
+    Application.put_env(:ecto_one, __MODULE__.Repo, opts)
+    Application.put_env(:ecto_one, __MODULE__.NoStorageRepo, opts)
   end
 
   ## Create
@@ -38,7 +38,7 @@ defmodule Mix.Tasks.Ecto.CreateDropTest do
   test "runs the adapter storage_up" do
     Process.put(:storage_up, :ok)
     Create.run ["-r", to_string(Repo)]
-    assert_received {:mix_shell, :info, ["The database for Mix.Tasks.Ecto.CreateDropTest.Repo has been created."]}
+    assert_received {:mix_shell, :info, ["The database for Mix.Tasks.EctoOne.CreateDropTest.Repo has been created."]}
   end
 
   test "runs the adapter storage_up with --quiet" do
@@ -50,7 +50,7 @@ defmodule Mix.Tasks.Ecto.CreateDropTest do
   test "informs the user when the repo is already up" do
     Process.put(:storage_up, {:error, :already_up})
     Create.run ["-r", to_string(Repo)]
-    assert_received {:mix_shell, :info, ["The database for Mix.Tasks.Ecto.CreateDropTest.Repo has already been created."]}
+    assert_received {:mix_shell, :info, ["The database for Mix.Tasks.EctoOne.CreateDropTest.Repo has already been created."]}
   end
 
   test "raises an error when storage_up gives an unknown feedback" do
@@ -61,7 +61,7 @@ defmodule Mix.Tasks.Ecto.CreateDropTest do
   end
 
   test "raises an error on storage_up when the adapter doesn't define a storage" do
-    assert_raise Mix.Error, ~r/to implement Ecto.Adapter.Storage/, fn ->
+    assert_raise Mix.Error, ~r/to implement EctoOne.Adapter.Storage/, fn ->
       Create.run ["-r", to_string(NoStorageRepo)]
     end
   end
@@ -71,7 +71,7 @@ defmodule Mix.Tasks.Ecto.CreateDropTest do
   test "runs the adapter storage_down" do
     Process.put(:storage_down, :ok)
     Drop.run ["-r", to_string(Repo)]
-    assert_received {:mix_shell, :info, ["The database for Mix.Tasks.Ecto.CreateDropTest.Repo has been dropped."]}
+    assert_received {:mix_shell, :info, ["The database for Mix.Tasks.EctoOne.CreateDropTest.Repo has been dropped."]}
   end
 
   test "runs the adapter storage_down with --quiet" do
@@ -83,7 +83,7 @@ defmodule Mix.Tasks.Ecto.CreateDropTest do
   test "informs the user when the repo is already down" do
     Process.put(:storage_down, {:error, :already_down})
     Drop.run ["-r", to_string(Repo)]
-    assert_received {:mix_shell, :info, ["The database for Mix.Tasks.Ecto.CreateDropTest.Repo has already been dropped."]}
+    assert_received {:mix_shell, :info, ["The database for Mix.Tasks.EctoOne.CreateDropTest.Repo has already been dropped."]}
   end
 
   test "raises an error when storage_down gives an unknown feedback" do
@@ -94,7 +94,7 @@ defmodule Mix.Tasks.Ecto.CreateDropTest do
   end
 
   test "raises an error on storage_down when the adapter doesn't define a storage" do
-    assert_raise Mix.Error, ~r/to implement Ecto.Adapter.Storage/, fn ->
+    assert_raise Mix.Error, ~r/to implement EctoOne.Adapter.Storage/, fn ->
       Drop.run ["-r", to_string(NoStorageRepo)]
     end
   end

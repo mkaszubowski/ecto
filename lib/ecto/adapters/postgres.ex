@@ -1,4 +1,4 @@
-defmodule Ecto.Adapters.Postgres do
+defmodule EctoOne.Adapters.Postgres do
   @moduledoc """
   Adapter module for PostgreSQL.
 
@@ -10,8 +10,8 @@ defmodule Ecto.Adapters.Postgres do
     * Full query support (including joins, preloads and associations)
     * Support for transactions
     * Support for data migrations
-    * Support for ecto.create and ecto.drop operations
-    * Support for transactional tests via `Ecto.Adapters.SQL`
+    * Support for ecto_one.create and ecto_one.drop operations
+    * Support for transactional tests via `EctoOne.Adapters.SQL`
 
   ## Options
 
@@ -24,9 +24,9 @@ defmodule Ecto.Adapters.Postgres do
   Those options should be set in the config file and require
   recompilation in order to make an effect.
 
-    * `:adapter` - The adapter name, in this case, `Ecto.Adapters.Postgres`
+    * `:adapter` - The adapter name, in this case, `EctoOne.Adapters.Postgres`
     * `:name`- The name of the Repo supervisor process
-    * `:pool` - The connection pool module, defaults to `Ecto.Pools.Poolboy`
+    * `:pool` - The connection pool module, defaults to `EctoOne.Pools.Poolboy`
     * `:pool_timeout` - The default timeout to use on pool calls, defaults to `5000`
     * `:timeout` - The default timeout to use on queries, defaults to `15000`
     * `:log_level` - The level to use when logging queries (default: `:debug`)
@@ -52,11 +52,11 @@ defmodule Ecto.Adapters.Postgres do
 
   """
 
-  # Inherit all behaviour from Ecto.Adapters.SQL
-  use Ecto.Adapters.SQL, :postgrex
+  # Inherit all behaviour from EctoOne.Adapters.SQL
+  use EctoOne.Adapters.SQL, :postgrex
 
   # And provide a custom storage implementation
-  @behaviour Ecto.Adapter.Storage
+  @behaviour EctoOne.Adapter.Storage
 
   ## Storage API
 
@@ -95,7 +95,7 @@ defmodule Ecto.Adapters.Postgres do
   defp run_with_psql(database, sql_command) do
     unless System.find_executable("psql") do
       raise "could not find executable `psql` in path, " <>
-            "please guarantee it is available before running ecto commands"
+            "please guarantee it is available before running ecto_one commands"
     end
 
     env =

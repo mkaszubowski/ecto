@@ -1,69 +1,69 @@
-defmodule Ecto.Integration.TestTransactionTest do
+defmodule EctoOne.Integration.TestTransactionTest do
   use ExUnit.Case
 
-  alias Ecto.Integration.TestRepo
-  alias Ecto.Pool
+  alias EctoOne.Integration.TestRepo
+  alias EctoOne.Pool
 
-  @ref {Ecto.Pool, Ecto.Adapters.SQL.Sandbox, elem(TestRepo.__pool__, 1)}
+  @ref {EctoOne.Pool, EctoOne.Adapters.SQL.Sandbox, elem(TestRepo.__pool__, 1)}
   @timeout :infinity
 
   test "sandbox pool is lazy" do
-    assert {:ok, _} = Ecto.Adapters.SQL.Sandbox.start_link(UnknownModuleBecauseLazy, [])
+    assert {:ok, _} = EctoOne.Adapters.SQL.Sandbox.start_link(UnknownModuleBecauseLazy, [])
   end
 
   test "begin, restart and rollback" do
     assert_transaction(:raw)
-    assert :ok = Ecto.Adapters.SQL.begin_test_transaction(TestRepo)
+    assert :ok = EctoOne.Adapters.SQL.begin_test_transaction(TestRepo)
     assert_transaction(:sandbox)
-    assert :ok = Ecto.Adapters.SQL.restart_test_transaction(TestRepo)
+    assert :ok = EctoOne.Adapters.SQL.restart_test_transaction(TestRepo)
     assert_transaction(:sandbox)
-    assert :ok = Ecto.Adapters.SQL.rollback_test_transaction(TestRepo)
+    assert :ok = EctoOne.Adapters.SQL.rollback_test_transaction(TestRepo)
     assert_transaction(:raw)
   after
-    Ecto.Adapters.SQL.rollback_test_transaction(TestRepo)
+    EctoOne.Adapters.SQL.rollback_test_transaction(TestRepo)
   end
 
   test "restart_test_transaction begins a transaction if one is not running" do
     assert_transaction(:raw)
-    assert :ok = Ecto.Adapters.SQL.restart_test_transaction(TestRepo)
+    assert :ok = EctoOne.Adapters.SQL.restart_test_transaction(TestRepo)
     assert_transaction(:sandbox)
-    assert :ok = Ecto.Adapters.SQL.rollback_test_transaction(TestRepo)
+    assert :ok = EctoOne.Adapters.SQL.rollback_test_transaction(TestRepo)
     assert_transaction(:raw)
   after
-    Ecto.Adapters.SQL.rollback_test_transaction(TestRepo)
+    EctoOne.Adapters.SQL.rollback_test_transaction(TestRepo)
   end
 
   test "begin_test_transaction inside another transaction should timeout" do
     TestRepo.transaction(fn ->
       assert {:timeout, _} =
-        catch_exit(Ecto.Adapters.SQL.restart_test_transaction(TestRepo,
+        catch_exit(EctoOne.Adapters.SQL.restart_test_transaction(TestRepo,
           [timeout: 200, pool_timeout: 200]))
     end)
   after
-    Ecto.Adapters.SQL.rollback_test_transaction(TestRepo)
+    EctoOne.Adapters.SQL.rollback_test_transaction(TestRepo)
   end
 
   test "restart_test_transaction inside another transaction should timeout" do
     TestRepo.transaction(fn ->
       assert {:timeout, _} =
-        catch_exit(Ecto.Adapters.SQL.restart_test_transaction(TestRepo,
+        catch_exit(EctoOne.Adapters.SQL.restart_test_transaction(TestRepo,
                    [timeout: 200, pool_timeout: 200]))
     end)
   after
-    Ecto.Adapters.SQL.rollback_test_transaction(TestRepo)
+    EctoOne.Adapters.SQL.rollback_test_transaction(TestRepo)
   end
 
   test "begin_test_transaction should fail when it has already began" do
-    Ecto.Adapters.SQL.begin_test_transaction(TestRepo)
+    EctoOne.Adapters.SQL.begin_test_transaction(TestRepo)
     assert_raise RuntimeError, ~r"cannot begin test transaction", fn ->
-      Ecto.Adapters.SQL.begin_test_transaction(TestRepo)
+      EctoOne.Adapters.SQL.begin_test_transaction(TestRepo)
     end
   after
-    Ecto.Adapters.SQL.rollback_test_transaction(TestRepo)
+    EctoOne.Adapters.SQL.rollback_test_transaction(TestRepo)
   end
 
   test "sandbox mode does not disconnect on transaction break" do
-    Ecto.Adapters.SQL.begin_test_transaction(TestRepo)
+    EctoOne.Adapters.SQL.begin_test_transaction(TestRepo)
     {:ok, conn} = TestRepo.transaction(fn() ->
         assert %{conn: conn} = Process.get(@ref)
         Pool.break(@ref, @timeout)
@@ -76,11 +76,11 @@ defmodule Ecto.Integration.TestTransactionTest do
       assert Process.alive?(pid)
     end)
   after
-    Ecto.Adapters.SQL.rollback_test_transaction(TestRepo)
+    EctoOne.Adapters.SQL.rollback_test_transaction(TestRepo)
   end
 
   test "sandbox mode does not disconnect on run break" do
-    Ecto.Adapters.SQL.begin_test_transaction(TestRepo)
+    EctoOne.Adapters.SQL.begin_test_transaction(TestRepo)
     {_, pool_mod, pool} = @ref
     try do
       Pool.run(pool_mod, pool, @timeout, fn(conn, _) ->
@@ -93,11 +93,11 @@ defmodule Ecto.Integration.TestTransactionTest do
         end)
     end
   after
-    Ecto.Adapters.SQL.rollback_test_transaction(TestRepo)
+    EctoOne.Adapters.SQL.rollback_test_transaction(TestRepo)
   end
 
   test "sandbox mode does not disconnect if transaction caller dies" do
-    Ecto.Adapters.SQL.begin_test_transaction(TestRepo)
+    EctoOne.Adapters.SQL.begin_test_transaction(TestRepo)
     _ = Process.flag(:trap_exit, true)
 
     parent = self()
@@ -119,11 +119,11 @@ defmodule Ecto.Integration.TestTransactionTest do
       assert Process.alive?(pid)
     end)
   after
-    Ecto.Adapters.SQL.rollback_test_transaction(TestRepo)
+    EctoOne.Adapters.SQL.rollback_test_transaction(TestRepo)
   end
 
   test "sandbox mode does not disconnect if run caller dies" do
-    Ecto.Adapters.SQL.begin_test_transaction(TestRepo)
+    EctoOne.Adapters.SQL.begin_test_transaction(TestRepo)
     _ = Process.flag(:trap_exit, true)
 
     parent = self()
@@ -145,7 +145,7 @@ defmodule Ecto.Integration.TestTransactionTest do
       assert Process.alive?(pid)
     end)
   after
-    Ecto.Adapters.SQL.rollback_test_transaction(TestRepo)
+    EctoOne.Adapters.SQL.rollback_test_transaction(TestRepo)
   end
 
   test "raw mode disconnects on transaction break" do
@@ -212,7 +212,7 @@ defmodule Ecto.Integration.TestTransactionTest do
   defp assert_transaction(mode) do
     TestRepo.transaction(fn ->
       {_, pool, _, _} = TestRepo.__pool__
-      assert Ecto.Adapters.SQL.Sandbox.mode(pool) === mode
+      assert EctoOne.Adapters.SQL.Sandbox.mode(pool) === mode
     end)
   end
 end

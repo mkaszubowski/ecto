@@ -1,18 +1,18 @@
-defmodule Ecto.Integration.Schema do
+defmodule EctoOne.Integration.Schema do
   defmacro __using__(_) do
     quote do
-      use Ecto.Schema
+      use EctoOne.Schema
 
       type =
-        Application.get_env(:ecto, :primary_key_type) ||
-        raise ":primary_key_type not set in :ecto application"
+        Application.get_env(:ecto_one, :primary_key_type) ||
+        raise ":primary_key_type not set in :ecto_one application"
       @primary_key {:id, type, autogenerate: true}
       @foreign_key_type type
     end
   end
 end
 
-defmodule Ecto.Integration.Post do
+defmodule EctoOne.Integration.Post do
   @moduledoc """
   This module is used to test:
 
@@ -23,8 +23,8 @@ defmodule Ecto.Integration.Post do
     * Dependent callbacks
 
   """
-  use Ecto.Integration.Schema
-  import Ecto.Changeset
+  use EctoOne.Integration.Schema
+  import EctoOne.Changeset
 
   schema "posts" do
     field :counter, :id # Same as integer
@@ -36,13 +36,13 @@ defmodule Ecto.Integration.Post do
     field :visits, :integer
     field :intensity, :float
     field :bid, :binary_id
-    field :uuid, Ecto.UUID, autogenerate: true
+    field :uuid, EctoOne.UUID, autogenerate: true
     field :meta, :map
-    field :posted, Ecto.Date
-    has_many :comments, Ecto.Integration.Comment, on_delete: :delete_all, on_replace: :delete
-    has_one :permalink, Ecto.Integration.Permalink, on_delete: :fetch_and_delete, on_replace: :delete
+    field :posted, EctoOne.Date
+    has_many :comments, EctoOne.Integration.Comment, on_delete: :delete_all, on_replace: :delete
+    has_one :permalink, EctoOne.Integration.Permalink, on_delete: :fetch_and_delete, on_replace: :delete
     has_many :comments_authors, through: [:comments, :author]
-    belongs_to :author, Ecto.Integration.User
+    belongs_to :author, EctoOne.Integration.User
     timestamps
   end
 
@@ -52,14 +52,14 @@ defmodule Ecto.Integration.Post do
   end
 end
 
-defmodule Ecto.Integration.PostUsecTimestamps do
+defmodule EctoOne.Integration.PostUsecTimestamps do
   @moduledoc """
   This module is used to test:
 
     * Usec timestamps
 
   """
-  use Ecto.Integration.Schema
+  use EctoOne.Integration.Schema
 
   schema "posts" do
     field :title, :string
@@ -67,7 +67,7 @@ defmodule Ecto.Integration.PostUsecTimestamps do
   end
 end
 
-defmodule Ecto.Integration.Comment do
+defmodule EctoOne.Integration.Comment do
   @moduledoc """
   This module is used to test:
 
@@ -76,18 +76,18 @@ defmodule Ecto.Integration.Comment do
     * Dependent callbacks
 
   """
-  use Ecto.Integration.Schema
+  use EctoOne.Integration.Schema
 
   schema "comments" do
     field :text, :string
     field :lock_version, :integer, default: 1
-    belongs_to :post, Ecto.Integration.Post
-    belongs_to :author, Ecto.Integration.User
+    belongs_to :post, EctoOne.Integration.Post
+    belongs_to :author, EctoOne.Integration.User
     has_one :post_permalink, through: [:post, :permalink]
   end
 end
 
-defmodule Ecto.Integration.Permalink do
+defmodule EctoOne.Integration.Permalink do
   @moduledoc """
   This module is used to test:
 
@@ -95,17 +95,17 @@ defmodule Ecto.Integration.Permalink do
     * Dependent callbacks
 
   """
-  use Ecto.Integration.Schema
+  use EctoOne.Integration.Schema
 
   schema "permalinks" do
     field :url, :string
-    belongs_to :post, Ecto.Integration.Post
-    belongs_to :user, Ecto.Integration.User
+    belongs_to :post, EctoOne.Integration.Post
+    belongs_to :user, EctoOne.Integration.User
     has_many :post_comments_authors, through: [:post, :comments_authors]
   end
 end
 
-defmodule Ecto.Integration.User do
+defmodule EctoOne.Integration.User do
   @moduledoc """
   This module is used to test:
 
@@ -114,19 +114,19 @@ defmodule Ecto.Integration.User do
     * Dependent callbacks
 
   """
-  use Ecto.Integration.Schema
+  use EctoOne.Integration.Schema
 
   schema "users" do
     field :name, :string
-    has_many :comments, Ecto.Integration.Comment, foreign_key: :author_id, on_delete: :nilify_all
-    has_many :posts, Ecto.Integration.Post, foreign_key: :author_id, on_delete: :nothing, on_replace: :delete
-    has_many :permalinks, Ecto.Integration.Permalink
-    belongs_to :custom, Ecto.Integration.Custom, references: :bid, type: :binary_id
+    has_many :comments, EctoOne.Integration.Comment, foreign_key: :author_id, on_delete: :nilify_all
+    has_many :posts, EctoOne.Integration.Post, foreign_key: :author_id, on_delete: :nothing, on_replace: :delete
+    has_many :permalinks, EctoOne.Integration.Permalink
+    belongs_to :custom, EctoOne.Integration.Custom, references: :bid, type: :binary_id
     timestamps
   end
 end
 
-defmodule Ecto.Integration.Custom do
+defmodule EctoOne.Integration.Custom do
   @moduledoc """
   This module is used to test:
 
@@ -135,22 +135,22 @@ defmodule Ecto.Integration.Custom do
 
   Due to the second item, it must be a subset of posts.
   """
-  use Ecto.Integration.Schema
+  use EctoOne.Integration.Schema
 
   @primary_key {:bid, :binary_id, autogenerate: true}
   schema "customs" do
-    field :uuid, Ecto.UUID
+    field :uuid, EctoOne.UUID
   end
 end
 
-defmodule Ecto.Integration.Barebone do
+defmodule EctoOne.Integration.Barebone do
   @moduledoc """
   This module is used to test:
 
     * A model wthout primary keys
 
   """
-  use Ecto.Integration.Schema
+  use EctoOne.Integration.Schema
 
   @primary_key false
   schema "barebones" do
@@ -158,7 +158,7 @@ defmodule Ecto.Integration.Barebone do
   end
 end
 
-defmodule Ecto.Integration.Tag do
+defmodule EctoOne.Integration.Tag do
   @moduledoc """
   This module is used to test:
 
@@ -166,40 +166,40 @@ defmodule Ecto.Integration.Tag do
     * Embedding many models (uses array)
 
   """
-  use Ecto.Integration.Schema
+  use EctoOne.Integration.Schema
 
   schema "tags" do
     field :ints, {:array, :integer}
-    field :uuids, {:array, Ecto.UUID}
-    embeds_many :items, Ecto.Integration.Item
+    field :uuids, {:array, EctoOne.UUID}
+    embeds_many :items, EctoOne.Integration.Item
   end
 end
 
-defmodule Ecto.Integration.Item do
+defmodule EctoOne.Integration.Item do
   @moduledoc """
   This module is used to test:
 
     * Embedding
 
   """
-  use Ecto.Integration.Schema
+  use EctoOne.Integration.Schema
 
   embedded_schema do
     field :price, :integer
-    field :valid_at, Ecto.Date
+    field :valid_at, EctoOne.Date
   end
 end
 
-defmodule Ecto.Integration.Order do
+defmodule EctoOne.Integration.Order do
   @moduledoc """
   This module is used to test:
 
     * Embedding one model
 
   """
-  use Ecto.Integration.Schema
+  use EctoOne.Integration.Schema
 
   schema "orders" do
-    embeds_one :item, Ecto.Integration.Item
+    embeds_one :item, EctoOne.Integration.Item
   end
 end

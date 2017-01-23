@@ -1,4 +1,4 @@
-defmodule Ecto.LogEntry do
+defmodule EctoOne.LogEntry do
   @doc """
   Struct used for logging entries.
 
@@ -13,7 +13,7 @@ defmodule Ecto.LogEntry do
     * connection_pid - the connection process that executed the query
   """
 
-  alias Ecto.LogEntry
+  alias EctoOne.LogEntry
 
   @type t :: %LogEntry{query: iodata | (t -> iodata), params: [term],
                        query_time: integer, queue_time: integer, connection_pid: pid | nil,
@@ -45,7 +45,7 @@ defmodule Ecto.LogEntry do
       params: params, query: query, result: result} = entry = resolve(entry)
 
     params = Enum.map params, fn
-      %Ecto.Query.Tagged{value: value} -> value
+      %EctoOne.Query.Tagged{value: value} -> value
       value -> value
     end
 

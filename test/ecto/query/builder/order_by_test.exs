@@ -1,10 +1,10 @@
-defmodule Ecto.Query.Builder.OrderByTest do
+defmodule EctoOne.Query.Builder.OrderByTest do
   use ExUnit.Case, async: true
 
-  import Ecto.Query.Builder.OrderBy
-  doctest Ecto.Query.Builder.OrderBy
+  import EctoOne.Query.Builder.OrderBy
+  doctest EctoOne.Query.Builder.OrderBy
 
-  import Ecto.Query
+  import EctoOne.Query
 
   test "escape" do
     assert {Macro.escape(quote do [asc: &0.y] end), %{}} ==
@@ -31,29 +31,29 @@ defmodule Ecto.Query.Builder.OrderByTest do
   end
 
   test "invalid order_by" do
-    assert_raise Ecto.Query.CompileError, "unbound variable `x` in query", fn ->
+    assert_raise EctoOne.Query.CompileError, "unbound variable `x` in query", fn ->
       escape(quote do x.y end, [], __ENV__)
     end
 
     message = "expected :asc, :desc or interpolated value in `order_by`, got: `:test`"
-    assert_raise Ecto.Query.CompileError, message, fn ->
+    assert_raise EctoOne.Query.CompileError, message, fn ->
       escape(quote do [test: x.y] end, [x: 0], __ENV__)
     end
 
     message = "expected :asc or :desc in `order_by`, got: `:temp`"
-    assert_raise Ecto.Query.CompileError, message, fn ->
+    assert_raise EctoOne.Query.CompileError, message, fn ->
       temp = :temp
       order_by("posts", [p], [{^var!(temp), p.y}])
     end
 
     message = "expected a field as an atom in `order_by`, got: `\"temp\"`"
-    assert_raise Ecto.Query.CompileError, message, fn ->
+    assert_raise EctoOne.Query.CompileError, message, fn ->
       temp = "temp"
       order_by("posts", [p], [asc: ^temp])
     end
 
     message = "expected a list or keyword list of fields in `order_by`, got: `\"temp\"`"
-    assert_raise Ecto.Query.CompileError, message, fn ->
+    assert_raise EctoOne.Query.CompileError, message, fn ->
       temp = "temp"
       order_by("posts", [p], ^temp)
     end

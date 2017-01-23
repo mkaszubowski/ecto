@@ -1,8 +1,8 @@
-defmodule Mix.Tasks.Ecto.Gen.RepoTest do
+defmodule Mix.Tasks.EctoOne.Gen.RepoTest do
   use ExUnit.Case
 
   import Support.FileHelpers
-  import Mix.Tasks.Ecto.Gen.Repo, only: [run: 1]
+  import Mix.Tasks.EctoOne.Gen.Repo, only: [run: 1]
 
   test "generates a new repo" do
     in_tmp fn _ ->
@@ -10,16 +10,16 @@ defmodule Mix.Tasks.Ecto.Gen.RepoTest do
 
       assert_file "lib/repo.ex", """
       defmodule Repo do
-        use Ecto.Repo, otp_app: :ecto
+        use EctoOne.Repo, otp_app: :ecto_one
       end
       """
 
       assert_file "config/config.exs", """
       use Mix.Config
 
-      config :ecto, Repo,
-        adapter: Ecto.Adapters.Postgres,
-        database: "ecto_repo",
+      config :ecto_one, Repo,
+        adapter: EctoOne.Adapters.Postgres,
+        database: "ecto_one_repo",
         username: "user",
         password: "pass",
         hostname: "localhost"
@@ -42,9 +42,9 @@ defmodule Mix.Tasks.Ecto.Gen.RepoTest do
       # Hello
       use Mix.Config
 
-      config :ecto, Repo,
-        adapter: Ecto.Adapters.Postgres,
-        database: "ecto_repo",
+      config :ecto_one, Repo,
+        adapter: EctoOne.Adapters.Postgres,
+        database: "ecto_one_repo",
         username: "user",
         password: "pass",
         hostname: "localhost"
@@ -65,7 +65,7 @@ defmodule Mix.Tasks.Ecto.Gen.RepoTest do
   test "generates default repo" do
     in_tmp fn _ ->
       run []
-      assert_file "lib/ecto/repo.ex", "defmodule Ecto.Repo do"
+      assert_file "lib/ecto_one/repo.ex", "defmodule EctoOne.Repo do"
     end
   end
 end

@@ -1,5 +1,5 @@
-defmodule Mix.Ecto do
-  # Conveniences for writing Mix.Tasks in Ecto.
+defmodule Mix.EctoOne do
+  # Conveniences for writing Mix.Tasks in EctoOne.
   @moduledoc false
 
   @doc """
@@ -7,7 +7,7 @@ defmodule Mix.Ecto do
 
   If no repo option is given, we get one from the environment.
   """
-  @spec parse_repo([term]) :: [Ecto.Repo.t]
+  @spec parse_repo([term]) :: [EctoOne.Repo.t]
   def parse_repo(args) do
     parse_repo(args, [])
   end
@@ -47,7 +47,7 @@ defmodule Mix.Ecto do
     Enum.map repos, &ensure_repo(&1, args)
   end
 
-  @spec ensure_repo(module, list) :: Ecto.Repo.t | no_return
+  @spec ensure_repo(module, list) :: EctoOne.Repo.t | no_return
   def ensure_repo(repo, args) do
     Mix.Task.run "loadpaths", args
 
@@ -61,7 +61,7 @@ defmodule Mix.Ecto do
         if function_exported?(repo, :__repo__, 0) do
           repo
         else
-          Mix.raise "module #{inspect repo} is not a Ecto.Repo. " <>
+          Mix.raise "module #{inspect repo} is not a EctoOne.Repo. " <>
                     "Please pass a repo with the -r option."
         end
       {:error, error} ->
@@ -73,9 +73,9 @@ defmodule Mix.Ecto do
   @doc """
   Ensures the given repository is started and running.
   """
-  @spec ensure_started(Ecto.Repo.t) :: Ecto.Repo.t | no_return
+  @spec ensure_started(EctoOne.Repo.t) :: EctoOne.Repo.t | no_return
   def ensure_started(repo) do
-    {:ok, _} = Application.ensure_all_started(:ecto)
+    {:ok, _} = Application.ensure_all_started(:ecto_one)
 
     case repo.start_link do
       {:ok, pid} -> {:ok, pid}
@@ -99,7 +99,7 @@ defmodule Mix.Ecto do
   @doc """
   Gets the migrations path from a repository.
   """
-  @spec migrations_path(Ecto.Repo.t) :: String.t
+  @spec migrations_path(EctoOne.Repo.t) :: String.t
   def migrations_path(repo) do
     Path.join(repo_priv(repo), "migrations")
   end

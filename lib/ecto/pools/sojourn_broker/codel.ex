@@ -1,4 +1,4 @@
-defmodule Ecto.Pools.SojournBroker.CoDel do
+defmodule EctoOne.Pools.SojournBroker.CoDel do
   @moduledoc """
   CoDel based broker.
 

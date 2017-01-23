@@ -1,12 +1,12 @@
-defmodule Ecto.Integration.IntervalTest do
-  use Ecto.Integration.Case
+defmodule EctoOne.Integration.IntervalTest do
+  use EctoOne.Integration.Case
 
-  alias Ecto.Integration.Post
-  alias Ecto.Integration.TestRepo
-  import Ecto.Query
+  alias EctoOne.Integration.Post
+  alias EctoOne.Integration.TestRepo
+  import EctoOne.Query
 
-  @posted %Ecto.Date{year: 2014, month: 1, day: 1}
-  @inserted_at %Ecto.DateTime{year: 2014, month: 1, day: 1,
+  @posted %EctoOne.Date{year: 2014, month: 1, day: 1}
+  @inserted_at %EctoOne.DateTime{year: 2014, month: 1, day: 1,
                               hour: 2, min: 0, sec: 0, usec: 0}
 
   setup do

@@ -1,4 +1,4 @@
-defmodule Ecto.Adapter.Storage  do
+defmodule EctoOne.Adapter.Storage  do
   @moduledoc """
   Specifies the adapter storage API.
   """
@@ -15,7 +15,7 @@ defmodule Ecto.Adapter.Storage  do
   ## Examples
 
     storage_up(username: postgres,
-               database: 'ecto_test',
+               database: 'ecto_one_test',
                hostname: 'localhost')
 
   """
@@ -31,7 +31,7 @@ defmodule Ecto.Adapter.Storage  do
   ## Examples
 
     storage_down(username: postgres,
-                 database: 'ecto_test',
+                 database: 'ecto_one_test',
                  hostname: 'localhost')
 
   """

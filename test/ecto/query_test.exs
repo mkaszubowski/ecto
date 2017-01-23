@@ -1,11 +1,11 @@
 Code.require_file "../support/eval_helpers.exs", __DIR__
 
-defmodule Ecto.QueryTest do
+defmodule EctoOne.QueryTest do
   use ExUnit.Case, async: true
 
   import Support.EvalHelpers
-  import Ecto.Query
-  alias Ecto.Query
+  import EctoOne.Query
+  alias EctoOne.Query
 
   defmacrop macro_equal(column, value) do
     quote do
@@ -40,14 +40,14 @@ defmodule Ecto.QueryTest do
   end
 
   test "binding should be list of variables" do
-    assert_raise Ecto.Query.CompileError,
+    assert_raise EctoOne.Query.CompileError,
                  "binding list should contain only variables, got: 0", fn ->
       quote_and_eval select(%Query{}, [0], 1)
     end
   end
 
   test "does not allow nils in comparison" do
-    assert_raise Ecto.Query.CompileError,
+    assert_raise EctoOne.Query.CompileError,
                  ~r"comparison with nil is forbidden as it always evaluates to false", fn ->
       quote_and_eval from p in "posts", where: p.id == nil
     end
@@ -84,7 +84,7 @@ defmodule Ecto.QueryTest do
   end
 
   test "unbound _ var" do
-    assert_raise Ecto.Query.CompileError, fn ->
+    assert_raise EctoOne.Query.CompileError, fn ->
       quote_and_eval("posts" |> select([], _.x))
     end
 
@@ -95,7 +95,7 @@ defmodule Ecto.QueryTest do
   end
 
   test "binding collision" do
-    assert_raise Ecto.Query.CompileError, "variable `x` is bound twice", fn ->
+    assert_raise EctoOne.Query.CompileError, "variable `x` is bound twice", fn ->
       quote_and_eval("posts" |> from("comments") |> select([x, x], x.id))
     end
   end
@@ -104,7 +104,7 @@ defmodule Ecto.QueryTest do
     from(a in %Query{}, [])
     from([a] in %Query{}, [])
 
-    assert_raise Ecto.Query.CompileError, fn ->
+    assert_raise EctoOne.Query.CompileError, fn ->
       comment = "comments"
       from([a, b] in comment, [])
     end
@@ -156,12 +156,12 @@ defmodule Ecto.QueryTest do
     from(p in "posts", join: c in assoc(p, :comments), select: p)
 
     message = ~r"`on` keyword must immediately follow a join"
-    assert_raise Ecto.Query.CompileError, message, fn ->
+    assert_raise EctoOne.Query.CompileError, message, fn ->
       quote_and_eval(from(c in "comments", on: c.text == "", select: c))
     end
 
     message = ~r"cannot specify `on` on `inner_join` when using association join,"
-    assert_raise Ecto.Query.CompileError, message, fn ->
+    assert_raise EctoOne.Query.CompileError, message, fn ->
       quote_and_eval(from(c in "comments", join: p in assoc(c, :post), on: true))
     end
   end
@@ -177,7 +177,7 @@ defmodule Ecto.QueryTest do
   end
 
   test "exclude/2 will exclude a passed in field" do
-    base = %Ecto.Query{}
+    base = %EctoOne.Query{}
 
     query = from(p in "posts",
                  join: b in "blogs",
@@ -237,24 +237,24 @@ defmodule Ecto.QueryTest do
 
   test "exclude/2 will not set a non-existent field to nil" do
     query = from(p in "posts", select: p)
-    msg = ~r"no function clause matching in Ecto.Query"
+    msg = ~r"no function clause matching in EctoOne.Query"
 
     assert_raise FunctionClauseError, msg, fn ->
-      Ecto.Query.exclude(query, :fake_field)
+      EctoOne.Query.exclude(query, :fake_field)
     end
   end
 
   test "exclude/2 will not reset :from" do
     query = from(p in "posts", select: p)
-    msg = ~r"no function clause matching in Ecto.Query"
+    msg = ~r"no function clause matching in EctoOne.Query"
 
     assert_raise FunctionClauseError, msg, fn ->
-      Ecto.Query.exclude(query, :from)
+      EctoOne.Query.exclude(query, :from)
     end
   end
 
   test "exclude/2 will reset preloads and assocs if :preloads is passed in" do
-    base = %Ecto.Query{}
+    base = %EctoOne.Query{}
 
     query = from p in "posts", join: c in assoc(p, :comments), preload: [:author, comments: c]
 

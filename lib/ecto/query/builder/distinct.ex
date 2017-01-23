@@ -1,7 +1,7 @@
-defmodule Ecto.Query.Builder.Distinct do
+defmodule EctoOne.Query.Builder.Distinct do
   @moduledoc false
 
-  alias Ecto.Query.Builder
+  alias EctoOne.Query.Builder
 
   @doc """
   Escapes a list of quoted expressions.
@@ -43,7 +43,7 @@ defmodule Ecto.Query.Builder.Distinct do
     {expr, params} = escape(expr, binding, env)
     params         = Builder.escape_params(params)
 
-    distinct = quote do: %Ecto.Query.QueryExpr{
+    distinct = quote do: %EctoOne.Query.QueryExpr{
                            expr: unquote(expr),
                            params: unquote(params),
                            file: unquote(env.file),
@@ -54,9 +54,9 @@ defmodule Ecto.Query.Builder.Distinct do
   @doc """
   The callback applied by `build/4` to build the query.
   """
-  @spec apply(Ecto.Queryable.t, term) :: Ecto.Query.t
+  @spec apply(EctoOne.Queryable.t, term) :: EctoOne.Query.t
   def apply(query, distinct) do
-    query = Ecto.Queryable.to_query(query)
+    query = EctoOne.Queryable.to_query(query)
 
     if query.distinct do
       Builder.error! "only one distinct expression is allowed in query"

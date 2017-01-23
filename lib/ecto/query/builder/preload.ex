@@ -1,6 +1,6 @@
-defmodule Ecto.Query.Builder.Preload do
+defmodule EctoOne.Query.Builder.Preload do
   @moduledoc false
-  alias Ecto.Query.Builder
+  alias EctoOne.Query.Builder
 
   @doc """
   Escapes a preload.
@@ -33,10 +33,10 @@ defmodule Ecto.Query.Builder.Preload do
       {[], [foo: {1, []}, bar: {2, []}]}
 
       iex> escape([foo: {{:c, [], nil}, :bar}], [c: 1])
-      ** (Ecto.Query.CompileError) cannot preload `:bar` inside join association preload
+      ** (EctoOne.Query.CompileError) cannot preload `:bar` inside join association preload
 
       iex> escape([foo: [bar: {:c, [], nil}]], [c: 1])
-      ** (Ecto.Query.CompileError) cannot preload join association `:bar` with binding `c` because parent preload is not a join association
+      ** (EctoOne.Query.CompileError) cannot preload join association `:bar` with binding `c` because parent preload is not a join association
 
   """
   @spec escape(Macro.t, Keyword.t) :: {[Macro.t], [Macro.t]} | no_return
@@ -106,7 +106,7 @@ defmodule Ecto.Query.Builder.Preload do
   end
 
   defp escape_key({:^, _, [expr]}) do
-    quote(do: Ecto.Query.Builder.Preload.key!(unquote(expr)))
+    quote(do: EctoOne.Query.Builder.Preload.key!(unquote(expr)))
   end
 
   defp escape_key(other) do
@@ -149,9 +149,9 @@ defmodule Ecto.Query.Builder.Preload do
   @doc """
   The callback applied by `build/4` to build the query.
   """
-  @spec apply(Ecto.Queryable.t, term, term) :: Ecto.Query.t
+  @spec apply(EctoOne.Queryable.t, term, term) :: EctoOne.Query.t
   def apply(query, preloads, assocs) do
-    query = Ecto.Queryable.to_query(query)
+    query = EctoOne.Queryable.to_query(query)
     %{query | preloads: query.preloads ++ preloads, assocs: query.assocs ++ assocs}
   end
 end

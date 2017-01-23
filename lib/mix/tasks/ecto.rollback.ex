@@ -1,6 +1,6 @@
-defmodule Mix.Tasks.Ecto.Rollback do
+defmodule Mix.Tasks.EctoOne.Rollback do
   use Mix.Task
-  import Mix.Ecto
+  import Mix.EctoOne
 
   @shortdoc "Rollback migrations from a repo"
 
@@ -8,7 +8,7 @@ defmodule Mix.Tasks.Ecto.Rollback do
   Reverts applied migrations in the given repository.
 
   By default, migrations are expected at "priv/YOUR_REPO/migrations"
-  directory of the current application but it can be configured
+  directo_onery of the current application but it can be configured
   by specify the `:priv` key under the repository configuration.
 
   Runs the latest applied migration by default. To roll back to
@@ -22,14 +22,14 @@ defmodule Mix.Tasks.Ecto.Rollback do
 
   ## Examples
 
-      mix ecto.rollback
-      mix ecto.rollback -r Custom.Repo
+      mix ecto_one.rollback
+      mix ecto_one.rollback -r Custom.Repo
 
-      mix ecto.rollback -n 3
-      mix ecto.rollback --step 3
+      mix ecto_one.rollback -n 3
+      mix ecto_one.rollback --step 3
 
-      mix ecto.rollback -v 20080906120000
-      mix ecto.rollback --to 20080906120000
+      mix ecto_one.rollback -v 20080906120000
+      mix ecto_one.rollback --to 20080906120000
 
   ## Command line options
 
@@ -42,7 +42,7 @@ defmodule Mix.Tasks.Ecto.Rollback do
   """
 
   @doc false
-  def run(args, migrator \\ &Ecto.Migrator.run/4) do
+  def run(args, migrator \\ &EctoOne.Migrator.run/4) do
     repos = parse_repo(args)
 
     {opts, _, _} = OptionParser.parse args,

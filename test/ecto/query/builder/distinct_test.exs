@@ -1,8 +1,8 @@
-defmodule Ecto.Query.Builder.DistinctTest do
+defmodule EctoOne.Query.Builder.DistinctTest do
   use ExUnit.Case, async: true
 
-  import Ecto.Query.Builder.Distinct
-  doctest Ecto.Query.Builder.Distinct
+  import EctoOne.Query.Builder.Distinct
+  doctest EctoOne.Query.Builder.Distinct
 
   test "escape" do
     assert {Macro.escape(quote do [&0.y] end), %{}} ==
@@ -17,7 +17,7 @@ defmodule Ecto.Query.Builder.DistinctTest do
   end
 
   test "escape raise" do
-    assert_raise Ecto.Query.CompileError, "unbound variable `x` in query", fn ->
+    assert_raise EctoOne.Query.CompileError, "unbound variable `x` in query", fn ->
       escape(quote do x.y end, [], __ENV__)
     end
   end
