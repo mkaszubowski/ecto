@@ -8,8 +8,8 @@ defmodule EctoOne.Mixfile do
   def project do
     [app: :ecto_one,
      version: @version,
-     elixir: "~> 1.0",
-     deps: deps,
+     elixir: "~> 1.4",
+     deps: deps(),
      build_per_environment: false,
      consolidate_protocols: false,
      test_paths: test_paths(Mix.env),
@@ -21,8 +21,8 @@ defmodule EctoOne.Mixfile do
      preferred_cli_env: ["test.all": :test],
 
      # Hex
-     description: description,
-     package: package,
+     description: description(),
+     package: package(),
 
      # Docs
      name: "EctoOne",
